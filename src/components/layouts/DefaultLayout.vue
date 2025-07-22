@@ -2,7 +2,10 @@
   <div class="layout">
     <Header />
     <main class="main">
-      <router-view />
+      <!-- 수정된 부분 -->
+      <router-view v-slot="{ Component }">
+        <component :is="Component" />
+      </router-view>
     </main>
     <NavBar />
   </div>
@@ -17,8 +20,12 @@ import NavBar from '@/components/layouts/NavBar.vue';
 .layout {
   width: 100%;
   padding-bottom: 60px; /* 하단 바 가려지지 않게 여백 확보 */
+  /*수정*/
+  min-height: 100vh;
+  position: relative;
 }
 .main {
   padding-top: 70px;
+  position: relative;
 }
 </style>

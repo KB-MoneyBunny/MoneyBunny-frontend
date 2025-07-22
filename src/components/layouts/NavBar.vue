@@ -1,22 +1,20 @@
 <template>
-  <div class="bottom-nav-wrapper">
-    <nav class="bottom-nav">
-      <RouterLink
-        v-for="item in navItems"
-        :key="item.name"
-        :to="item.path"
-        class="nav-item"
-        :class="{ active: isActive(item.path) }"
-      >
-        <img
-          :src="isActive(item.path) ? item.iconActive : item.icon"
-          :alt="item.name"
-          class="nav-icon"
-        />
-        <span>{{ item.name }}</span>
-      </RouterLink>
-    </nav>
-  </div>
+  <nav class="bottom-nav">
+    <RouterLink
+      v-for="item in navItems"
+      :key="item.name"
+      :to="item.path"
+      class="nav-item"
+      :class="{ active: isActive(item.path) }"
+    >
+      <img
+        :src="isActive(item.path) ? item.iconActive : item.icon"
+        :alt="item.name"
+        class="nav-icon"
+      />
+      <span>{{ item.name }}</span>
+    </RouterLink>
+  </nav>
 </template>
 
 <script setup>
@@ -57,25 +55,23 @@ const isActive = (path) => route.path.startsWith(path);
 </script>
 
 <style scoped>
-.bottom-nav-wrapper {
+.bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 1000;
-}
 
-.bottom-nav {
   width: 100%;
-  max-width: 474px; /* 앱 최대 너비 */
+  max-width: 474px;
+  margin: 0 auto;
+
   height: 60px;
   background: white;
   border-top: 1px solid #ddd;
   display: flex;
   justify-content: space-around;
   align-items: center;
+  z-index: 1000;
 }
 
 .nav-item {

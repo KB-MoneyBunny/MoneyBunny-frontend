@@ -8,9 +8,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 // import notificationRoutes from './notification';
 // import policyRoutes from './policy';
 
-// import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
+// 레이아웃 컴포넌트
+import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 
-// 각 탭 페이지 import
+//페이지 컴포넌트
 import LoginPage from '@/pages/auth/LoginPage.vue';
 import HomeTotalTab from '@/pages/home/tabs/HomeTotalTab.vue';
 import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
@@ -32,11 +33,34 @@ import MypageMain from '@/pages/mypage/MypageMain.vue';
 
 const routes = [
   { path: '/', name: 'login', component: LoginPage },
+
   // 하단 네비게이션 바 탭들
-  { path: '/home', name: 'home', component: HomeTotalTab },
-  { path: '/asset', name: 'asset', component: AssetMainTab },
-  { path: '/policy', name: 'policy', component: PolicyMainTab },
-  { path: '/mypage', name: 'mypage', component: MypageMain },
+  {
+    path: '/', // DefaultLayout을 사용하는 페이지들
+    component: DefaultLayout,
+    children: [
+      {
+        path: 'home', // 홈 탭
+        name: 'home',
+        component: HomeTotalTab,
+      },
+      {
+        path: 'asset', // 자산 탭
+        name: 'asset',
+        component: AssetMainTab,
+      },
+      {
+        path: 'policy', // 정책 탭
+        name: 'policy',
+        component: PolicyMainTab,
+      },
+      {
+        path: 'mypage', // 마이페이지 탭
+        name: 'mypage',
+        component: MypageMain,
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
