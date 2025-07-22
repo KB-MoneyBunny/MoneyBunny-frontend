@@ -12,12 +12,15 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
+  plugins: [
+    vue(),
+    VitePWA({
+      registerType: 'autoUpdate', // 🔄 새 서비스워커 감지 시 자동 업데이트
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'], // 캐시할 정적 파일
+      },
+    }),
+  ],
 
   // 개발 서버 설정
   server: {
