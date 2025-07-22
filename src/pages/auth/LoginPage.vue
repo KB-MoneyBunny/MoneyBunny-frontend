@@ -1,89 +1,120 @@
-<script setup>
-import { computed, reactive, ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useRoute, useRouter } from 'vue-router';
-
-const cr = useRoute();
-const router = useRouter();
-const auth = useAuthStore();
-
-// 폼 데이터 관리
-const member = reactive({
-  username: '',
-  password: '',
-});
-
-const error = ref('');
-const disableSubmit = computed(() => !(member.username && member.password));
-
-// 로그인 로직
-const login = async () => {
-  console.log(member);
-  try {
-    await auth.login(member); // 인증 스토어의 login 액션 호출
-
-    //router.push('/'); // 성공 시 홈페이지로 이동
-
-    // 리다이렉트 로직
-    if (cr.query.next) {
-      // 원래 접근하려던 페이지가 있는 경우
-      router.push({ name: cr.query.next });
-    } else {
-      // 일반 로그인인 경우 메인 페이지로
-      router.push('/');
-    }
-  } catch (e) {
-    console.log('에러=======', e);
-    error.value = e.response.data; // 에러 메시지 표시
-  }
-};
-</script>
-
 <template>
-  <div class="mt-5 mx-auto" style="width: 500px">
-    <h1 class="my-5">
-      <i class="fa-solid fa-right-to-bracket"></i>
-      로그인
-    </h1>
+  <div class="loginContainer">
+    <div class="loginCard">
+      <h1 class="loginTitle font-28 font-extrabold">MoneyBunny</h1>
+      <p class="loginSubtitle font-15 font-regular">
+        아이디와 비밀번호를 입력해주세요
+      </p>
 
-    <form @submit.prevent="login">
-      <!-- 사용자 ID 입력 -->
-      <div class="mb-3 mt-3">
-        <label for="username" class="form-label">
-          <i class="fa-solid fa-user"></i> 사용자 ID:
-        </label>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="사용자 ID"
-          v-model="member.username"
-        />
+      <div class="formGroup">
+        <label for="id" class="font-15 font-bold">아이디</label>
+        <input type="text" id="id" placeholder="아이디를 입력하세요" />
       </div>
 
-      <!-- 비밀번호 입력 -->
-      <div class="mb-3">
-        <label for="password" class="form-label">
-          <i class="fa-solid fa-lock"></i> 비밀번호:
-        </label>
+      <div class="formGroup">
+        <label for="password" class="font-15 font-bold">비밀번호</label>
         <input
           type="password"
-          class="form-control"
-          placeholder="비밀번호"
-          v-model="member.password"
+          id="password"
+          placeholder="비밀번호를 입력하세요"
         />
       </div>
 
-      <!-- 에러 메시지 표시 -->
-      <div v-if="error" class="text-danger">{{ error }}</div>
+      <button class="loginButton font-15 font-bold">로그인</button>
 
-      <!-- 로그인 버튼 -->
-      <button
-        type="submit"
-        class="btn btn-primary mt-4"
-        :disabled="disableSubmit"
-      >
-        <i class="fa-solid fa-right-to-bracket"></i> 로그인
-      </button>
-    </form>
+      <div class="loginLinks font-12">
+        <a href="#">아이디 찾기</a>
+        <span>|</span>
+        <a href="#">비밀번호 찾기</a>
+      </div>
+
+      <div class="signupLink font-12">
+        계정이 없으신가요? <a href="#">회원가입</a>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.loginContainer {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--input-bg-2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 360px;
+  background-color: white;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.loginTitle {
+  text-align: center;
+  color: var(--base-blue-dark);
+}
+
+.loginSubtitle {
+  text-align: center;
+  color: var(--text-bluegray);
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+input {
+  font-size: 14px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--input-bg-1);
+  outline: none;
+}
+
+.loginButton {
+  width: 100%;
+  background-color: var(--base-blue-dark);
+  color: white;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.loginLinks {
+  margin-top: 16px;
+  text-align: center;
+  color: var(--text-bluegray);
+}
+
+.loginLinks a {
+  color: var(--text-bluegray);
+  text-decoration: none;
+  margin: 0 6px;
+}
+
+.signupLink {
+  text-align: center;
+  margin-top: 16px;
+  color: var(--text-lightgray);
+}
+
+.signupLink a {
+  color: var(--base-lavender);
+  text-decoration: none;
+  margin-left: 4px;
+}
+</style>

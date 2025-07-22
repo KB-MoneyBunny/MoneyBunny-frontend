@@ -1,18 +1,21 @@
-<!-- 기본 레이아웃 컴포넌트 -->
-<script setup>
-import Header from './Header.vue';
-import NavBar from './NavBar.vue';
-import Footer from './Footer.vue';
-</script>
-
 <template>
-  <div class="container">
+  <div class="layout">
     <Header />
-    <NavBar />
-    <div class="content my-5 px-3">
-      <slot></slot>
-      <!-- 페이지 컨텐츠가 들어갈 슬롯 -->
-    </div>
-    <Footer />
+    <main class="main">
+      <router-view />
+    </main>
   </div>
 </template>
+
+<script setup>
+import Header from '@/components/layouts/Header.vue';
+</script>
+
+<style scoped>
+.layout {
+  width: 100%;
+}
+.main {
+  padding-top: 70px;
+}
+</style>
