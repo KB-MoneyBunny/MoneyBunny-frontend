@@ -3,13 +3,10 @@
   <div class="mypage-wrapper">
     <h1>마이페이지 메인</h1>
     <!-- 추후에 프로필 카드, 즐겨찾기 등 추가 예정 -->
-    <BottomNav />
   </div>
 </template>
 
-<script setup>
-import BottomNav from '@/components/layouts/NavBar.vue';
-</script>
+<script setup></script>
 
 <style scoped>
 .mypage-wrapper {

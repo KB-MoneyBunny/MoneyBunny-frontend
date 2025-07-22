@@ -2,11 +2,14 @@
   <header class="top-header">
     <div class="header-inner">
       <h1 class="logo-text font-28 font-bold">MoneyBunny</h1>
-      <img
-        src="@/assets/images/icons/bunny/notification_bunny.png"
-        alt="MoneyBunny Logo"
-        class="logo-img"
-      />
+      <!--알림 이동-->
+      <RouterLink to="/notification">
+        <img
+          src="@/assets/images/icons/bunny/notification_bunny_background.png"
+          alt="MoneyBunny Logo"
+          class="logo-img"
+        />
+      </RouterLink>
     </div>
   </header>
 </template>
@@ -26,11 +29,9 @@
   width: 100%;
   max-width: 474px;
   margin: 0 auto;
-
   height: 60px;
   border-bottom: 1px solid var(--base-lavender);
   background: white;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -47,11 +48,21 @@
   box-sizing: border-box;
 }
 
+/* 텍스트 가운데 정렬 */
 .logo-text {
   color: var(--base-blue-dark);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
+/* 이미지 오른쪽 고정 */
 .logo-img {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 40px;
   height: 40px;
   object-fit: contain;
