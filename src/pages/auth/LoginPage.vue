@@ -1,3 +1,30 @@
+<script setup>
+import { ref } from 'vue';
+import AttendanceCheckModal from './AttendanceCheckModal.vue';
+
+const showModal = ref(false);
+const id = ref('');
+const password = ref('');
+
+const handleLogin = () => {
+  if (!id.value.trim()) {
+    alert('아이디를 입력해주세요.');
+    return;
+  }
+  if (!password.value.trim()) {
+    alert('비밀번호를 입력해주세요.');
+    return;
+  }
+
+  // 🔐 서버 로그인 로직 생략
+  showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
+};
+</script>
+
 <template>
   <div class="loginContainer">
     <div class="loginCard">
@@ -8,7 +35,12 @@
 
       <div class="formGroup">
         <label for="id" class="font-15 font-bold">아이디</label>
-        <input type="text" id="id" placeholder="아이디를 입력하세요" />
+        <input
+          type="text"
+          id="id"
+          v-model="id"
+          placeholder="아이디를 입력하세요"
+        />
       </div>
 
       <div class="formGroup">
@@ -16,22 +48,29 @@
         <input
           type="password"
           id="password"
+          v-model="password"
           placeholder="비밀번호를 입력하세요"
         />
       </div>
 
-      <button class="loginButton font-15 font-bold">로그인</button>
+      <button class="loginButton font-15 font-bold" @click="handleLogin">
+        로그인
+      </button>
 
-      <div class="loginLinks font-12">
-        <a href="#">아이디 찾기</a>
+      <div class="loginLinks font-13">
+        <router-link to="/findId">아이디 찾기</router-link>
         <span>|</span>
-        <a href="#">비밀번호 찾기</a>
+        <router-link to="/findPassword">비밀번호 찾기</router-link>
       </div>
 
-      <div class="signupLink font-12">
-        계정이 없으신가요? <a href="#">회원가입</a>
+      <div class="signupLink font-13">
+        계정이 없으신가요?
+        <router-link to="/signUpEmailVerify">회원가입</router-link>
       </div>
     </div>
+
+    <!-- ✅ 출석체크 모달 -->
+    <AttendanceCheckModal v-if="showModal" />
   </div>
 </template>
 
@@ -49,37 +88,40 @@
 
 .loginCard {
   width: 100%;
-  max-width: 360px;
+  max-width: 350px;
   background-color: white;
-  padding: 32px;
-  border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  border-radius: 16px;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); */
 }
 
 .loginTitle {
   text-align: center;
-  color: var(--base-blue-dark);
+  color: var(--text-login);
+  margin-bottom: 9px;
 }
 
 .loginSubtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin-top: 8px;
-  margin-bottom: 24px;
+  margin-top: 9px;
+  margin-bottom: 36px;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  /* margin-bottom: 16px; */
 }
 
 input {
+  margin-top: 9px;
+  margin-bottom: 16px;
   font-size: 14px;
-  padding: 12px 14px;
-  border: none;
+  padding: 12px 16px;
+  border: 1px solid var(--input-outline);
   border-radius: 8px;
-  background-color: var(--input-bg-1);
+  background-color: transparent;
   outline: none;
 }
 
@@ -88,14 +130,14 @@ input {
   background-color: var(--base-blue-dark);
   color: white;
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
-  margin-top: 12px;
+  margin-top: 8px;
   cursor: pointer;
 }
 
 .loginLinks {
-  margin-top: 16px;
+  margin-top: 13px;
   text-align: center;
   color: var(--text-bluegray);
 }
@@ -115,6 +157,6 @@ input {
 .signupLink a {
   color: var(--base-lavender);
   text-decoration: none;
-  margin-left: 4px;
+  margin-left: 10px;
 }
 </style>

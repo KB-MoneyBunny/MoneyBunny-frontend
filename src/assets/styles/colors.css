@@ -34,6 +34,7 @@
   --text-darkgray: #666666;
   --text-bluegray: #6b7280;
   --text-lightgray: #999999;
+  --text-login: #1f2937;
 
   /* =============================
      Alert / Notification Colors
@@ -42,4 +43,6 @@
   --alert-strong: #cf5959;
   --alert-light-1: #f2a9a9;
   --alert-light-2: #f9dada;
+
+  --input-outline: #f1f5f9;
 }
