@@ -1,31 +1,34 @@
-<!-- 헤더 레이아웃 컴포넌트 -->
-
-<script setup>
-import config from '@/config';
-
-// @ : './src' 경로 별칭 (vite.config.js 에서 설정)
-// 경로 별칭 사용 이유: 상대 경로 사용 시 경로 변경 시 수정 번거로움
-// 경로 별칭 사용 방법: @/config 와 같이 사용
-</script>
-
 <template>
-  <div class="jumbotron p-5 bg-primary text-white">
-    <!-- config/index.js 에서 설정한 타이틀 및 서브타이틀 -->
-    <h1>{{ config.title }}</h1>
-    <p>{{ config.subtitle }}</p>
-  </div>
+  <header class="header-container">
+    <h1 class="logo-text font-28 font-bold">MoneyBunny</h1>
+    <img
+      src="@/assets/images/icons/bunny/notification_bunny.png"
+      alt="MoneyBunny Logo"
+      class="logoImg"
+    />
+  </header>
 </template>
 
-<!-- 
-  <style scoped> : 현재 컴포넌트에서만 적용되는 스타일
- -->
+<script setup>
+// script setup 방식 사용 (Composition API)
+</script>
+
 <style scoped>
-.jumbotron {
-  background-image: url('@/assets/images/background.jpg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  color: white;
-  padding: 2rem;
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: var(--base-blue-light);
+  border-bottom: 1px solid var(--base-lavender);
+}
+
+.logo-text {
+  color: var(--base-blue-dark);
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
 }
 </style>

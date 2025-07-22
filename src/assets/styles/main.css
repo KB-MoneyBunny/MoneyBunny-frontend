@@ -1,0 +1,21 @@
+@import './colors.css';
+@import './fonts.css';
+
+body {
+  font-family: 'NanumSquareNeo', sans-serif;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* app 사이즈 */
+#app {
+  width: 474px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--input-bg-2);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
