@@ -1,45 +1,113 @@
 /* ===============================
-   Font-face 정의
+   1. Web Font (CDN from NAVER)
+================================= */
+@font-face {
+  font-family: 'NanumSquareNeoLight';
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.eot');
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff')
+      format('woff'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.ttf')
+      format('truetype');
+}
+
+@font-face {
+  font-family: 'NanumSquareNeo';
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.eot');
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff')
+      format('woff'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.ttf')
+      format('truetype');
+}
+
+@font-face {
+  font-family: 'NanumSquareNeoBold';
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.eot');
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff')
+      format('woff'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.ttf')
+      format('truetype');
+}
+
+@font-face {
+  font-family: 'NanumSquareNeoExtraBold';
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.eot');
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff')
+      format('woff'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.ttf')
+      format('truetype');
+}
+
+@font-face {
+  font-family: 'NanumSquareNeoHeavy';
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.eot');
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff')
+      format('woff'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.ttf')
+      format('truetype');
+}
+
+@font-face {
+  font-family: 'NanumSquareNeoVariable';
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeo-Variable.eot');
+  src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeo-Variable.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeo-Variable.woff')
+      format('woff'),
+    url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeo-Variable.ttf')
+      format('truetype');
+}
+
+/* ===============================
+   2. Local Font (Same font-family with weights)
+   Use only if you use local font files
 ================================= */
 @font-face {
   font-family: 'NanumSquareNeo';
   src: url('../fonts/NanumSquareNeo-aLt.ttf') format('truetype');
   font-weight: 300;
-  font-style: normal;
 }
 @font-face {
   font-family: 'NanumSquareNeo';
   src: url('../fonts/NanumSquareNeo-bRg.ttf') format('truetype');
   font-weight: 400;
-  font-style: normal;
 }
 @font-face {
   font-family: 'NanumSquareNeo';
   src: url('../fonts/NanumSquareNeo-cBd.ttf') format('truetype');
   font-weight: 700;
-  font-style: normal;
 }
 @font-face {
   font-family: 'NanumSquareNeo';
   src: url('../fonts/NanumSquareNeo-dEb.ttf') format('truetype');
   font-weight: 800;
-  font-style: normal;
 }
 @font-face {
   font-family: 'NanumSquareNeo';
   src: url('../fonts/NanumSquareNeo-eHv.ttf') format('truetype');
   font-weight: 900;
-  font-style: normal;
 }
 
 /* ===============================
-   Font-size 유틸 클래스
+   3. Font Size Utility Classes
 ================================= */
 .font-10 {
   font-size: 10px;
 }
 .font-12 {
   font-size: 12px;
+}
+.font-13 {
+  font-size: 13px;
 }
 .font-14 {
   font-size: 14px;
@@ -72,7 +140,9 @@
   font-size: 32px;
 }
 
-/* Font-weight */
+/* ===============================
+   4. Font Weight Utility Classes
+================================= */
 .font-light {
   font-weight: 300;
 }
