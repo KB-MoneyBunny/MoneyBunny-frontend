@@ -10,7 +10,12 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 // import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 
+// 각 탭 페이지 import
 import LoginPage from '@/pages/auth/LoginPage.vue';
+import HomeTotalTab from '@/pages/home/tabs/HomeTotalTab.vue';
+import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
+import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
+import MypageMain from '@/pages/mypage/MypageMain.vue';
 
 // const router = createRouter({
 //   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,11 +31,12 @@ import LoginPage from '@/pages/auth/LoginPage.vue';
 // });
 
 const routes = [
-  {
-    path: '/',
-    name: 'login',
-    component: LoginPage,
-  },
+  { path: '/', name: 'login', component: LoginPage },
+  // 하단 네비게이션 바 탭들
+  { path: '/home', name: 'home', component: HomeTotalTab },
+  { path: '/asset', name: 'asset', component: AssetMainTab },
+  { path: '/policy', name: 'policy', component: PolicyMainTab },
+  { path: '/mypage', name: 'mypage', component: MypageMain },
 ];
 
 const router = createRouter({
