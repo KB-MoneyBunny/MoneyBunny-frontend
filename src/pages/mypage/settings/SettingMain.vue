@@ -1,8 +1,8 @@
 <template>
   <div class="settingMain">
-    <!-- 알림 설정 -->
-    <div class="toggleRow">
-      <span class="label font-15 font-regular">알림 설정</span>
+    <!-- 알림 설정 (settingItem으로 통일) -->
+    <div class="settingItem">
+      <span class="text font-18 font-regular">알림 설정</span>
       <button
         class="toggleBtn font-14 font-bold"
         :class="{ on: notificationEnabled, off: !notificationEnabled }"
@@ -15,7 +15,7 @@
     <!-- 설정 리스트 -->
     <div class="settingList">
       <div class="settingItem">
-        <span class="text">비밀번호 변경</span>
+        <span class="text font-18 font-regular">비밀번호 변경</span>
         <img
           src="@/assets/images/icons/mypage/right_arrow.png"
           alt="arrow"
@@ -24,34 +24,56 @@
         />
       </div>
       <div class="settingItem">
-        <span class="text">개인정보 처리 방침</span>
+        <span class="text font-18 font-regular">개인정보 처리 방침</span>
         <img
           src="@/assets/images/icons/mypage/right_arrow.png"
           class="arrowIcon"
         />
       </div>
       <div class="settingItem">
-        <span class="text">서비스 이용약관</span>
+        <span class="text font-18 font-regular">서비스 이용약관</span>
         <img
           src="@/assets/images/icons/mypage/right_arrow.png"
           class="arrowIcon"
         />
       </div>
       <div class="settingItem">
-        <span class="text">버전 정보</span>
-        <span class="version">v1.2.3</span>
+        <span class="text font-18 font-regular">버전 정보</span>
+        <span class="version font-15 font-regular">v1.2.3</span>
       </div>
-      <div class="settingItem logout" @click="logout">로그아웃</div>
+      <!-- ✅ 로그아웃 항목 (리스트처럼 보이게) -->
+      <div class="settingItem logoutItem" @click="handleLogout">
+        <span class="text font-18 font-regular logout">로그아웃</span>
+      </div>
     </div>
+
+    <!-- 로그아웃 모달 -->
+    <LogoutConfirmModal
+      v-if="showLogoutModal"
+      @close="showLogoutModal = false"
+      @logout="confirmLogout"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import LogoutConfirmModal from './LogoutConfirmModal.vue';
 
 const router = useRouter();
 const notificationEnabled = ref(true);
+const showLogoutModal = ref(false);
+
+const handleLogout = () => {
+  showLogoutModal.value = true;
+};
+
+const confirmLogout = () => {
+  // 로그아웃 처리 로직 (예: localStorage 제거, router 이동 등)
+  localStorage.removeItem('currentUser');
+  router.push('/login');
+};
 
 const toggleNotification = () => {
   notificationEnabled.value = !notificationEnabled.value;
@@ -68,11 +90,9 @@ const logout = () => {
 
 <style scoped>
 .settingMain {
-  padding: 20px;
+  padding: 6px 20px 20px 20px;
   background-color: white;
   border-radius: 16px;
-  box-shadow: var(--card-shadow);
-  font-family: 'NanumSquareNeo', sans-serif;
 }
 
 .toggleRow {
@@ -93,7 +113,6 @@ const logout = () => {
   border: none;
   color: white;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .toggleBtn.on {
@@ -107,15 +126,14 @@ const logout = () => {
 .settingList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 12px;
+  gap: 8px;
 }
 
 .settingItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--input-bg-1);
 }
 
@@ -124,25 +142,19 @@ const logout = () => {
 }
 
 .text {
-  font-size: 15px;
-  font-weight: 400;
-  color: var(--text-strong);
+  color: var(--text-login);
 }
 
 .arrowIcon {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
 }
 
 .version {
-  font-size: 13px;
-  color: var(--text-sub);
+  color: var(--text-lightgray);
 }
-
 .logout {
   color: red;
-  font-weight: bold;
-  font-size: 15px;
 }
 </style>
