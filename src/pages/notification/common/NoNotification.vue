@@ -18,11 +18,15 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+//알림 설정
 const goToSettings = () => {
-  // 알림 설정 페이지로 이동 (예: 마이페이지 > 설정)
-  console.log('알림 설정으로 이동');
+  router.push('/mypage'); // 마이페이지 메인 경로로 이동
 };
 
+//알림 새로고침
 const refreshList = () => {
   // 알림 목록 새로고침 기능
   console.log('알림 새로고침');
@@ -34,6 +38,9 @@ const refreshList = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* 세로 가운데 정렬 */
+
+  height: calc(100vh - 60px); /* 헤더 제외 시 */
   padding: 48px 16px;
   text-align: center;
   color: #333;
@@ -72,7 +79,7 @@ const refreshList = () => {
 }
 
 .btn.primary {
-  background-color: #2f466c;
+  background-color: var(--base-blue-dark);
   color: #fff;
 }
 

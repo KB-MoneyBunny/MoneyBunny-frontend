@@ -30,23 +30,31 @@ const tabs = [
 .tab-switcher {
   display: flex;
   justify-content: space-around;
-  border-bottom: 1px solid #eee;
-  padding: 8px 0;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .tab-button {
+  flex: 1;
   background: none;
   border: none;
+  border-radius: 10px;
   padding: 8px 12px;
-  font-size: 14px;
+
   color: #777;
   cursor: pointer;
   position: relative;
+  font-size: 15px;
   font-weight: 500;
+
+  transition: all 0.2s ease-in-out;
 }
 
 .tab-button.active {
-  color: #2f466c;
+  background-color: #2e3a59; /* 진한 네이비 */
+  color: white;
 }
 
 .tab-button.active::after {

@@ -1,17 +1,22 @@
 <template>
   <div>
-    <NotificationTabSwitcher />
+    <!--헤더 추가-->
+    <div class="notification-center">
+      <NotificationTabSwitcher v-model="selectedTab" />
 
-    <div v-if="notifications.length === 0">
-      <NoNotification />
-    </div>
-    <div v-else>
-      <NotificationList :items="notifications" />
+      <div v-if="notifications.length === 0">
+        <NoNotification />
+      </div>
+      <div v-else>
+        <NotificationList :items="notifications" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+/*알림용 해더 추가 */
+import NotificationHeader from './common/NotificationHeader.vue';
 import NotificationTabSwitcher from './common/NotificationTabSwitcher.vue';
 import NoNotification from './common/NoNotification.vue';
 import NotificationList from './common/NotificationList.vue';
