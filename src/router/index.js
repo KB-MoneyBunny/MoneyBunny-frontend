@@ -8,6 +8,9 @@ import SignUpProfilePage from '@/pages/auth/SignUpProfilePage.vue';
 import FindIdResultPage from '@/pages/auth/FindIdResultPage.vue';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage.vue';
 import AttendanceCheckModal from '@/pages/auth/AttendanceCheckModal.vue';
+import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
+import MypageMain from '@/pages/mypage/MypageMain.vue';
+import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 
 const routes = [
   {
@@ -49,6 +52,22 @@ const routes = [
     path: '/attendanceCheck',
     name: 'attendanceCheck',
     component: AttendanceCheckModal,
+  },
+  {
+    path: '/mypage',
+    component: MypageMain,
+    children: [
+      {
+        path: 'settings',
+        name: 'myPageSettings',
+        component: SettingMain,
+      },
+    ],
+  },
+  {
+    path: '/mypage/settings/changePassword',
+    name: 'changePassword',
+    component: ChangePassword, // ✅ 이걸 children 이 아니라 루트 레벨로
   },
 ];
 

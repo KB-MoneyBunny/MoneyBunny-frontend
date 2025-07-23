@@ -2,14 +2,25 @@
 import carrotIcon from '@/assets/images/icons/attendance/attendance_before.png';
 import bunnyIcon from '@/assets/images/icons/attendance/attendance_bunny.png';
 
+// emit 정의
+const emit = defineEmits(['close']);
+
 const days = ['월', '화', '수', '목', '금', '토', '일'];
+
+const handleClose = () => {
+  emit('close');
+};
+
+const handleComplete = () => {
+  // 출석체크 완료 로직
+  emit('close');
+};
 </script>
 
 <template>
-  <div class="overlay">
-    <div class="modal">
-      <button class="closeButton" @click="$emit('close')">✕</button>
-
+  <div class="overlay" @click="handleClose">
+    <div class="modal" @click.stop>
+      <button class="closeButton" @click="handleClose">✕</button>
       <h2 class="modalTitle font-20 font-extrabold">🎉 출석체크</h2>
       <p class="modalSubtitle font-14 font-regular">
         매일 출석하고 포인트를 받아보세요!
@@ -34,7 +45,10 @@ const days = ['월', '화', '수', '목', '금', '토', '일'];
       <div class="rewardBox font-18 font-bold">
         오늘의 리워드<br />100포인트
       </div>
-      <button class="completeButton font-15 font-bold">출석체크 완료</button>
+
+      <button class="completeButton font-15 font-bold" @click="handleComplete">
+        출석체크 완료
+      </button>
 
       <p class="infoText font-13 font-regular">
         연속 출석 시 더 많은 포인트를 받을 수 있어요!
@@ -56,16 +70,15 @@ const days = ['월', '화', '수', '목', '금', '토', '일'];
   align-items: center;
   z-index: 9999;
 }
+
 .modal {
-  background: black;
+  background: white; /* 검은색에서 흰색으로 변경 */
   border-radius: 20px;
   padding: 28px;
-  width: 200px;
-  top: 10px;
-  max-width: 340px;
-  position: fixed;
-  /* text-align: center; */
-  z-index: 1000;
+  width: 90%;
+  max-width: 340px; /* 크기 조정 */
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .closeButton {
@@ -76,10 +89,16 @@ const days = ['월', '화', '수', '목', '금', '토', '일'];
   border: none;
   font-size: 18px;
   cursor: pointer;
+  color: var(--text-darkgray);
+}
+
+.closeButton:hover {
+  color: var(--text-black);
 }
 
 .modalTitle {
   color: var(--base-blue-dark);
+  margin-bottom: 8px;
 }
 
 .modalSubtitle {
@@ -91,6 +110,7 @@ const days = ['월', '화', '수', '목', '금', '토', '일'];
   display: flex;
   justify-content: space-between;
   margin-bottom: 16px;
+  gap: 4px;
 }
 
 .dayBox {
@@ -98,6 +118,7 @@ const days = ['월', '화', '수', '목', '금', '토', '일'];
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  flex: 1;
 }
 
 .dayLabel {
@@ -134,7 +155,12 @@ const days = ['월', '화', '수', '목', '금', '토', '일'];
   cursor: pointer;
 }
 
+.completeButton:hover {
+  background-color: var(--base-blue-darker);
+}
+
 .infoText {
   color: var(--text-bluegray);
+  margin: 0;
 }
 </style>
