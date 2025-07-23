@@ -1,17 +1,21 @@
-<!-- src/pages/mypage/MypageMain.vue -->
 <template>
-  <div class="notification-wrapper">
-    <h1>알림 페이지 메인</h1>
-    <!-- 추후에 프로필 카드, 즐겨찾기 등 추가 예정 -->
+  <div>
+    <NotificationTabSwitcher />
+
+    <div v-if="notifications.length === 0">
+      <NoNotification />
+    </div>
+    <div v-else>
+      <NotificationList :items="notifications" />
+    </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import NotificationTabSwitcher from './common/NotificationTabSwitcher.vue';
+import NoNotification from './common/NoNotification.vue';
+import NotificationList from './common/NotificationList.vue';
 
-<style scoped>
-.notification-wrapper {
-  padding: 20px;
-  padding-bottom: 80px; /* 하단 네비게이션 영역 확보 */
-  text-align: center;
-}
-</style>
+// 예시용 dummy 데이터
+const notifications = []; // 빈 상태일 때 NoNotification 보여짐
+</script>
