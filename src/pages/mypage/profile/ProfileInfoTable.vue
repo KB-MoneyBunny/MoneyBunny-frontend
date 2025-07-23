@@ -27,16 +27,16 @@ defineProps({
 <style scoped>
 .infoCard {
   background-color: white;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .infoRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
+  padding: 15px;
   border-bottom: 1px solid var(--input-bg-1);
 }
 

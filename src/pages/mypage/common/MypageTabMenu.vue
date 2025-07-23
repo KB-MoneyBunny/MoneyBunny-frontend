@@ -1,21 +1,21 @@
 <template>
   <div class="tabHeader">
     <span
-      class="tabItem font-15"
+      class="tabItem font-15 font-bold"
       :class="{ active: currentTab === 'profile' }"
       @click="$emit('changeTab', 'profile')"
     >
       프로필
     </span>
     <span
-      class="tabItem font-15"
+      class="tabItem font-15 font-bold"
       :class="{ active: currentTab === 'bookmark' }"
       @click="$emit('changeTab', 'bookmark')"
     >
       북마크
     </span>
     <span
-      class="tabItem font-15"
+      class="tabItem font-15 font-bold"
       :class="{ active: currentTab === 'settings' }"
       @click="$emit('changeTab', 'settings')"
     >
@@ -31,13 +31,14 @@ defineProps(['currentTab']);
 <style scoped>
 .tabHeader {
   display: flex;
-  justify-content: space-around;
-  border-bottom: 2px solid var(--input-outline);
-  margin-bottom: 20px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 0;
 }
-
 .tabItem {
-  padding-bottom: 8px;
+  flex: 1;
+  text-align: center;
+  padding-bottom: 10px;
   color: var(--text-bluegray);
   cursor: pointer;
 }

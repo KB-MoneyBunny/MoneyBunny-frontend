@@ -4,14 +4,19 @@
     <!-- 고정 프로필 카드 -->
     <MypageProfileCard :userInfo="userInfo" @edit="openModal" />
 
-    <!-- 탭 메뉴 -->
-    <MypageTabMenu :currentTab="currentTab" @changeTab="changeTab" />
+    <!-- 하나의 카드 안에 탭 메뉴 + 콘텐츠 -->
+    <div class="infoCard">
+      <MypageTabMenu :currentTab="currentTab" @changeTab="changeTab" />
 
-    <!-- 탭별 콘텐츠 -->
-    <div class="tabContent">
-      <ProfileInfoTable v-if="currentTab === 'profile'" :userInfo="userInfo" />
-      <BookmarkList v-if="currentTab === 'bookmark'" :bookmarks="bookmarks" />
-      <router-view v-if="currentTab === 'settings'" />
+      <!-- 탭별 콘텐츠 -->
+      <div class="tabContent">
+        <ProfileInfoTable
+          v-if="currentTab === 'profile'"
+          :userInfo="userInfo"
+        />
+        <BookmarkList v-if="currentTab === 'bookmark'" :bookmarks="bookmarks" />
+        <SettingMain v-if="currentTab === 'settings'" />
+      </div>
     </div>
 
     <!-- 프로필 수정 모달 -->
@@ -27,8 +32,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref } from 'vue';
 
 // 컴포넌트 import
 import MypageProfileCard from './common/MypageProfileCard.vue';
@@ -36,9 +40,7 @@ import MypageTabMenu from './common/MypageTabMenu.vue';
 import ProfileInfoTable from './profile/ProfileInfoTable.vue';
 import EditProfileModal from './profile/EditProfileModal.vue';
 import BookmarkList from './bookmark/BookmarkList.vue';
-
-const router = useRouter();
-const route = useRoute();
+import SettingMain from './settings/SettingMain.vue';
 
 const currentTab = ref('profile');
 const isModalOpen = ref(false);
@@ -49,17 +51,7 @@ const userInfo = ref({
   phone: '010-1234-5678',
 });
 
-const bookmarks = ref([
-  // 임시 예시
-  // {
-  //   title: '창업 지원금 프로그램',
-  //   description: '예비창업자 및 초기창업자를 위한 사업자금 지원',
-  //   supportAmount: '최대 5천만원',
-  //   deadline: '2024.11.30',
-  //   status: '신청가능',
-  //   isBookmarked: true,
-  // }
-]);
+const bookmarks = ref([]);
 
 const openModal = () => {
   isModalOpen.value = true;
@@ -67,27 +59,11 @@ const openModal = () => {
 
 const changeTab = (tab) => {
   currentTab.value = tab;
-  if (tab === 'settings') {
-    router.push({ name: 'myPageSettings' });
-  } else {
-    router.push({ path: '/mypage' }); // 기본 탭
-  }
 };
 
 const handleUpdate = (data) => {
   userInfo.value = { ...userInfo.value, ...data };
 };
-watch(
-  () => route.fullPath,
-  (path) => {
-    if (path.includes('/mypage/settings')) {
-      currentTab.value = 'settings';
-    } else if (path.includes('/mypage')) {
-      currentTab.value = 'profile';
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <style scoped>
@@ -99,12 +75,21 @@ watch(
   box-sizing: border-box;
 }
 
+.infoCard {
+  background-color: white;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+/* .tabContent {
+  margin-top: 100px;
+} */
+
 .userCard {
   background-color: white;
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .userInfo {
@@ -147,7 +132,6 @@ watch(
   background-color: white;
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .tabHeader {
