@@ -53,17 +53,11 @@ const tabs = [
 }
 
 .tab-button.active {
-  background-color: #2e3a59; /* 진한 네이비 */
-  color: white;
+  color: #2f466c;
 }
 
-.tab-button.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: #2f466c;
+.tab-button.active {
+  background-color: var(--base-blue-dark); /* 진한 네이비 */
+  color: white;
 }
 </style>
