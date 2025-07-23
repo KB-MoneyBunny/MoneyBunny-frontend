@@ -26,8 +26,15 @@ const closeModal = () => {
 </script>
 
 <template>
-  <div>
-    <div class="loginContainer">
+  <div class="loginContainer">
+    <div class="loginWrapper">
+      <!-- 🐰 토끼 이미지 추가 -->
+      <img
+        src="@/assets/images/icons/signup/login_main.png"
+        alt="login-bunny"
+        class="bunnyImage"
+      />
+
       <div class="loginCard">
         <h1 class="loginTitle font-28 font-extrabold">MoneyBunny</h1>
         <p class="loginSubtitle font-15 font-regular">
@@ -160,5 +167,30 @@ input {
   color: var(--base-lavender);
   text-decoration: none;
   margin-left: 10px;
+}
+.loginWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bunnyImage {
+  width: 90px;
+  height: auto;
+  position: absolute;
+  top: -30px;
+  z-index: 2;
+}
+
+.loginCard {
+  background-color: white;
+  padding: 24px;
+  border-radius: 16px;
+  margin-top: 40px; /* 토끼 머리 공간 확보 */
+  width: 100%;
+  box-sizing: border-box;
 }
 </style>

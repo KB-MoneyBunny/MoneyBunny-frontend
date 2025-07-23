@@ -1,19 +1,16 @@
 <template>
-  <div class="bookmarkList">
+  <div class="bookmark-list">
     <NoBookmarkCard v-if="!filteredBookmarks.length" />
     <div v-else>
-      <div class="listHeader">
-        <p class="headerTitle">저장된 정책</p>
-        <span class="countText">{{ filteredBookmarks.length }}개</span>
+      <div class="header">
+        <p>저장된 정책</p>
+        <span>{{ filteredBookmarks.length }}개</span>
       </div>
-
-      <div class="cardList">
-        <BookmarkCard
-          v-for="(item, index) in filteredBookmarks"
-          :key="index"
-          :item="item"
-        />
-      </div>
+      <BookmarkCard
+        v-for="(item, index) in filteredBookmarks"
+        :key="index"
+        :item="item"
+      />
     </div>
   </div>
 </template>
@@ -24,10 +21,7 @@ import NoBookmarkCard from './NoBookmarkCard.vue';
 
 export default {
   name: 'BookmarkList',
-  components: {
-    BookmarkCard,
-    NoBookmarkCard,
-  },
+  components: { BookmarkCard, NoBookmarkCard },
   props: {
     bookmarks: {
       type: Array,
@@ -43,32 +37,18 @@ export default {
 </script>
 
 <style scoped>
-.bookmarkList {
-  padding: 20px;
+.bookmark-list {
+  padding: 16px;
 }
-
-.listHeader {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
-
-.headerTitle {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.countText {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-gray);
-}
-
-.cardList {
+.card-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 </style>

@@ -7,8 +7,8 @@
         class="profileImage"
       />
       <div class="userText">
-        <p class="userName font-18 font-bold">{{ userInfo.name }}</p>
-        <p class="userEmail font-14 font-regular">{{ userInfo.email }}</p>
+        <p class="userName font-22 font-bold">{{ userInfo.name }}</p>
+        <p class="userEmail font-15 font-regular">{{ userInfo.email }}</p>
       </div>
       <button class="editBtn" @click="$emit('edit')">
         <img src="@/assets/images/icons/mypage/edit.png" alt="수정" />
@@ -18,29 +18,30 @@
 </template>
 
 <script setup>
-const defaultImage = '/assets/images/icons/profile/profile_edit_beard.png';
 defineProps({ userInfo: Object });
 </script>
 
 <style scoped>
 .userCard {
   background-color: white;
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  margin: 0 auto 24px; /* ✅ 좌우 가운데 정렬 */
+  width: 416px;
+  height: 136px;
 }
 
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   position: relative;
 }
 
 .profileImage {
-  width: 84px;
-  height: 84px;
+  margin-left: 12px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   background-color: var(--input-bg-3);
   object-fit: cover;
@@ -51,6 +52,12 @@ defineProps({ userInfo: Object });
   flex-direction: column;
   justify-content: center;
   flex: 1;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.userText p {
+  margin: 0;
 }
 
 .userName {
@@ -59,7 +66,6 @@ defineProps({ userInfo: Object });
 
 .userEmail {
   color: var(--text-bluegray);
-  margin-top: 4px;
 }
 
 .editBtn {
@@ -67,10 +73,11 @@ defineProps({ userInfo: Object });
   border: none;
   padding: 0;
   cursor: pointer;
+  margin-right: 12px;
 }
 
 .editBtn img {
-  width: 20px;
-  height: 20px;
+  width: 23px;
+  height: 23px;
 }
 </style>
