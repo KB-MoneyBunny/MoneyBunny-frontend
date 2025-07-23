@@ -1,9 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import profile1 from '@/assets/images/icons/profile/profile_sprout.png';
-import profile2 from '@/assets/images/icons/profile/profile_beard.png';
-import profile3 from '@/assets/images/icons/profile/profile_eyelash.png';
-import profile4 from '@/assets/images/icons/profile/profile_carrot.png';
+import profile1 from '@/assets/images/icons/profile/profile_edit_sprout.png';
+import profile2 from '@/assets/images/icons/profile/profile_edit_beard.png';
+import profile3 from '@/assets/images/icons/profile/profile_edit_eyelash.png';
+import profile4 from '@/assets/images/icons/profile/profile_edit_carrot.png';
 
 const profileImages = [profile1, profile2, profile3, profile4];
 let selectedImage = profileImages[0];
@@ -117,21 +117,22 @@ const goLogin = () => {
 
 .card {
   width: 100%;
-  max-width: 420px;
+  max-width: 350px;
   background: white;
   border-radius: 20px;
-  padding: 32px;
+  padding: 16px;
+  border: none;
 }
 
 .title {
   text-align: center;
-  color: var(--base-blue-dark);
+  color: var(--text-login);
 }
 
 .subtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin: 8px 0 24px;
+  margin: 8px 0 32px;
 }
 
 .profileImageSection {
@@ -140,16 +141,17 @@ const goLogin = () => {
 
 .profileImages {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
   margin-top: 12px;
   margin-bottom: 8px;
+  justify-content: space-between;
 }
 
 .profileImage {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 2px solid transparent;
+  /* border: 2px solid transparent; */
   cursor: pointer;
 }
 
@@ -175,10 +177,12 @@ const goLogin = () => {
 input {
   flex: 1;
   padding: 12px;
+  border: 1px solid var(--input-outline);
   border-radius: 8px;
-  border: none;
-  background-color: var(--input-bg-1);
+  background-color: transparent;
   font-size: 14px;
+  margin-top: 7px;
+  margin-bottom: 25px;
 }
 
 .checkButton {

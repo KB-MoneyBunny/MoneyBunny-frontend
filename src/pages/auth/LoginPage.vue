@@ -26,51 +26,53 @@ const closeModal = () => {
 </script>
 
 <template>
-  <div class="loginContainer">
-    <div class="loginCard">
-      <h1 class="loginTitle font-28 font-extrabold">MoneyBunny</h1>
-      <p class="loginSubtitle font-15 font-regular">
-        아이디와 비밀번호를 입력해주세요
-      </p>
+  <div>
+    <div class="loginContainer">
+      <div class="loginCard">
+        <h1 class="loginTitle font-28 font-extrabold">MoneyBunny</h1>
+        <p class="loginSubtitle font-15 font-regular">
+          아이디와 비밀번호를 입력해주세요
+        </p>
 
-      <div class="formGroup">
-        <label for="id" class="font-15 font-bold">아이디</label>
-        <input
-          type="text"
-          id="id"
-          v-model="id"
-          placeholder="아이디를 입력하세요"
-        />
-      </div>
+        <div class="formGroup">
+          <label for="id" class="font-15 font-bold">아이디</label>
+          <input
+            type="text"
+            id="id"
+            v-model="id"
+            placeholder="아이디를 입력하세요"
+          />
+        </div>
 
-      <div class="formGroup">
-        <label for="password" class="font-15 font-bold">비밀번호</label>
-        <input
-          type="password"
-          id="password"
-          v-model="password"
-          placeholder="비밀번호를 입력하세요"
-        />
-      </div>
+        <div class="formGroup">
+          <label for="password" class="font-15 font-bold">비밀번호</label>
+          <input
+            type="password"
+            id="password"
+            v-model="password"
+            placeholder="비밀번호를 입력하세요"
+          />
+        </div>
 
-      <button class="loginButton font-15 font-bold" @click="handleLogin">
-        로그인
-      </button>
+        <button class="loginButton font-15 font-bold" @click="handleLogin">
+          로그인
+        </button>
 
-      <div class="loginLinks font-13">
-        <router-link to="/findId">아이디 찾기</router-link>
-        <span>|</span>
-        <router-link to="/findPassword">비밀번호 찾기</router-link>
-      </div>
+        <div class="loginLinks font-13">
+          <router-link to="/findId">아이디 찾기</router-link>
+          <span>|</span>
+          <router-link to="/findPassword">비밀번호 찾기</router-link>
+        </div>
 
-      <div class="signupLink font-13">
-        계정이 없으신가요?
-        <router-link to="/signUpEmailVerify">회원가입</router-link>
+        <div class="signupLink font-13">
+          계정이 없으신가요?
+          <router-link to="/signUpEmailVerify">회원가입</router-link>
+        </div>
       </div>
     </div>
 
     <!-- ✅ 출석체크 모달 -->
-    <AttendanceCheckModal v-if="showModal" />
+    <AttendanceCheckModal v-if="showModal" @close="closeModal" />
   </div>
 </template>
 

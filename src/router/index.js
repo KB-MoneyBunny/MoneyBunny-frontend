@@ -21,6 +21,9 @@ import SignUpProfilePage from '@/pages/auth/SignUpProfilePage.vue';
 import FindIdResultPage from '@/pages/auth/FindIdResultPage.vue';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage.vue';
 import AttendanceCheckModal from '@/pages/auth/AttendanceCheckModal.vue';
+import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
+import MypageMain from '@/pages/mypage/MypageMain.vue';
+import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 
 //페이지
 //홈 화면-하위
@@ -84,59 +87,22 @@ const routes = [
     component: AttendanceCheckModal,
   },
 
-  // 하단 네비게이션 바 탭들
   {
-    path: '/', // DefaultLayout을 사용하는 페이지들
-    component: DefaultLayout,
+    path: '/mypage',
+    component: MypageMain,
     children: [
       {
-        path: '', // 기본 진입 시
-        redirect: 'home', // 자동으로 /home 으로 이동
-      },
-      {
-        path: 'home', // 홈 탭
-        component: HomeMainPage,
-        children: [
-          { path: '', name: 'home-total', component: HomeTotalTab },
-          {
-            path: 'account',
-            name: 'home-account',
-            component: () => import('@/pages/home/tabs/HomeAccountTab.vue'),
-          },
-          {
-            path: 'saving',
-            name: 'home-saving',
-            component: () => import('@/pages/home/tabs/HomeSavingTab.vue'),
-          },
-          {
-            path: 'spending',
-            name: 'home-spending',
-            component: () => import('@/pages/home/tabs/HomeSpendingTab.vue'),
-          },
-        ],
-      },
-      {
-        path: 'asset', // 자산 탭
-        name: 'asset',
-        component: AssetMainTab,
-      },
-      {
-        path: 'policy', // 정책 탭
-        name: 'policy',
-        component: PolicyMainTab,
-      },
-      {
-        path: 'mypage', // 마이페이지 탭
-        name: 'mypage',
-        component: MypageMain,
-      },
-      {
-        path: 'notification',
-        name: 'notification',
-        component: NotificationCenter,
+        path: 'settings',
+        name: 'myPageSettings',
+        component: SettingMain,
       },
     ],
   },
+  {
+    path: '/mypage/settings/changePassword',
+    name: 'changePassword',
+    component: ChangePassword, 
+
 ];
 
 const router = createRouter({
