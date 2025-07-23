@@ -97,7 +97,7 @@ const routes = [
       {
         path: 'home', // 홈 탭
         name: 'home',
-        component: HomeTotalTab,
+        component: HomeMainPage,
       },
       {
         path: 'asset', // 자산 탭
