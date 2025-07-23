@@ -1,3 +1,4 @@
+
 <template>
   <div class="myPageContainer">
     <!-- 고정 프로필 카드 -->
@@ -180,5 +181,6 @@ watch(
 
 .infoValue {
   color: var(--text-login);
+
 }
 </style>

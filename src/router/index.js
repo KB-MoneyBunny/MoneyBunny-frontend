@@ -1,5 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
+// 라우터 모듈 import
+// import authRoutes from './auth';
+// import assetRoutes from './asset';
+// import homeRoutes from './home';
+// import mypageRoutes from './mypage';
+// import notificationRoutes from './notification';
+// import policyRoutes from './policy';
+
+// 레이아웃 컴포넌트
+import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
+
+//페이지 컴포넌트
+//로그인
 import LoginPage from '@/pages/auth/LoginPage.vue';
 import FindIdPage from '@/pages/auth/FindIdPage.vue';
 import FindPasswordPage from '@/pages/auth/FindPasswordPage.vue';
@@ -12,12 +25,32 @@ import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
 import MypageMain from '@/pages/mypage/MypageMain.vue';
 import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 
+//페이지
+//홈 화면-하위
+import HomeMainPage from '@/pages/home/HomeMainPage.vue';
+import HomeTotalTab from '@/pages/home/tabs/HomeTotalTab.vue';
+
+import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
+import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
+import MypageMain from '@/pages/mypage/MypageMain.vue';
+import NotificationCenter from '@/pages/notification/NotificationCenter.vue'; // 알림
+
+// const router = createRouter({
+//   history: createWebHistory(import.meta.env.BASE_URL),
+//   routes: [
+//     { path: '/', name: 'login', component: LoginPage }, // 첫 화면을 로그인 페이지로
+//     ...authRoutes,
+//     ...assetRoutes,
+//     ...homeRoutes,
+//     ...mypageRoutes,
+//     ...notificationRoutes,
+//     ...policyRoutes,
+//   ],
+// });
+
 const routes = [
-  {
-    path: '/',
-    name: 'login',
-    component: LoginPage,
-  },
+  { path: '/', name: 'login', component: LoginPage },
+
   {
     path: '/findId',
     name: 'findId',
@@ -53,6 +86,7 @@ const routes = [
     name: 'attendanceCheck',
     component: AttendanceCheckModal,
   },
+
   {
     path: '/mypage',
     component: MypageMain,
@@ -67,8 +101,8 @@ const routes = [
   {
     path: '/mypage/settings/changePassword',
     name: 'changePassword',
-    component: ChangePassword, // ✅ 이걸 children 이 아니라 루트 레벨로
-  },
+    component: ChangePassword, 
+
 ];
 
 const router = createRouter({
