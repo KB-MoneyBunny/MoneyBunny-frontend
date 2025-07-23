@@ -6,12 +6,6 @@ importScripts(
   "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"
 ); // Firebase Messaging 기능용
 
-// 아래 내용은 써도 되는지 확인 한 번만!!!!
-// import { precacheAndRoute } from "workbox-precaching";
-
-// // PWA precache 처리 (vite-plugin-pwa)
-// precacheAndRoute(self.__WB_MANIFEST);
-
 // 📌 Service Worker 설치 이벤트 발생 시
 self.addEventListener("install", (e) => {
   // 기존 활성화된 서비스워커 대기 없이 바로 새로 적용되도록 설정
