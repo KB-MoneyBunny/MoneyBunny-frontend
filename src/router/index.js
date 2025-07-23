@@ -101,8 +101,8 @@ const routes = [
   {
     path: '/mypage/settings/changePassword',
     name: 'changePassword',
-    component: ChangePassword, 
-
+    component: ChangePassword,
+  },
 ];
 
 const router = createRouter({
