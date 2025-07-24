@@ -1,5 +1,5 @@
 <template>
-  <div>최근 지출 카드</div>
+  <div>계좌 요약 카드</div>
 </template>
 
 <script setup>
