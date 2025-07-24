@@ -1,15 +1,14 @@
 <template>
   <div class="home-total-tab">
-    <Header />
-
-    <AssetSummaryCard :totalAsset="26867500" :monthlyIncome="203000" />
-    <TabSwitcher
-      :activeTab="selectedTab"
-      @change-tab="$emit('switchTab', $event)"
+    <!--오늘의 한마디-->
+    <DailyMessageCard
+      title="오늘의 한마디!"
+      message="오늘 커피값이 많이 나갔네요!"
+      cta="내일은 집에서 커피 어때요?
+      ? 🐰"
     />
 
-    <DailyMessageCard message="오늘이 헌디! 오늘 계획했던 일 하셨나요?" />
-
+    <!--계좌 현황-->
     <AccountOverviewCard :accounts="accountList" />
 
     <RecentSpendingCard :spendingList="spendingList" />
@@ -19,13 +18,12 @@
 </template>
 
 <script setup>
-import Header from '@/components/layouts/Header.vue';
 import AssetSummaryCard from '../common/AssetSummaryCard.vue';
-import TabSwitcher from '../common/TabSwitcher.vue';
 import DailyMessageCard from '../total/DailyMessageCard.vue';
 import AccountOverviewCard from '../total/AccountOverviewCard.vue';
 import RecentSpendingCard from '../total/RecentSpendingCard.vue';
 import UpcomingScheduleCard from '../total/UpcomingScheduleCard.vue';
+import TotalSummaryCard from '../total/TotalSummaryCard.vue';
 
 // 예시 데이터
 const accountList = [
@@ -62,6 +60,9 @@ function onTabChange(newTab) {
 
 <style scoped>
 .home-total-tab {
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* ✅ 요약 카드와 탭 사이 포함 모든 요소 간 20px 간격 */
+  padding: 20px;
 }
 </style>
