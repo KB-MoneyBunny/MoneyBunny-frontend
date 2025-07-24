@@ -3,20 +3,25 @@
     <div class="top-section">
       <div class="label-row">
         <span class="label">총 자산</span>
-        <span class="rate">+2.5%</span>
+        <span class="rate">{{ summary.rate }}</span>
       </div>
-      <p class="amount">26,867,500원</p>
+      <p class="amount">{{ summary.totalAsset }}</p>
     </div>
 
     <div class="bottom-section">
       <span class="label">이번 달 지출</span>
-      <p class="expense">203,000원</p>
+      <p class="expense">{{ summary.monthlyExpense }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-// 백엔드 연동 전 → 정적 데이터
+// 더미 데이터 (나중에 Axios로 교체 예정)
+const summary = {
+  rate: '+2.5%',
+  totalAsset: '26,867,500원',
+  monthlyExpense: '203,000원',
+};
 </script>
 
 <style scoped>
