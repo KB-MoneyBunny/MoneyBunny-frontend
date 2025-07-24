@@ -39,7 +39,7 @@ function onTabChange(tab) {
 .home-total-tab {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* ✅ 요약 카드와 탭 사이 포함 모든 요소 간 20px 간격 */
-  padding: 20px;
+  gap: 1.25rem; /* ✅ 요약 카드와 탭 사이 포함 모든 요소 간 20px 간격 */
+  padding: 1.25rem;
 }
 </style>

@@ -11,7 +11,8 @@
       </div>
     </div>
 
-    <!--계좌 목록-->
+    <!--계좌 목록:2개-->
+
     <div
       v-for="(account, index) in accounts.slice(0, 2)"
       :key="index"
@@ -64,8 +65,8 @@ onMounted(() => {
 <style scoped>
 .overview-card {
   background-color: #fff;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 1rem;
+  padding: 1rem;
   box-shadow: var(--shadow-sm);
 }
 
@@ -74,11 +75,11 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .title-row h3 {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--text-title);
 }
@@ -87,20 +88,20 @@ onMounted(() => {
   display: flex;
   align-items: center;
   background-color: var(--input-bg-2);
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 12px;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 .arrow-icon {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .bank-logo {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   object-fit: contain;
-  margin-right: 12px;
+  margin-right: 0.75rem;
 }
 
 .info {
@@ -109,11 +110,11 @@ onMounted(() => {
 
 .name {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.875rem;
 }
 
 .number {
-  font-size: 13px;
+  font-size: 0.75rem;
   color: var(--text-gray);
 }
 
@@ -123,11 +124,11 @@ onMounted(() => {
 
 .amount {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .type {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-gray);
 }
 </style>

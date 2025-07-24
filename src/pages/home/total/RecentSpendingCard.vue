@@ -51,33 +51,33 @@ const getIconPath = (category) => getSpendingIconPath(category);
 <style scoped>
 .recent-card {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 0.75rem;
 
-  padding: 16px;
+  padding: 1rem;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   cursor: pointer;
 }
 
 .title {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .arrow-icon {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .spending-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0.875rem;
 }
 
 .spending-item {
@@ -89,26 +89,26 @@ const getIconPath = (category) => getSpendingIconPath(category);
 .left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .icon {
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .info strong {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .sub {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #888;
 }
 
 .right {
   font-weight: bold;
   color: #333;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 </style>

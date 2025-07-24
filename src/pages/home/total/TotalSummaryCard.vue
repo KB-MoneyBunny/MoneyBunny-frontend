@@ -27,40 +27,40 @@ const summary = {
 <style scoped>
 .total-summary-card {
   background-color: var(--base-blue-dark);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 1rem;
+  padding: 1.5rem;
   color: #ffffff;
 }
 
 .label-row {
   display: flex;
   align-items: baseline;
-  gap: 5px;
-  margin-bottom: 6px;
+  gap: 0.3125rem;
+  margin-bottom: 0.375rem;
 }
 
 .label {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text-rate);
 }
 
 .rate {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
   color: var(--text-rate);
 }
 
 .amount {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .expense {
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 600;
-  margin-top: 6px;
+  margin-top: 0.375rem;
   margin-bottom: 0;
 }
 </style>

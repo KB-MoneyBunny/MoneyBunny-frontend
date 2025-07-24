@@ -63,6 +63,6 @@ const summaryCardComponent = computed(() => {
 
 <style scoped>
 .home-container {
-  padding: 20px;
+  padding: 1.25rem;
 }
 </style>

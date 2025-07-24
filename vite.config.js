@@ -49,5 +49,7 @@ export default defineConfig({
         target: 'http://localhost:8080', // 백엔드 서버 연결
       },
     },
+    port: 5173,
+    host: true,
   },
 });

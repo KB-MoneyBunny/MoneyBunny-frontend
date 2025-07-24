@@ -36,51 +36,51 @@ export default {
 <style scoped>
 .schedule-card {
   background-color: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.03);
 }
 
 .title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 00;
   color: var(--text-login);
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 
 .schedule-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .schedule-item {
   background-color: var(--base-white-pink);
-  border-radius: 10px;
-  padding: 10px 16px;
+  border-radius: 0.625rem;
+  padding: 0.625rem 1rem;
   transition: border 0.2s;
 }
 
 .content {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
-  margin: 0 0 2px 0;
+  margin: 0 0 0.125rem 0;
 }
 
 .datetime {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-bluegray);
   font-weight: 400;
-  margin: 2px;
+  margin: 0.125rem;
 }
 
 .no-schedule {
   background-color: var(--base-white-pink);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 14px;
+  border-radius: 0.625rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
   color: var(--text-bluegray);
   text-align: center;
-  margin-top: 8px; /* 제목과의 간격 확보 */
+  margin-top: 0.5rem; /* 제목과의 간격 확보 */
 }
 </style>
