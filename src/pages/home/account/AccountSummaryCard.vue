@@ -1,5 +1,5 @@
 <template>
   <div>
-    <h2>계좌 요약 카드</h2>
+    <h2>Account 요약 탭입니다</h2>
   </div>
 </template>

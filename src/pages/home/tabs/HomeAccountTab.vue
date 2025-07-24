@@ -1,21 +1,32 @@
 <template>
-  <div>
-    <NoAccountCard v-if="accounts.length === 0" />
-    <AccountList v-else :accounts="accounts" />
+  <div class="home-account-tab">
+    <div class="account-section">
+      <AccountList />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import accountsData from '@/assets/data/accounts.json';
-
-import NoAccountCard from '../account/NoAccountCard.vue';
+import AddItemButton from '../common/AddItemButton.vue';
 import AccountList from '../account/AccountList.vue';
 
-const accounts = ref([]);
-
-onMounted(() => {
-  // 백엔드 연동 전 가정
-  accounts.value = accountsData;
-});
+const onAddAccountClick = () => {
+  alert('계좌 추가 클릭됨');
+};
 </script>
+
+<style scoped>
+.home-account-tab {
+  margin-top: 1rem;
+}
+
+.account-section {
+  margin-top: 0.75rem;
+}
+
+.add-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+</style>
