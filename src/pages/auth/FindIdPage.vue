@@ -31,48 +31,55 @@ const handleClick = () => {
 
 <template>
   <div class="findIdContainer">
-    <div class="card">
-      <h1 class="title font-28 font-extrabold">MoneyBunny</h1>
-      <p class="subtitle font-13 font-regular">
-        아이디를 재설정하기 위해 이메일을 입력해주세요
-      </p>
+    <div class="loginWrapper">
+      <img
+        src="@/assets/images/icons/signup/login_main.png"
+        alt="login-bunny"
+        class="bunnyImage"
+      />
+      <div class="card">
+        <h1 class="title font-28 font-extrabold">MoneyBunny</h1>
+        <p class="subtitle font-13 font-regular">
+          아이디를 재설정하기 위해 이메일을 입력해주세요
+        </p>
 
-      <!-- 이메일 입력 -->
-      <div class="formGroup">
-        <label for="email" class="font-15 font-regular">이메일</label>
-        <input
-          type="email"
-          id="email"
-          v-model="email"
-          placeholder="이메일을 입력하세요"
-        />
-      </div>
+        <!-- 이메일 입력 -->
+        <div class="formGroup">
+          <label for="email" class="font-15 font-regular">이메일</label>
+          <input
+            type="email"
+            id="email"
+            v-model="email"
+            placeholder="이메일을 입력하세요"
+          />
+        </div>
 
-      <!-- 인증코드 입력: isCodeSent이 true일 때 표시 -->
-      <div v-if="isCodeSent" class="formGroup">
-        <label for="code" class="font-15 font-bold">인증코드</label>
-        <input
-          type="text"
-          id="code"
-          v-model="code"
-          placeholder="인증코드를 입력하세요"
-        />
-      </div>
+        <!-- 인증코드 입력: isCodeSent이 true일 때 표시 -->
+        <div v-if="isCodeSent" class="formGroup">
+          <label for="code" class="font-15 font-bold">인증코드</label>
+          <input
+            type="text"
+            id="code"
+            v-model="code"
+            placeholder="인증코드를 입력하세요"
+          />
+        </div>
 
-      <!-- 버튼 -->
-      <button class="submitButton font-15 font-bold" @click="handleClick">
-        {{ isCodeSent ? '인증하기' : '인증코드 발송' }}
-      </button>
+        <!-- 버튼 -->
+        <button class="submitButton font-15 font-bold" @click="handleClick">
+          {{ isCodeSent ? '인증하기' : '인증코드 발송' }}
+        </button>
 
-      <!-- 하단 링크 -->
-      <div class="link font-13">
-        <router-link to="/findPassword">비밀번호 찾기</router-link>
-        <span>|</span>
-        <router-link to="/">로그인</router-link>
-      </div>
-      <div class="signupLink font-13">
-        계정이 없으신가요?
-        <router-link to="/signUpEmailVerify">회원가입</router-link>
+        <!-- 하단 링크 -->
+        <div class="link font-13">
+          <router-link to="/findPassword">비밀번호 찾기</router-link>
+          <span>|</span>
+          <router-link to="/">로그인</router-link>
+        </div>
+        <div class="signupLink font-13">
+          계정이 없으신가요?
+          <router-link to="/signUpEmailVerify">회원가입</router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -160,5 +167,21 @@ input {
   color: var(--base-lavender);
   text-decoration: none;
   margin-left: 10px;
+}
+.loginWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bunnyImage {
+  width: 90px;
+  height: auto;
+  position: absolute;
+  top: -70px;
+  z-index: 2;
 }
 </style>

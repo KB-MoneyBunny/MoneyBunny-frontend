@@ -22,8 +22,6 @@ import FindIdResultPage from '@/pages/auth/FindIdResultPage.vue';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage.vue';
 import AttendanceCheckModal from '@/pages/auth/AttendanceCheckModal.vue';
 import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
-import MypageMain from '@/pages/mypage/MypageMain.vue';
-import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 
 //페이지
 //홈 화면-하위
@@ -34,19 +32,7 @@ import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
 import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
 import MypageMain from '@/pages/mypage/MypageMain.vue';
 import NotificationCenter from '@/pages/notification/NotificationCenter.vue'; // 알림
-
-// const router = createRouter({
-//   history: createWebHistory(import.meta.env.BASE_URL),
-//   routes: [
-//     { path: '/', name: 'login', component: LoginPage }, // 첫 화면을 로그인 페이지로
-//     ...authRoutes,
-//     ...assetRoutes,
-//     ...homeRoutes,
-//     ...mypageRoutes,
-//     ...notificationRoutes,
-//     ...policyRoutes,
-//   ],
-// });
+import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 
 const routes = [
   { path: '/', name: 'login', component: LoginPage },

@@ -28,7 +28,6 @@ const closeModal = () => {
 <template>
   <div class="loginContainer">
     <div class="loginWrapper">
-      <!-- 🐰 토끼 이미지 추가 -->
       <img
         src="@/assets/images/icons/signup/login_main.png"
         alt="login-bunny"
@@ -189,7 +188,7 @@ input {
   background-color: white;
   padding: 24px;
   border-radius: 16px;
-  margin-top: 40px; /* 토끼 머리 공간 확보 */
+  margin-top: 40px;
   width: 100%;
   box-sizing: border-box;
 }
