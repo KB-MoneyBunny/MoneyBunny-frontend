@@ -86,7 +86,7 @@ onMounted(() => {
 .account-item {
   display: flex;
   align-items: center;
-  background-color: #f7fafd;
+  background-color: var(--input-bg-2);
   padding: 12px;
   border-radius: 12px;
   margin-bottom: 12px;

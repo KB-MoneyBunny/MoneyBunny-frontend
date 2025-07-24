@@ -12,8 +12,10 @@ export const bankLogoMap = {
     '@/assets/images/icons/bank/kakao_original.png',
     import.meta.url
   ).href,
-  토스뱅크: new URL('@/assets/images/icons/bank/toss_fill.png', import.meta.url)
-    .href,
+  토스뱅크: new URL(
+    '@/assets/images/icons/bank/toss_original.png',
+    import.meta.url
+  ).href,
   케이뱅크: new URL(
     '@/assets/images/icons/bank/k_original.png',
     import.meta.url
