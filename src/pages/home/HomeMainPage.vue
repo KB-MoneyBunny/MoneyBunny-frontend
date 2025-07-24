@@ -8,7 +8,7 @@
     <TabSwitcher :selectedTab="selectedTab" @switch="handleTabSwitch" />
 
     <!-- 탭별 컴포넌트 -->
-    <HomeTotalTab v-if="selectedTab === '전체'" />
+    <HomeTotalTab v-if="selectedTab === '전체'" @switchTab="handleTabSwitch" />
     <HomeAccountTab v-if="selectedTab === '계좌'" />
     <HomeSavingTab v-if="selectedTab === '적금'" />
     <HomeSpendingTab v-if="selectedTab === '지출'" />
