@@ -12,7 +12,7 @@
     <AccountOverviewCard :accounts="accountList" @switchTab="onTabChange" />
 
     <!--최근 지출 카드-->
-    <RecentSpendingCard :spendingList="spendingList" />
+    <RecentSpendingCard :spendingList="spendingList" @switchTab="onTabChange" />
 
     <!--일정-->
     <UpcomingScheduleCard :scheduleList="scheduleList" />
@@ -27,7 +27,7 @@ import RecentSpendingCard from '../total/RecentSpendingCard.vue';
 import UpcomingScheduleCard from '../total/UpcomingScheduleCard.vue';
 import TotalSummaryCard from '../total/TotalSummaryCard.vue';
 
-//계좌탭 이동
+//탭 이동(계좌, 최근 지출)
 const emit = defineEmits(['switchTab']);
 
 function onTabChange(tab) {
