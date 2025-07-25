@@ -37,6 +37,7 @@ import PolicyQuizStep2 from "@/pages/policy/recommend/PolicyQuizStep2.vue";
 import PolicyQuizStep3 from "@/pages/policy/recommend/PolicyQuizStep3.vue";
 import PolicyResultSummary from "@/pages/policy/recommend/PolicyResultSummary.vue";
 
+
 const routes = [
   //
   // ─── 인증 관련 ──────────────────────────────────────
