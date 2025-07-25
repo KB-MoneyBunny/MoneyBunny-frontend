@@ -7,7 +7,7 @@
 
     <div class="home-card-subinfo">
       <div>
-        <div class="home-card-label">이번 달 순입출금</div>
+        <div class="home-card-label">이번 달 입출금 현황</div>
         <div class="home-card-value positive">+2,500,000원</div>
       </div>
       <div>

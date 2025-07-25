@@ -1,4 +1,3 @@
-<!-- AccountList.vue -->
 <template>
   <div>
     <div class="header">
@@ -11,15 +10,25 @@
 
     <div v-else class="account-list">
       <AccountItemCard
-        v-for="account in accounts"
+        v-for="account in visibleAccounts"
         :key="account.id"
         :account="account"
+        @delete="deleteAccount"
+        @set-main="setMainAccount"
       />
+    </div>
+
+    <!-- 더보기 버튼 -->
+    <div v-if="!showAll && accounts.length > 5" class="view-all-btn-box">
+      <button @click="showAll = true" class="view-all-btn">
+        전체 계좌 보기
+      </button>
     </div>
   </div>
 </template>
+
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import accountData from '@/assets/data/accounts.json';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
@@ -27,7 +36,6 @@ import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import NoAccountCard from './NoAccountCard.vue';
 import AccountItemCard from './AccountItemCard.vue';
 
-// 로고와 이름을 포함한 계좌 리스트 초기화
 const accounts = ref(
   accountData.map((item, idx) => ({
     id: idx + 1,
@@ -40,6 +48,12 @@ const accounts = ref(
     isMain: idx === 0,
     logoUrl: getBankLogoByCode(item.bankCode),
   }))
+);
+
+const showAll = ref(false);
+
+const visibleAccounts = computed(() =>
+  showAll.value ? accounts.value : accounts.value.slice(0, 4)
 );
 
 const deleteAccount = (id) => {
@@ -57,3 +71,17 @@ const handleAddClick = () => {
   alert('추후 모달 연결 가능');
 };
 </script>
+<style scoped>
+.view-all-btn-box {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: var(--text-bluegray);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+</style>

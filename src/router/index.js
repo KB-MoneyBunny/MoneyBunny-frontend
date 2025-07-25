@@ -13,7 +13,6 @@ import SignUpEmailVerifyPage from '@/pages/auth/SignUpEmailVerifyPage.vue';
 import SignUpProfilePage from '@/pages/auth/SignUpProfilePage.vue';
 import FindIdResultPage from '@/pages/auth/FindIdResultPage.vue';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage.vue';
-import AttendanceCheckModal from '@/pages/auth/AttendanceCheckModal.vue';
 
 //
 // ─── 마이페이지 관련 ──────────────────────────────────
@@ -23,7 +22,7 @@ import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
-import HomeMainPage from '@/pages/home/HomeMainPage.vue'; // 홈메인
+import HomeMainPage from '@/pages/home/HomeMainPage.vue';
 import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
 import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
 import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
@@ -58,41 +57,40 @@ const routes = [
     component: ResetPasswordPage,
   },
   { path: '/findIdResult', name: 'findIdResult', component: FindIdResultPage },
-  {
-    path: '/attendanceCheck',
-    name: 'attendanceCheck',
-    component: AttendanceCheckModal,
-  },
 
   //
-  // ─── 마이페이지 ─────────────────────────────────────
-  { path: '/mypage/settings', name: 'myPageSettings', component: SettingMain },
-  {
-    path: '/mypage/settings/changePassword',
-    name: 'changePassword',
-    component: ChangePassword,
-  },
-
-  //
-  // ─── 기본 레이아웃 하위 라우트 ──────────────────────
+  // ─── 기본 레이아웃 하위 ──────────────────────────────
   {
     path: '/',
     component: DefaultLayout,
     children: [
       { path: '', redirect: '/home' },
-      { path: 'home', name: 'home', component: HomeMainPage }, //수정
+      { path: 'home', name: 'home', component: HomeMainPage },
       { path: 'asset', name: 'asset', component: AssetMainTab },
       { path: 'mypage', name: 'mypage', component: MypageMain },
+      {
+        path: 'mypage/settings',
+        name: 'myPageSettings',
+        component: SettingMain,
+      },
+      {
+        path: 'mypage/settings/changePassword',
+        name: 'changePassword',
+        component: ChangePassword,
+      },
       {
         path: 'notification',
         name: 'notification',
         component: NotificationCenter,
       },
 
-      //
-      // ─── 정책 추천 흐름 ──────────────────────────────
-      { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
-      { path: 'policy/main', name: 'policyMain', component: PolicyMainTab },
+      // ─── 정책 메인 & 추천 흐름 ──────────────────────────────
+      { path: 'policy', name: 'policyMain', component: PolicyMainTab },
+      {
+        path: 'policy/intro',
+        name: 'policyIntroForm',
+        component: PolicyIntroForm,
+      },
       {
         path: 'policy/quiz/step1',
         name: 'policyQuizStep1',
