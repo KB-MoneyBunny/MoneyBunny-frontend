@@ -59,10 +59,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-// import {
-//   subscribeToPush,
-//   unsubscribeFromPush,
-// } from "@/firebase/notificationPermission";
+import {
+  subscribeToPush,
+  unsubscribeFromPush,
+} from '@/firebase/notificationPermission.js';
 import LogoutConfirmModal from './LogoutConfirmModal.vue';
 
 const router = useRouter();

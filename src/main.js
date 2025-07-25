@@ -11,7 +11,7 @@ import VueAwesomePaginate from 'vue-awesome-paginate'; // 페이지네이션 컴
 
 import App from './App.vue';
 import router from './router';
-// import { registerServiceWorker } from "./firebase/registerServiceWorker";
+import { registerServiceWorker } from './firebase/registerServiceWorker';
 
 const app = createApp(App);
 
