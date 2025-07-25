@@ -21,8 +21,13 @@ export const subscribeToPush = async () => {
   }
   console.log('🪪 내 FCM 토큰: ', token);
 
-  // 💪(상일) 백엔드 엔드포인트에 맞춰 수정하고 axios 사용으로 JWT 자동 전송
-  await axios.post('/api/subscription/subscribe', { token });
+  try {
+    // 💪(상일) 새로운 백엔드 엔드포인트에 맞춰 수정
+    await axios.post('/api/push/subscriptions', { token });
+  } catch (error) {
+    console.warn('푸시 알림 구독 실패 (백엔드 서버 확인 필요):', error.message);
+    // 푸시 알림 구독 실패해도 토큰은 반환 (로그인 진행 가능)
+  }
   
   return token;
 };
@@ -32,7 +37,11 @@ export const unsubscribeFromPush = async () => {
   const token = localStorage.getItem('fcm_token');
   // token이 null이면 서버에 보내봤자 무의미
   if (!token) return false;
-  // 💪(상일) 백엔드 엔드포인트에 맞춰 수정하고 axios 사용으로 JWT 자동 전송
-  await axios.post('/api/subscription/unsubscribe', { token });
+  try {
+    // 💪(상일) 새로운 백엔드 엔드포인트에 맞춰 수정 (DELETE 방식)
+    await axios.delete(`/api/push/subscriptions/${token}`);
+  } catch (error) {
+    console.warn('푸시 알림 구독 해제 실패 (백엔드 서버 확인 필요):', error.message);
+  }
   return true;
 };
