@@ -1,10 +1,12 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import AttendanceCheckModal from './AttendanceCheckModal.vue';
 
 const showModal = ref(false);
 const id = ref('');
 const password = ref('');
+const router = useRouter();
 
 const handleLogin = () => {
   if (!id.value.trim()) {
@@ -18,6 +20,10 @@ const handleLogin = () => {
 
   // 🔐 서버 로그인 로직 생략
   showModal.value = true;
+
+  setTimeout(() => {
+    router.push('/home'); // ✅ HomeTotalTab 으로 이동
+  }, 1000); // 1초 후 이동 (원하는 시간으로 조절 가능)
 };
 
 const closeModal = () => {

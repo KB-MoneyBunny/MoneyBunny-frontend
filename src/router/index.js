@@ -30,6 +30,8 @@ import PolicyQuizStep2 from '@/pages/policy/recommend/PolicyQuizStep2.vue';
 import PolicyQuizStep3 from '@/pages/policy/recommend/PolicyQuizStep3.vue';
 import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vue';
 
+import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
+
 const routes = [
   // 인증 관련
   { path: '/', name: 'login', component: LoginPage },
@@ -112,6 +114,12 @@ const routes = [
         path: '/policy/quiz/result',
         name: 'policyResultSummary',
         component: PolicyResultSummary,
+      },
+      {
+        path: '/policy/:id',
+        name: 'policyDetail',
+        component: PolicyDetailPage,
+        props: true,
       },
     ],
   },
