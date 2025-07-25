@@ -48,7 +48,7 @@ instance.interceptors.response.use(
     if (error.response?.status === 401) {
       const { logout } = useAuthStore();
       logout(); // 자동 로그아웃
-      router.push('/auth/login?error=login_required'); // 로그인 페이지로 이동
+      router.push('/?error=login_required'); // 로그인 페이지로 이동 (루트 경로 = 로그인 페이지)
 
       // 401 Unauthorized 에러 발생 시 자동으로 로그아웃하고 로그인 페이지로 이동
       return Promise.reject({

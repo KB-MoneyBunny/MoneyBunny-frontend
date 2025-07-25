@@ -53,9 +53,20 @@ export const useAuthStore = defineStore('auth', () => {
     //   email: member.username + '@test.com',
     // };
 
-    // 실제 API 호출 <- 추가
-    const { data } = await axios.post('/api/auth/login', member);
-    state.value = { ...data }; // 서버 응답 데이터로 상태 업데이트
+    // 💪(상일) 백엔드 MemberController의 정확한 엔드포인트 사용
+    const { data } = await axios.post('/api/member/login', {
+      username: member.username,
+      password: member.password
+    });
+    
+    // 💪(상일) AuthResultDTO 응답 구조에 맞춰 상태 업데이트
+    // 응답 형태: { token: "JWT토큰", user: { loginId, email, createdAt } }
+    state.value.token = data.token;
+    state.value.user = {
+      username: data.user?.loginId || member.username, // UserInfoDTO의 loginId 필드 사용
+      email: data.user?.email || '',
+      roles: [] // 현재 백엔드에서 roles 미구현
+    };
 
     // localStorage에 상태 저장
     localStorage.setItem('auth', JSON.stringify(state.value));
