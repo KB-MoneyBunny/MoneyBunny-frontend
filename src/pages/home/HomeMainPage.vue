@@ -1,68 +1,33 @@
-<!-- pages/home/HomeMainPage.vue -->
+<!-- src/pages/home/HomeMainPage.vue -->
 <template>
   <div class="home-container">
-    <!-- 각 탭에서 전용 요약 카드 렌더링 -->
-    <component :is="summaryCardComponent" />
-
-    <!--상단 탭-->
-    <TabSwitcher :selectedTab="selectedTab" @switch="handleTabSwitch" />
-
-    <!-- 탭별 컴포넌트 -->
-    <HomeTotalTab v-if="selectedTab === '전체'" @switchTab="handleTabSwitch" />
-    <HomeAccountTab v-if="selectedTab === '계좌'" />
-    <HomeSavingTab v-if="selectedTab === '적금'" />
-    <HomeSpendingTab v-if="selectedTab === '카드'" />
+    <TotalSummaryCard />
+    <DailyMessageCard class="tight-top-margin" />
+    <PolicyRecommendationCard class="with-gap-top" />
+    <AssetCompareCard />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-
-import TabSwitcher from '@/pages/home/common/TabSwitcher.vue';
-import HomeTotalTab from '@/pages/home/tabs/HomeTotalTab.vue';
-import HomeAccountTab from '@/pages/home/tabs/HomeAccountTab.vue';
-import HomeSavingTab from '@/pages/home/tabs/HomeSavingTab.vue';
-import SavingSummaryCard from '@/pages/home/saving/SavingSummaryCard.vue';
-import HomeSpendingTab from '@/pages/home/tabs/HomeSpendingTab.vue';
-import SpendingSummaryCard from '@/pages/home/spending/SpendingSummaryCard.vue';
 import TotalSummaryCard from '@/pages/home/total/TotalSummaryCard.vue';
-import AccountSummaryCard from '@/pages/home/account/AccountSummaryCard.vue';
-
-const selectedTab = ref('전체');
-const handleTabSwitch = (tab) => {
-  selectedTab.value = tab;
-};
-// 각 탭에 맞는 본문 컴포넌트
-const currentTabComponent = computed(() => {
-  switch (selectedTab.value) {
-    case '전체':
-      return HomeTotalTab;
-    case '계좌':
-      return HomeAccountTab;
-    case '적금':
-      return HomeSavingTab;
-    case '카드':
-      return HomeSpendingTab;
-  }
-});
-
-// 각 탭에 맞는 상단 요약 카드 컴포넌트
-const summaryCardComponent = computed(() => {
-  switch (selectedTab.value) {
-    case '전체':
-      return TotalSummaryCard;
-    case '계좌':
-      return AccountSummaryCard;
-    case '적금':
-      return SavingSummaryCard;
-    case '카드':
-      return SpendingSummaryCard;
-  }
-});
+import DailyMessageCard from '@/pages/home/total/DailyMessageCard.vue';
+import PolicyRecommendationCard from '@/pages/home/total/PolicyRecommendationCard.vue';
+import AssetCompareCard from '@/pages/home/total/AssetCompareCard.vue';
 </script>
 
 <style scoped>
 .home-container {
   padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* 기본 카드 간격 */
+}
+
+.tight-top-margin {
+  margin-top: -1.5rem; /* 자산 카드 ↔ 오늘의 한마디 사이 간격 좁힘 */
+}
+
+.with-gap-top {
+  margin-top: 0.5rem; /* 오늘의 한마디 ↔ 정책 카드 간격 넓힘 */
 }
 </style>

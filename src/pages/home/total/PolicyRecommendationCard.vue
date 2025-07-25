@@ -1,0 +1,76 @@
+<template>
+  <div class="recommendation-section">
+    <div class="header">
+      <h2>맞춤정책 추천 Top3</h2>
+      <span class="more" @click="goToPolicy">더보기</span>
+    </div>
+    <div class="card-list">
+      <PolicyCardItem
+        v-for="(item, i) in policyList"
+        :key="i"
+        :rank="i + 1"
+        :title="item.title"
+        :description="item.description"
+        :amount="item.amount"
+        :highlighted="i === 1"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useRouter } from 'vue-router';
+import PolicyCardItem from './PolicyCardItem.vue';
+
+const router = useRouter();
+
+const goToPolicy = () => {
+  router.push('/policy'); //정책 탭으로 이동
+};
+
+const policyList = [
+  {
+    title: '청년도약계좌',
+    description: '연 5% 이자 + 정부지원금',
+    amount: 1200000,
+  },
+  {
+    title: '청년희망적금',
+    description: '연 4.5% 이자 + 세제혜택',
+    amount: 980000,
+  },
+  {
+    title: '주택청약종합저축',
+    description: '연 3.5% 이자 + 청약가점',
+    amount: 750000,
+  },
+];
+</script>
+
+<style scoped>
+.recommendation-section {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 1rem;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.header h2 {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+.more {
+  font-size: 0.875rem;
+  color: var(--text-darkgray);
+  cursor: pointer;
+}
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+</style>
