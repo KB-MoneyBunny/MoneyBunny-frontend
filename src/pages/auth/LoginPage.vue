@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import AttendanceCheckModal from './AttendanceCheckModal.vue';
@@ -93,7 +93,6 @@ onMounted(() => {
 });
 
 // 에러 메시지 변경 감지
-import { watch } from 'vue';
 watch(errorMessage, () => {
   if (errorMessage.value) {
     clearErrorMessage();

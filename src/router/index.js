@@ -37,6 +37,7 @@ import PolicyQuizStep2 from "@/pages/policy/recommend/PolicyQuizStep2.vue";
 import PolicyQuizStep3 from "@/pages/policy/recommend/PolicyQuizStep3.vue";
 import PolicyResultSummary from "@/pages/policy/recommend/PolicyResultSummary.vue";
 
+import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
 
 const routes = [
   //
@@ -115,6 +116,12 @@ const routes = [
         name: "policyResultSummary",
         component: PolicyResultSummary,
       },
+      {
+        path: '/policy/:id',
+        name: 'policyDetail',
+        component: PolicyDetailPage,
+        props: true,
+      },
     ],
   },
 ];
@@ -146,7 +153,7 @@ router.beforeEach((to, from, next) => {
   if (authRequired && !authStore.isLogin) {
     // 로그인이 필요한 페이지인데 로그인하지 않은 경우
     console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
-    return next('/?error=auth_required');
+    return next({ path: '/', query: { error: 'auth_required' } });
   }
   
   if (to.path === '/' && authStore.isLogin) {
