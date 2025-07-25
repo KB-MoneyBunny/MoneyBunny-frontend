@@ -26,7 +26,7 @@ import SavingSummaryCard from '@/pages/home/saving/SavingSummaryCard.vue';
 import HomeSpendingTab from '@/pages/home/tabs/HomeSpendingTab.vue';
 import SpendingSummaryCard from '@/pages/home/spending/SpendingSummaryCard.vue';
 import TotalSummaryCard from '@/pages/home/total/TotalSummaryCard.vue';
-import AccountSummaryCard from './account/AccountSummaryCard.vue';
+import AccountSummaryCard from '@/pages/home/account/AccountSummaryCard.vue';
 
 const selectedTab = ref('전체');
 const handleTabSwitch = (tab) => {
