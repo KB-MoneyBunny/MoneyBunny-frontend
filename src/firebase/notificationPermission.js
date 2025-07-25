@@ -2,6 +2,7 @@
 
 import { getToken, deleteToken } from 'firebase/messaging';
 import { messaging } from './initFirebase';
+import axios from '@/api'; // JWT 토큰 자동 추가를 위한 axios 인터셉터 사용
 
 // 🔔 알림 구독 함수
 export const subscribeToPush = async () => {
@@ -20,13 +21,9 @@ export const subscribeToPush = async () => {
   }
   console.log('🪪 내 FCM 토큰: ', token);
 
-  const res = await fetch('/api/push/subscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token }),
-  });
-
-  if (!res.ok) throw new Error('서버 응답 오류');
+  // 💪(상일) 백엔드 엔드포인트에 맞춰 수정하고 axios 사용으로 JWT 자동 전송
+  await axios.post('/api/subscription/subscribe', { token });
+  
   return token;
 };
 
@@ -35,10 +32,7 @@ export const unsubscribeFromPush = async () => {
   const token = localStorage.getItem('fcm_token');
   // token이 null이면 서버에 보내봤자 무의미
   if (!token) return false;
-  await fetch('/api/push/unsubscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token }),
-  });
+  // 💪(상일) 백엔드 엔드포인트에 맞춰 수정하고 axios 사용으로 JWT 자동 전송
+  await axios.post('/api/subscription/unsubscribe', { token });
   return true;
 };

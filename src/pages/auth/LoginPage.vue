@@ -31,11 +31,13 @@ const handleLogin = async () => {
     errorMessage.value = '';
     
     // auth store의 login 메서드 호출
+    console.log('로그인 시도:', id.value.trim());
     await authStore.login({
       username: id.value.trim(),
       password: password.value
     });
     
+    console.log('로그인 성공, 출석체크 모달 표시');
     // 로그인 성공 시 출석체크 모달 표시
     showModal.value = true;
     
@@ -85,6 +87,8 @@ onMounted(() => {
     errorMessage.value = '로그인이 필요한 페이지입니다.';
   } else if (route.query.error === 'login_required') {
     errorMessage.value = '세션이 만료되었습니다. 다시 로그인해주세요.';
+  } else if (route.query.error === 'token_expired') {
+    errorMessage.value = 'JWT 토큰이 만료되었습니다. 다시 로그인해주세요.';
   }
 });
 

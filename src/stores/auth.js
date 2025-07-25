@@ -78,8 +78,25 @@ export const useAuthStore = defineStore('auth', () => {
     state.value = { ...initState }; // 상태를 초기값으로 리셋
   };
 
-  // 토큰 얻어오기 액션션
+  // 토큰 얻어오기 액션
   const getToken = () => state.value.token;
+
+  // 💪(상일) JWT 토큰 만료 확인 함수
+  const isTokenExpired = () => {
+    if (!state.value.token) return true;
+    
+    try {
+      // JWT 토큰의 payload 부분 디코딩 (base64)
+      const payload = JSON.parse(atob(state.value.token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000); // 현재 시간을 초 단위로 변환
+      
+      // exp 필드와 현재 시간 비교 (5분 여유 시간 고려)
+      return payload.exp && payload.exp < (currentTime + 300);
+    } catch (error) {
+      console.error('토큰 디코딩 에러:', error);
+      return true; // 디코딩 실패 시 만료된 것으로 간주
+    }
+  };
 
   // 상태 복원 로직
   // - localStorage에 인증 정보(auth)가 저장되어 있을 경우 상태 복원
@@ -109,9 +126,10 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     getToken,
-    changeProfile, // <= 추가
+    isTokenExpired, // 토큰 만료 확인 함수 추가
+    changeProfile,
 
-    // (4) avatar 관련 구문 return 추가
+    // avatar 관련
     avatarUrl,
     updateAvatar,
   };

@@ -7,24 +7,29 @@ const instance = axios.create({
   timeout: 1000, // 요청 타임아웃 설정(1000 == 1초)
 });
 
-// 요청 인터셉터 - 모든 요청에 JWT 토큰 자동 추가
+// 💪(상일) 요청 인터셉터 - JWT 토큰 자동 추가 및 만료 확인
 instance.interceptors.request.use(
   (config) => {
-    // Auth Store에서 토큰 추출
-    const { getToken } = useAuthStore();
+    const authStore = useAuthStore();
+    const { getToken, isTokenExpired, logout } = authStore;
     const token = getToken();
 
     if (token) {
+      // 토큰 만료 확인
+      if (isTokenExpired()) {
+        console.warn('JWT 토큰이 만료되었습니다. 자동 로그아웃 처리');
+        logout();
+        router.push('/?error=token_expired');
+        return Promise.reject({ error: '토큰이 만료되었습니다.' });
+      }
+
       // Authorization 헤더에 Bearer 토큰 추가
-      // (Bearer 토큰은 OAuth 2.0과 JWT에서 사용하는 표준 인증 방식)
       config.headers['Authorization'] = `Bearer ${token}`;
-      console.log(config.headers.Authorization);
     }
 
-    return config; // 수정된 config 반환
+    return config;
   },
   (error) => {
-    // 요청 중 에러 발생 시 처리
     return Promise.reject(error);
   }
 );
