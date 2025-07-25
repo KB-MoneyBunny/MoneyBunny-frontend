@@ -7,7 +7,7 @@
   margin-bottom: 1.5rem;
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04);
 
-  height: 180px; /* ✅ 고정 높이 */
+  height: 180px; /* 고정 높이 */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -20,7 +20,7 @@
   font-weight: 500;
   color: var(--text-rate);
   line-height: 1.4;
-  /* ✅ 아래 요소(숫자)와의 간격 확보 */
+  /* 아래 요소(숫자)와의 간격 확보 */
   margin-bottom: 0.375rem;
 }
 

@@ -38,6 +38,10 @@ export const bankLogoMap = {
   ).href,
   IM뱅크: new URL('@/assets/images/icons/bank/im_fill.png', import.meta.url)
     .href,
+  NH농협은행: new URL(
+    '@/assets/images/icons/bank/nonghyup.png',
+    import.meta.url
+  ).href,
 };
 
 import { bankCodeMap } from './bankCodeMap';

@@ -64,5 +64,39 @@
     "balance": 15624,
     "createdAt": 1753196512506,
     "accountTransactions": null
+  },
+
+  {
+    "id": null,
+    "userId": null,
+    "bankCode": "0110",
+    "accountName": "스무살우리 통장",
+    "accountNumber": "1002059793828",
+    "accountType": "11",
+    "balance": 15624,
+    "createdAt": 1753196512506,
+    "accountTransactions": null
+  },
+  {
+    "id": null,
+    "userId": null,
+    "bankCode": "0270",
+    "accountName": "스무살우리 통장",
+    "accountNumber": "1002059793828",
+    "accountType": "11",
+    "balance": 15624,
+    "createdAt": 1753196512506,
+    "accountTransactions": null
+  },
+  {
+    "id": null,
+    "userId": null,
+    "bankCode": "0890",
+    "accountName": "스무살우리 통장",
+    "accountNumber": "1002059793828",
+    "accountType": "11",
+    "balance": 15624,
+    "createdAt": 1753196512506,
+    "accountTransactions": null
   }
 ]
