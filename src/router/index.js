@@ -23,7 +23,7 @@ import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
 import HomeMainPage from '@/pages/home/HomeMainPage.vue';
-import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
+import AssetMain from '@/pages/asset/AssetMain.vue';
 import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
 import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 
@@ -66,7 +66,7 @@ const routes = [
     children: [
       { path: '', redirect: '/home' },
       { path: 'home', name: 'home', component: HomeMainPage },
-      { path: 'asset', name: 'asset', component: AssetMainTab },
+      { path: 'asset', name: 'asset', component: AssetMain },
       { path: 'mypage', name: 'mypage', component: MypageMain },
       {
         path: 'mypage/settings',
