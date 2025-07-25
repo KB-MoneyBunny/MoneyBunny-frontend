@@ -35,5 +35,7 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    port: 5173,
+    host: true,
   },
 });

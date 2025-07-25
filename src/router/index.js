@@ -88,9 +88,15 @@ const routes = [
       { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
       { path: 'policy/main', name: 'policyMain', component: PolicyMainTab }, // 정책 추천 퀴즈 흐름
       {
-        path: '/policy/quiz/step1',
+
+        path: 'home', // 홈 탭
+        name: 'home',
+        component: HomeMainPage,
+      },
+      {  path: '/policy/quiz/step1',
         name: 'policyQuizStep1',
         component: PolicyQuizStep1,
+
       },
       {
         path: '/policy/quiz/step2',
