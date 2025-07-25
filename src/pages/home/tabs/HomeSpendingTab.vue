@@ -1,5 +1,5 @@
 <template>
   <div>
-    <h2>소비 탭입니다</h2>
+    <h2>카드 탭입니다</h2>
   </div>
 </template>

@@ -16,7 +16,7 @@ defineProps({
   selectedTab: String,
 });
 
-const tabs = ['전체', '계좌', '적금', '지출'];
+const tabs = ['전체', '계좌', '적금', '카드'];
 </script>
 
 <style scoped>
@@ -42,7 +42,7 @@ const tabs = ['전체', '계좌', '적금', '지출'];
 }
 
 .tab-button.active {
-  background-color: #2e3a59; /* 진한 네이비 */
+  background-color: var(--base-blue-dark); /* 진한 네이비 */
   color: white;
 }
 </style>

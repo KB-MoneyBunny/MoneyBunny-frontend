@@ -11,7 +11,7 @@
     <HomeTotalTab v-if="selectedTab === '전체'" @switchTab="handleTabSwitch" />
     <HomeAccountTab v-if="selectedTab === '계좌'" />
     <HomeSavingTab v-if="selectedTab === '적금'" />
-    <HomeSpendingTab v-if="selectedTab === '지출'" />
+    <HomeSpendingTab v-if="selectedTab === '카드'" />
   </div>
 </template>
 
@@ -41,7 +41,7 @@ const currentTabComponent = computed(() => {
       return HomeAccountTab;
     case '적금':
       return HomeSavingTab;
-    case '지출':
+    case '카드':
       return HomeSpendingTab;
   }
 });
@@ -55,7 +55,7 @@ const summaryCardComponent = computed(() => {
       return AccountSummaryCard;
     case '적금':
       return SavingSummaryCard;
-    case '지출':
+    case '카드':
       return SpendingSummaryCard;
   }
 });
