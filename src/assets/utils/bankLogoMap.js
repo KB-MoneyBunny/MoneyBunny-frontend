@@ -40,6 +40,12 @@ export const bankLogoMap = {
     .href,
 };
 
+import { bankCodeMap } from './bankCodeMap';
 export function getBankLogo(bankName) {
+  return bankLogoMap[bankName] || '/default-logo.png';
+}
+
+export function getBankLogoByCode(bankCode) {
+  const bankName = bankCodeMap[bankCode];
   return bankLogoMap[bankName] || '/default-logo.png';
 }

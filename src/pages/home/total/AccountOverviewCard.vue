@@ -38,19 +38,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import accountsData from '@/assets/data/accounts.json';
-
-// 은행명과 로고 이미지 파일명을 매핑
+import rawAccounts from '@/assets/data/accounts.json';
 import { getBankLogo } from '@/assets/utils/bankLogoMap.js';
+import { getBankName } from '@/assets/utils/bankCodeMap.js';
 
 const router = useRouter();
 const accounts = ref([]);
 
-//계좌탭으로 이동
 const emit = defineEmits(['switchTab']);
 
 function goToAccountTab() {
-  emit('switchTab', '계좌'); // 탭 이름은 '계좌'
+  emit('switchTab', '계좌');
 }
 
 function formatWon(value) {
@@ -58,7 +56,12 @@ function formatWon(value) {
 }
 
 onMounted(() => {
-  accounts.value = accountsData;
+  accounts.value = rawAccounts.map((account) => ({
+    ...account,
+    bank: getBankName(account.bankCode),
+    number: account.accountNumber,
+    type: account.accountType === '11' ? '입출금통장' : '적금',
+  }));
 });
 </script>
 

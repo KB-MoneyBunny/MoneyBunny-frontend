@@ -21,21 +21,24 @@
 <script setup>
 import { ref } from 'vue';
 import accountData from '@/assets/data/accounts.json';
-import { bankLogoMap } from '@/assets/utils/bankLogoMap.js';
+import { getBankName } from '@/assets/utils/bankCodeMap.js';
+import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
+
 import NoAccountCard from './NoAccountCard.vue';
 import AccountItemCard from './AccountItemCard.vue';
 
-// 로고를 포함한 계좌 리스트 초기화
+// 로고와 이름을 포함한 계좌 리스트 초기화
 const accounts = ref(
   accountData.map((item, idx) => ({
-    id: idx + 1, // 또는 고유 id 생성
-    bank: item.bank,
+    id: idx + 1,
+    bankCode: item.bankCode,
+    bank: getBankName(item.bankCode),
     name: item.accountName,
-    number: item.number,
+    number: item.accountNumber,
     balance: item.balance,
-    type: item.type,
-    isMain: idx === 0, // 첫 번째만 대표
-    logoUrl: bankLogoMap[item.bank] || '', // 로고 매핑
+    type: item.accountType === '11' ? '입출금통장' : '적금',
+    isMain: idx === 0,
+    logoUrl: getBankLogoByCode(item.bankCode),
   }))
 );
 
