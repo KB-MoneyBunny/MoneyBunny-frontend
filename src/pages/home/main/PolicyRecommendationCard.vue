@@ -34,7 +34,32 @@ const goToPolicy = () => {
   router.push('/policy'); //정책 탭으로 이동
 };
 
+const goToQuiz = () => {
+  router.push('/policy/taps/PolicyMainTab'); // 예: 유형 검사 시작
+};
+
+//정책 있는 경우
+const policyList = [
+  {
+    title: '청년도약계좌',
+    description: '연 5% 이자 + 정부지원금',
+    amount: 1200000,
+  },
+  {
+    title: '청년희망적금',
+    description: '연 4.5% 이자 + 세제혜택',
+    amount: 980000,
+  },
+  {
+    title: '주택청약종합저축',
+    description: '연 3.5% 이자 + 청약가점',
+    amount: 750000,
+  },
+];
+
+/*정책 없는 경우
 const policyList = [];
+*/
 </script>
 
 <style scoped>

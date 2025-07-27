@@ -1,18 +1,22 @@
 <!--src\pages\asset\AssetMain.vue-->
 <template>
   <div class="asset-main-wrapper">
+    <div class="asset-main-tab">
+      <TotalAssetCard />
+      <AccountStatusCard class="with-margin" />
+      <CardStatusCard />
+    </div>
+    <!---->
     <!-- 계좌 현황 -->
     <AccountOverviewCard @switchTab="$emit('switchTab', $event)" />
 
     <!-- 카드 현황 -->
-    <section class="asset-section">
-      <div class="asset-section-header">카드 현황</div>
-      <CardOverviewCard />
-    </section>
+    <CardOverviewCard @switchTab="$emit('switchTab', $event)" />
   </div>
 </template>
 
 <script setup>
+import TotalAssetCard from '@/pages/asset/main/TotalAssetCard.vue';
 import AccountOverviewCard from '../main/AccountOverviewCard.vue';
 import CardOverviewCard from '../main/CardOverviewCard.vue';
 

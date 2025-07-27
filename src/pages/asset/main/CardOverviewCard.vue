@@ -1,17 +1,17 @@
 <template>
-  <div class="card-card-wrapper">
-    <!-- ✅ 헤더 클릭 시 내부 탭 전환 -->
-    <div class="card-header" @click="goToCardTab">
+  <div class="card-overview-card">
+    <!-- 헤더 -->
+    <div class="card-header">
       <div class="card-title">카드</div>
-      <!-- ✅ 제목 텍스트 추가 -->
       <img
         src="@/assets/images/icons/common/arrow_right.png"
         class="arrow-icon"
         alt="이동"
+        @click.stop="goToCardTab"
       />
     </div>
 
-    <!-- 카드 목록 -->
+    <!-- 카드 리스트 -->
     <div class="card-item" v-for="(card, index) in cards" :key="index">
       <div class="left">
         <img :src="card.cardImage" class="bank-logo" />
@@ -29,9 +29,9 @@
   </div>
 </template>
 <script setup>
-const emit = defineEmits(['switchTab']); // ✅ emit 선언
+const emit = defineEmits(['switchTab']); //  emit 선언
 
-// ✅ 내부 탭 전환
+//  내부 탭 전환
 const goToCardTab = () => {
   emit('switchTab', '카드');
 };
@@ -65,7 +65,11 @@ const cards = [
 ];
 </script>
 <style scoped>
-.card-card-wrapper {
+.card-overview-card {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 1rem;
