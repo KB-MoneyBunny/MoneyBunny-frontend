@@ -1,7 +1,8 @@
+<!--src\pages\home\main\NoPolicyCard.vue-->
 <template>
   <div class="no-policy-card">
     <img
-      src="@/assets/images/icons/bunny/policy_bunny.png"
+      src="@/assets/images/icons/bunny/policy_bunny_background.png"
       alt="돋보기 토끼"
       class="bunny-img"
     />
@@ -12,7 +13,6 @@
     <button class="start-btn" @click="$emit('start-quiz')">
       유형 검사 시작하기 →
     </button>
-    <div class="see-all">전체 정책 둘러보기</div>
   </div>
 </template>
 
