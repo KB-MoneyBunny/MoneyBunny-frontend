@@ -6,56 +6,76 @@
     <div class="asset-box">
       <div class="block light">
         <div class="label">현재 자산</div>
-        <div class="amount">26,867,500원</div>
-        <div class="desc">2024년 1월 기준</div>
+        <div class="amount">{{ currentAssetDisplay }}</div>
       </div>
       <div class="block dark">
         <div class="label">예상 자산</div>
-        <div class="amount">29,517,500원</div>
-        <div class="desc">1년 후 (정책 적용)</div>
+        <div class="amount">{{ expectedAssetDisplay }}</div>
       </div>
     </div>
 
     <!-- 자산 증가율 -->
     <div class="growth-box">
       <div class="growth-left">
-        <!-- 바뀐 부분 -->
         <img
           src="@/assets/images/icons/common/increase.png"
           alt="자산 증가 아이콘"
           class="icon"
         />
-
         <span class="text">
-          <strong>자산 증가율</strong>
-          <br />
-          예상 증가금액: +2,650,000원
+          <strong>자산 증가율</strong><br />
+          예상 증가금액: {{ increaseAmountDisplay }}
         </span>
       </div>
-      <div class="growth-rate">9.9%</div>
-    </div>
-
-    <!-- 추천 이유 -->
-    <div class="reason-box">
-      <div class="reason-title">
-        <img
-          src="@/assets/images/icons/common/lamp.png"
-          alt="추천 아이콘"
-          class="icon"
-        />
-        <span>추천 이유</span>
-      </div>
-
-      <p class="reason-text">
-        현재 자산 구성과 연령대를 고려할 때, 청년도약계좌와 청년희망적금을 통해
-        안정적인 수익률을 확보하면서 세제혜택까지 받을 수 있습니다.
-      </p>
+      <div class="growth-rate">{{ increaseRateDisplay }}</div>
     </div>
   </div>
 </template>
 
 <script setup>
-// 추후 props or API 연동 가능
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
+
+// 자산 관련 상태 선언
+const currentAsset = ref(null);
+const expectedAsset = ref(null);
+const increaseAmount = ref(null);
+const increaseRate = ref(null);
+
+//컴포넌트 마운트 시 화면
+onMounted(async () => {
+  try {
+    //백엔드 서버에서 계좌 정보 가져오기
+    const res = await axios.get('http://localhost:3000/accounts?userId=1');
+    const accounts = res.data;
+    const total = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+
+    //계좌 잔액 총합
+    currentAsset.value = total;
+    //변경 예정: 정책 적용 시 자산 증가
+    expectedAsset.value = Math.round(total * 1.1);
+
+    //증가 금액과 증가율 계산
+    increaseAmount.value = expectedAsset.value - total;
+    increaseRate.value = ((increaseAmount.value / total) * 100).toFixed(1);
+  } catch (e) {
+    //오류 발생시
+    console.error('자산 불러오기 실패', e);
+  }
+});
+
+// fallback display용
+const format = (val, suffix = '원') =>
+  val ? val.toLocaleString() + suffix : '9,999' + suffix;
+
+const currentAssetDisplay = computed(() => format(currentAsset.value));
+const expectedAssetDisplay = computed(() => format(expectedAsset.value));
+const increaseAmountDisplay = computed(
+  () => '+' + format(increaseAmount.value)
+);
+const increaseRateDisplay = computed(() =>
+  increaseRate.value ? `${increaseRate.value}%` : '9.9%'
+);
 </script>
 
 <style scoped>
@@ -110,11 +130,6 @@
   margin: 0.5rem 0;
 }
 
-.desc {
-  font-size: 0.75rem;
-  opacity: 0.85;
-}
-
 /* 자산 증가율 */
 .growth-box {
   background: #eef2ff;
@@ -134,32 +149,7 @@
 
 .growth-rate {
   font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--text-green);
-}
-
-/* 추천 이유 */
-.reason-box {
-  background: #f8fafc;
-  border-radius: 0.75rem;
-  padding: 1rem;
-}
-
-.reason-title {
-  display: flex;
-  align-items: center;
   font-weight: 800;
-  font-size: 0.9rem;
-  color: var(--text-bluegray);
-  gap: 0.5rem;
-}
-
-.reason-title .icon {
-  width: 1.125rem;
-  height: 1.125rem;
-  object-fit: contain;
-}
-.reason-text {
-  font-size: 0.8rem;
+  color: var(--text-green);
 }
 </style>

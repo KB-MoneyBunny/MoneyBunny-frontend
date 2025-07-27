@@ -49,28 +49,37 @@ const policyList = [
 
 <style scoped>
 .recommendation-section {
-  background: white;
-  padding: 1.25rem;
+  background-color: white;
   border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
 }
+
 .header h2 {
-  font-size: 1.125rem;
-  font-weight: bold;
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
+  color: var(--text-login);
+  margin: 0;
 }
+
 .more {
-  font-size: 0.875rem;
-  color: var(--text-darkgray);
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  color: var(--text-lightgray);
   cursor: pointer;
 }
+
 .card-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 </style>

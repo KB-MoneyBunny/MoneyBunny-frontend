@@ -1,12 +1,25 @@
 <template>
   <div class="card-card-wrapper">
+    <!-- ✅ 헤더 클릭 시 내부 탭 전환 -->
+    <div class="card-header" @click="goToCardTab">
+      <div class="card-title">카드</div>
+      <!-- ✅ 제목 텍스트 추가 -->
+      <img
+        src="@/assets/images/icons/common/arrow_right.png"
+        class="arrow-icon"
+        alt="이동"
+      />
+    </div>
+
+    <!-- 카드 목록 -->
     <div class="card-item" v-for="(card, index) in cards" :key="index">
       <div class="left">
-        <img :src="getBankLogo(card.bankCode)" class="bank-logo" />
+        <img :src="card.cardImage" class="bank-logo" />
         <div class="card-info">
           <div class="bank-name">
-            {{ getBankName(card.bankCode) }} {{ card.cardName }}
+            {{ getIssuerName(card.issuerCode) }} {{ card.cardName }}
           </div>
+          <div class="card-number">{{ card.cardMaskedNumber }}</div>
         </div>
       </div>
       <div class="right">
@@ -15,34 +28,42 @@
     </div>
   </div>
 </template>
-
 <script setup>
-import { bankCodeMap } from '@/assets/utils/bankCodeMap';
-import { bankLogoMap } from '@/assets/utils/bankLogoMap';
+const emit = defineEmits(['switchTab']); // ✅ emit 선언
 
-const getBankName = (code) => {
-  return bankCodeMap[code] || '알 수 없음';
+// ✅ 내부 탭 전환
+const goToCardTab = () => {
+  emit('switchTab', '카드');
 };
 
-const getBankLogo = (code) => {
-  return bankLogoMap[code] || '';
+const issuerCodeMap = {
+  '0309': '우리카드',
+  '0040': 'KB국민카드',
 };
 
-// 더미 카드 데이터
+const getIssuerName = (code) => {
+  return issuerCodeMap[code] || '알 수 없음';
+};
+
 const cards = [
   {
-    bankCode: '0880',
-    cardName: '신한카드 Deep Dream',
-    amount: 450000,
+    issuerCode: '0309',
+    cardName: '카드의정석 I&U+',
+    cardMaskedNumber: '5317********2156',
+    cardImage:
+      'https://pc.wooricard.com/webcontent/cdPrdImgFileList/2024/2/13/1931f194-e38e-4c90-87d3-f084acb6218a.png',
+    amount: 325000,
   },
   {
-    bankCode: '0040',
+    issuerCode: '0040',
     cardName: 'KB국민 Simple카드',
-    amount: 310000,
+    cardMaskedNumber: '5211********1002',
+    cardImage:
+      'https://img1.kbcard.com/ST/img/cxc/kbcard/upload/img/product/09122_img.png',
+    amount: 210000,
   },
 ];
 </script>
-
 <style scoped>
 .card-card-wrapper {
   display: flex;
@@ -50,6 +71,26 @@ const cards = [
   gap: 1rem;
 }
 
+/* 🔹 헤더 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--base-blue-dark);
+}
+
+.arrow-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 🔹 카드 아이템 */
 .card-item {
   display: flex;
   justify-content: space-between;
@@ -63,8 +104,8 @@ const cards = [
 }
 
 .bank-logo {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
@@ -77,6 +118,11 @@ const cards = [
   font-size: 0.875rem;
   font-weight: bold;
   color: var(--base-blue-dark);
+}
+
+.card-number {
+  font-size: 0.75rem;
+  color: var(--text-lightgray);
 }
 
 .right {

@@ -30,6 +30,6 @@ const summary = {
   display: flex;
   align-items: baseline;
   gap: 0.375rem;
-  margin-bottom: 0.25rem; /* ✅ 간격 줄이기 */
+  margin-bottom: 0.25rem; /* 간격 줄이기 */
 }
 </style>

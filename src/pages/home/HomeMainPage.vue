@@ -1,18 +1,17 @@
-<!-- src/pages/home/HomeMainPage.vue -->
 <template>
   <div class="home-container">
     <TotalSummaryCard />
-    <DailyMessageCard class="tight-top-margin" />
-    <PolicyRecommendationCard class="with-gap-top" />
     <AssetCompareCard />
+    <PolicyRecommendationCard class="with-gap-top" />
+    <DailyMessageCard class="tight-top-margin" />
   </div>
 </template>
 
 <script setup>
-import TotalSummaryCard from '@/pages/home/total/TotalSummaryCard.vue';
-import DailyMessageCard from '@/pages/home/total/DailyMessageCard.vue';
-import PolicyRecommendationCard from '@/pages/home/total/PolicyRecommendationCard.vue';
-import AssetCompareCard from '@/pages/home/total/AssetCompareCard.vue';
+import TotalSummaryCard from '@/pages/home/main/TotalSummaryCard.vue';
+import AssetCompareCard from '@/pages/home/main/AssetCompareCard.vue';
+import PolicyRecommendationCard from '@/pages/home/main/PolicyRecommendationCard.vue';
+import DailyMessageCard from '@/pages/home/main/DailyMessageCard.vue';
 </script>
 
 <style scoped>
@@ -20,14 +19,15 @@ import AssetCompareCard from '@/pages/home/total/AssetCompareCard.vue';
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* 기본 카드 간격 */
+  gap: 0.5rem;
 }
 
+/* 한마디 카드는 아래 간격만 살짝 줄여주기 */
 .tight-top-margin {
-  margin-top: -1.5rem; /* 자산 카드 ↔ 오늘의 한마디 사이 간격 좁힘 */
+  margin-top: 0.5rem;
 }
 
 .with-gap-top {
-  margin-top: 0.5rem; /* 오늘의 한마디 ↔ 정책 카드 간격 넓힘 */
+  margin-top: 0.5rem;
 }
 </style>
