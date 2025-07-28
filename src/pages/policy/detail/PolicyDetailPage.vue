@@ -5,7 +5,6 @@ import { useRoute } from 'vue-router';
 import PolicyHeader from './PolicyHeader.vue';
 import PolicyTab from './PolicyTabs.vue';
 import PolicyTabContent from './PolicyTabContent.vue';
-import PolicyFooter from './PolicyFooter.vue';
 
 // 라우터에서 id 가져오기
 const route = useRoute();
@@ -67,29 +66,38 @@ const policyList = [
 const policyId = parseInt(route.params.id);
 const policy = policyList.find((p) => p.id === policyId);
 </script>
-
 <template>
   <div class="policyDetailPage" v-if="policy">
     <PolicyHeader :policy="policy" />
     <PolicyTab v-model:selectedTab="selectedTab" />
-    <PolicyTabContent :policy="policy" :tab="selectedTab">
-      <template #condition>
-        <div>신청 조건 내용 들어감</div>
-      </template>
-      <template #apply>
-        <div>신청 방법 내용 들어감</div>
-      </template>
-    </PolicyTabContent>
-    <PolicyFooter :policy="policy" />
+
+    <!-- ✅ 탭 콘텐츠를 감싸는 공통 박스 -->
+    <div class="contentBox">
+      <PolicyTabContent :policy="policy" :tab="selectedTab">
+        <template #condition>
+          <div>신청 조건 내용 들어감</div>
+        </template>
+        <template #apply>
+          <div>신청 방법 내용 들어감</div>
+        </template>
+      </PolicyTabContent>
+    </div>
   </div>
+
   <div v-else class="noData">정책 정보를 찾을 수 없습니다.</div>
 </template>
 
 <style scoped>
 .policyDetailPage {
-  padding: 20px;
   background-color: var(--input-bg-2);
 }
+
+.contentBox {
+  background-color: white;
+  border-radius: 12px;
+  padding: 10x;
+}
+
 .noData {
   padding: 40px;
   text-align: center;

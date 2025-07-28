@@ -86,7 +86,7 @@ const policyList = ref([
 </script>
 <style scoped>
 .policyWrapper {
-  padding: 0 20px;
+  /* padding: 0 20px; */
   padding-bottom: 80px;
   background-color: var(--input-bg-2);
   font-family: 'NanumSquareNeo';
