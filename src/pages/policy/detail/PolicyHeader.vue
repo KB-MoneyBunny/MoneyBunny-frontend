@@ -1,7 +1,11 @@
 <script setup>
 import { ref } from 'vue';
 
-// Props
+// 이미지 import
+import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
+import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
+import shareIcon from '@/assets/images/icons/policy/share.png';
+
 const props = defineProps({
   policy: {
     type: Object,
@@ -9,28 +13,25 @@ const props = defineProps({
   },
 });
 
-const isBookmarked = ref(false);
+const bookmark = ref(false);
 
 const toggleBookmark = () => {
-  isBookmarked.value = !isBookmarked.value;
+  bookmark.value = !bookmark.value;
 };
 </script>
 
 <template>
   <div class="policyHeader">
     <div class="headerTop">
-      <h2 class="title font-bold font-22">{{ policy.title }}</h2>
+      <div class="title font-bold font-22">{{ policy.title }}</div>
       <img
-        :src="
-          isBookmarked
-            ? '@/assets/images/icons/policy/bookmark_after.png'
-            : '@/assets/images/icons/policy/bookmark_before.png'
-        "
+        :src="bookmark ? bookmarkAfter : bookmarkBefore"
         alt="bookmark icon"
         class="headerIcon"
         @click="toggleBookmark"
       />
     </div>
+
     <p class="desc font-15 font-regular">{{ policy.description }}</p>
 
     <div class="tags">
@@ -45,12 +46,8 @@ const toggleBookmark = () => {
 
     <div class="actions">
       <button class="applyButton font-15 font-bold">바로 신청하기</button>
-      <button class="shareButton font-15">
-        <img
-          src="@/assets/images/icons/policy/share.png"
-          alt="공유"
-          class="shareIcon"
-        />
+      <button class="shareButton font-15 font-bold">
+        <img :src="shareIcon" alt="공유" class="shareIcon" />
         공유하기
       </button>
     </div>
@@ -60,16 +57,15 @@ const toggleBookmark = () => {
 <style scoped>
 .policyHeader {
   background-color: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 24px;
 }
 
 .headerTop {
   display: flex;
   justify-content: space-between;
   align-items: start;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .headerIcon {
@@ -80,26 +76,26 @@ const toggleBookmark = () => {
 
 .desc {
   color: var(--text-bluegray);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .tags {
   display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .tag {
   background-color: var(--input-outline);
   color: var(--text-bluegray);
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 6px;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 4px;
 }
 
 .supportAmount {
   color: var(--base-blue-dark);
-  margin-bottom: 16px;
+  margin-bottom: 15px;
 }
 
 .actions {
@@ -114,16 +110,17 @@ const toggleBookmark = () => {
   border: none;
   padding: 12px;
   border-radius: 8px;
+  margin-right: 5px;
 }
 
 .shareButton {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 7px;
   background-color: var(--input-bg-2);
   color: var(--text-bluegray);
   border: none;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
 }
 
