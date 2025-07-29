@@ -2,7 +2,7 @@
   <div class="card-overview-card">
     <!-- 헤더 -->
     <div class="card-header" @click="goToCardTab">
-      <div class="card-title">카드</div>
+      <div class="card-title">카드 현황</div>
       <img
         src="@/assets/images/icons/common/arrow_right.png"
         class="arrow-icon"
@@ -11,22 +11,22 @@
     </div>
 
     <!-- 카드 리스트 -->
-    <CardList :cards="cards" />
+    <CardOverviewList :cards="cards" />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import CardList from '../card/CardList.vue'; // 카드 리스트 컴포넌트 경로
+import CardOverviewList from '../card/CardOverviewList.vue';
 
 const emit = defineEmits(['switchTab']);
 
-// 내부 탭 전환: 카드탭 이동
+// 내부 탭 전환
 const goToCardTab = () => {
   emit('switchTab', '카드');
 };
 
-// 카드 더미 데이터
+// 더미 카드 데이터
 const cards = ref([
   {
     issuerCode: '0309',
