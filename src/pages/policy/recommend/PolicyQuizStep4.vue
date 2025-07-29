@@ -8,32 +8,42 @@
   <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
     <section class="quizContent">
       <div class="progressBarWrapper">
-        <span class="font-13 font-regular">질문 1 / 5</span>
+        <span class="font-13 font-regular">질문 4 / 5</span>
         <div class="progressBar">
-          <div class="progress" :style="{ width: '20%' }"></div>
+          <div class="progress" :style="{ width: '80%' }"></div>
         </div>
       </div>
 
-      <h3 class="question font-22 font-bold">최종 학력을 선택해주세요</h3>
+      <h3 class="question font-22 font-bold">
+        관심 있는 정책 분야를 선택해주세요
+      </h3>
+      <p class="font-12 font-regular">다중선택 가능</p>
 
-      <ul class="options">
-        <li
-          v-for="option in options"
-          :key="option"
-          class="optionItem"
-          :class="{ selected: selectedOption === option }"
-          @click="selectedOption = option"
-        >
-          {{ option }}
-        </li>
-      </ul>
+      <div
+        v-for="(group, index) in policyGroups"
+        :key="index"
+        style="margin-bottom: 24px"
+      >
+        <p class="font-16 font-bold">{{ index + 1 }}. {{ group.title }}</p>
+        <ul class="options">
+          <li
+            v-for="item in group.items"
+            :key="item"
+            class="optionItem"
+            :class="{ selected: selectedOptions.includes(item) }"
+            @click="toggleOption(item)"
+          >
+            {{ item }}
+          </li>
+        </ul>
+      </div>
     </section>
 
     <footer class="quizFooter">
       <button class="prevButton font-20" @click="goToPrevStep">이전</button>
       <button
         class="nextButton font-20"
-        :disabled="!selectedOption"
+        :disabled="selectedOptions.length === 0"
         @click="goToNextStep"
       >
         다음
@@ -47,35 +57,60 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default {
-  name: 'PolicyQuizStep1',
+  name: 'PolicyQuizStep2',
   setup() {
     const router = useRouter();
-    const selectedOption = ref('');
-    const options = [
-      '제한없음',
-      '고졸 미만',
-      '고교 재학',
-      '고졸 예정',
-      '고교 졸업',
-      '대학 재학',
-      '대졸 예정',
-      '대학 졸업',
-      '석·박사',
-      '기타',
+    const selectedOptions = ref([]);
+
+    const policyGroups = [
+      {
+        title: '취업 및 창업 지원',
+        items: ['교육지원', '인턴', '중소기업', '벤처', '장기미취업청년'],
+      },
+      {
+        title: '금융 지원',
+        items: [
+          '바우처',
+          '보조금',
+          '대출',
+          '금리혜택',
+          '맞춤형상담서비스',
+          '신용회복',
+        ],
+      },
+      {
+        title: '주거 지원',
+        items: ['공공임대주택', '주거지원'],
+      },
+      {
+        title: '가정 및 생계 지원',
+        items: ['청년가장', '출산'],
+      },
     ];
+
+    const toggleOption = (item) => {
+      const index = selectedOptions.value.indexOf(item);
+      if (index === -1) {
+        selectedOptions.value.push(item);
+      } else {
+        selectedOptions.value.splice(index, 1);
+      }
+    };
+
     const goToPrevStep = () => {
-      router.push({ name: 'policyIntroForm' });
+      router.push({ name: 'policyQuizStep3' });
     };
 
     const goToNextStep = () => {
-      if (selectedOption.value) {
-        router.push({ name: 'policyQuizStep2' });
+      if (selectedOptions.value.length > 0) {
+        router.push({ name: 'policyQuizStep5' });
       }
     };
 
     return {
-      options,
-      selectedOption,
+      selectedOptions,
+      policyGroups,
+      toggleOption,
       goToNextStep,
       goToPrevStep,
     };
@@ -127,14 +162,14 @@ export default {
 }
 
 .question {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: var(--text-login);
 }
 
 .options {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -154,10 +189,9 @@ export default {
 }
 
 .quizFooter {
-  margin-top: 32px;
   display: flex;
   gap: 12px;
-  justify-content: center;
+  margin-top: 32px;
 }
 
 .prevButton,
@@ -166,7 +200,6 @@ export default {
   padding: 12px 0;
   border-radius: 10px;
   border: none;
-  font-weight: bold;
 }
 
 .prevButton {
