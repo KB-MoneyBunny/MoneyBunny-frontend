@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import AccountList from '../account/AccountList.vue';
+import AccountList from '../account/AccountOverviewList.vue';
 import rawAccounts from '@/assets/data/accounts.json';
 
 const emit = defineEmits(['switchTab']);
