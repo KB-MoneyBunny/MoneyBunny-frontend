@@ -25,7 +25,7 @@ import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
 import HomeMainPage from '@/pages/home/HomeMainPage.vue'; // 홈메인
-import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
+import AssetMain from '@/pages/asset/AssetMain.vue'; //🥕성빈: 자산 메인탭
 import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
 import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 
