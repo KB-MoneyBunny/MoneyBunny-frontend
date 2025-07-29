@@ -1,3 +1,4 @@
+<!--src\pages\asset\account\AccountList.vue-->
 <template>
   <div class="account-list-wrapper">
     <!-- 상단 컨트롤 바 -->

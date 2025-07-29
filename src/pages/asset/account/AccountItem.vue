@@ -1,5 +1,6 @@
+<!--src\pages\asset\account\AccountItem.vue-->
 <template>
-  <div class="account-item">
+  <div class="account-item" @click="goToDetail">
     <!-- 은행 로고 -->
     <img
       :src="getBankLogoByCode(account.bankCode)"
@@ -10,9 +11,9 @@
     <!-- 계좌 정보 -->
     <div class="account-info">
       <div class="info-top">
-        <span class="bank-name"
-          >{{ getBankName(account.bankCode) }} {{ account.accountName }}</span
-        >
+        <span class="bank-name">
+          {{ getBankName(account.bankCode) }} {{ account.accountName }}
+        </span>
         <span v-if="account.isMain" class="main-badge">대표</span>
       </div>
       <p class="account-number">
@@ -23,12 +24,18 @@
     </div>
 
     <!-- 우측 컨트롤 -->
-    <div class="account-control">
-      <button v-if="account.isMain" class="main-label">대표 계좌</button>
-      <button v-else class="set-main-btn" @click="$emit('set-main', account)">
+    <div class="account-control" @click.stop>
+      <button v-if="account.isMain" class="main-label" disabled>
+        대표 계좌
+      </button>
+      <button
+        v-else
+        class="set-main-btn"
+        @click.stop="$emit('set-main', account)"
+      >
         대표 설정
       </button>
-      <button class="delete-btn" @click="$emit('delete', account)">
+      <button class="delete-btn" @click.stop="$emit('delete', account)">
         <img src="@/assets/images/icons/common/Trash.png" alt="삭제" />
       </button>
     </div>
@@ -38,7 +45,9 @@
 <script setup>
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const props = defineProps({
   account: { type: Object, required: true },
 });
@@ -46,6 +55,10 @@ const props = defineProps({
 const formatWon = (value) => `${value.toLocaleString()}원`;
 const formatAccountNumber = (number) =>
   number.replace(/(\d{3})(\d{3})(\d{3,4})/, '$1-$2-$3');
+
+const goToDetail = () => {
+  router.push(`/account/${props.account.id}`); // 계좌 상세 페이지 이동
+};
 </script>
 
 <style scoped>
@@ -57,7 +70,7 @@ const formatAccountNumber = (number) =>
   border-radius: 0.75rem;
   padding: 1rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f0f0f0; /*🥕성빈: 테두리 있?없? */
+  border: 1px solid #f0f0f0;
 }
 
 .bank-logo {
@@ -126,6 +139,10 @@ const formatAccountNumber = (number) =>
   padding: 0.25rem 0.6rem;
   border-radius: 1rem;
   cursor: pointer;
+}
+
+.set-main-btn:hover {
+  background: var(--sub-skyblue);
 }
 
 .delete-btn {
