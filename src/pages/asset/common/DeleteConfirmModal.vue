@@ -9,7 +9,7 @@
         </button>
       </div>
 
-      <!-- 중앙 이미지 -->
+      <!-- 중앙 아이콘 -->
       <img
         src="@/assets/images/icons/bunny/crying_bunny.png"
         alt="토끼 아이콘"
@@ -17,14 +17,14 @@
       />
 
       <!-- 안내 문구 -->
-      <p class="modal-text">{{ message || '이 항목을 삭제하시겠습니까?' }}</p>
+      <p class="modal-text">{{ message }}</p>
       <p v-if="subtitle" class="modal-subtitle">{{ subtitle }}</p>
       <p v-if="warning" class="warning-text">{{ warning }}</p>
 
       <!-- 하단 버튼 -->
       <div class="modal-actions">
-        <button class="cancel-btn" @click="onClose">취소</button>
-        <button class="delete-btn" @click="onConfirm">삭제</button>
+        <button class="cancel-btn" @click.stop="onClose">취소</button>
+        <button class="delete-btn" @click.stop="onConfirm">삭제</button>
       </div>
     </div>
   </div>
@@ -35,17 +35,22 @@ export default {
   name: 'DeleteConfirmModal',
   props: {
     visible: { type: Boolean, required: true },
-    title: { type: String, default: '삭제 확인' },
-    message: { type: String, default: '정말 삭제하시겠습니까?' },
-    subtitle: { type: String, default: '' }, // 카드/계좌 정보 표시 등
-    warning: { type: String, default: '삭제된 항목은 복구할 수 없습니다.' },
+    title: { type: String, default: '삭제 확인' }, // 모달 제목
+    message: { type: String, default: '정말 삭제하시겠습니까?' }, // 안내 문구
+    subtitle: { type: String, default: '' }, // 추가 정보 (계좌명 등)
+    warning: { type: String, default: '삭제된 항목은 복구할 수 없습니다.' }, // 경고 문구
   },
   emits: ['close', 'confirm'],
   methods: {
-    onClose() {
+    // 닫기 이벤트
+    onClose(event) {
+      event?.stopPropagation();
       this.$emit('close');
     },
-    onConfirm() {
+    // 삭제 확인 이벤트 (버블링 차단)
+    onConfirm(event) {
+      event?.stopPropagation();
+      event?.preventDefault();
       this.$emit('confirm');
     },
   },
@@ -91,7 +96,6 @@ export default {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-login);
-  margin: 0;
 }
 
 .close-btn {
@@ -106,8 +110,8 @@ export default {
 }
 
 .bunny-icon {
-  display: block; /* 블록 요소로 설정 */
-  margin: 0 auto 1rem auto; /* 좌우 자동 정렬로 수평 중앙 정렬 */
+  display: block;
+  margin: 0 auto 1rem auto;
   width: 60px;
   height: 70px;
 }
@@ -154,6 +158,5 @@ export default {
 
 .delete-btn {
   background: var(--alert-strong);
-  color: white;
 }
 </style>

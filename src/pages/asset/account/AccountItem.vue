@@ -1,6 +1,6 @@
-<!--src\pages\asset\account\AccountItem.vue-->
 <template>
-  <div class="account-item" @click="goToDetail">
+  <!-- 루트 요소에서는 클릭 이벤트 제거 -->
+  <div class="account-item">
     <!-- 은행 로고 -->
     <img
       :src="getBankLogoByCode(account.bankCode)"
@@ -8,8 +8,8 @@
       class="bank-logo"
     />
 
-    <!-- 계좌 정보 -->
-    <div class="account-info">
+    <!-- 계좌 정보: 이 영역에서만 상세 페이지로 이동 -->
+    <div class="account-info" @click="goToDetail">
       <div class="info-top">
         <span class="bank-name">
           {{ getBankName(account.bankCode) }} {{ account.accountName }}
@@ -23,11 +23,13 @@
       <p class="balance">{{ formatWon(account.balance) }}</p>
     </div>
 
-    <!-- 우측 컨트롤 -->
+    <!-- 계좌 컨트롤 영역 -->
     <div class="account-control" @click.stop>
+      <!-- 대표 계좌 라벨 -->
       <button v-if="account.isMain" class="main-label" disabled>
         대표 계좌
       </button>
+      <!-- 대표 계좌 설정 버튼 -->
       <button
         v-else
         class="set-main-btn"
@@ -35,29 +37,57 @@
       >
         대표 설정
       </button>
-      <button class="delete-btn" @click.stop="$emit('delete', account)">
+      <!-- 삭제 버튼 (버블링 방지 위해 @click.stop 사용) -->
+      <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
         <img src="@/assets/images/icons/common/Trash.png" alt="삭제" />
       </button>
     </div>
+
+    <!-- 삭제 확인 모달 -->
+    <DeleteConfirmModal
+      :visible="isDeleteModalOpen"
+      title="계좌 삭제"
+      message="계좌를 삭제하시겠습니까?"
+      :subtitle="`${getBankName(account.bankCode)} • ${formatAccountNumber(
+        account.accountNumber
+      )}`"
+      warning="삭제된 계좌는 복구할 수 없습니다."
+      @close="isDeleteModalOpen = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import DeleteConfirmModal from '@/pages/asset/common/DeleteConfirmModal.vue';
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
-import { useRouter } from 'vue-router';
 
-const router = useRouter();
 const props = defineProps({
   account: { type: Object, required: true },
 });
+const emit = defineEmits(['set-main', 'delete']); // 상위 이벤트 전달
+const router = useRouter();
+const isDeleteModalOpen = ref(false);
 
+// 계좌 상세 페이지 이동 (계좌 정보 영역 클릭 시만 실행)
+const goToDetail = () => {
+  router.push(`/account/${props.account.id}`);
+};
+
+// 금액 포맷
 const formatWon = (value) => `${value.toLocaleString()}원`;
+// 계좌번호 포맷 (###-###-####)
 const formatAccountNumber = (number) =>
   number.replace(/(\d{3})(\d{3})(\d{3,4})/, '$1-$2-$3');
 
-const goToDetail = () => {
-  router.push(`/account/${props.account.id}`); // 계좌 상세 페이지 이동
+// 삭제 처리 (이벤트 버블링 차단 후 상위로 삭제 이벤트 전달)
+const handleDelete = (event) => {
+  event?.stopPropagation();
+  emit('delete', props.account);
+  isDeleteModalOpen.value = false;
 };
 </script>
 
@@ -82,6 +112,7 @@ const goToDetail = () => {
 
 .account-info {
   flex: 1;
+  cursor: pointer; /* 클릭 가능 영역임을 표시 */
 }
 
 .info-top {
@@ -120,7 +151,6 @@ const goToDetail = () => {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: space-between;
   gap: 0.5rem;
 }
 
