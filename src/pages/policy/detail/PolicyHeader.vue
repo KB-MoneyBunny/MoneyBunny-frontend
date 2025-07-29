@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 
-// 이미지 import
+import ShareModal from './ShareModal.vue';
 import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
 import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
 import shareIcon from '@/assets/images/icons/policy/share.png';
@@ -14,9 +14,14 @@ const props = defineProps({
 });
 
 const bookmark = ref(false);
+const showModal = ref(false);
 
 const toggleBookmark = () => {
   bookmark.value = !bookmark.value;
+};
+
+const toggleShareModal = () => {
+  showModal.value = true;
 };
 </script>
 
@@ -46,11 +51,12 @@ const toggleBookmark = () => {
 
     <div class="actions">
       <button class="applyButton font-15 font-bold">바로 신청하기</button>
-      <button class="shareButton font-15 font-bold">
+      <button class="shareButton font-15 font-bold" @click="toggleShareModal">
         <img :src="shareIcon" alt="공유" class="shareIcon" />
         공유하기
       </button>
     </div>
+    <ShareModal v-if="showModal" @close="showModal = false" />
   </div>
 </template>
 

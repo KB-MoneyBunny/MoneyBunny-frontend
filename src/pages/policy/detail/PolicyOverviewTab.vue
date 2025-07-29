@@ -36,7 +36,7 @@ const iconMap = {
     </div>
 
     <!-- ✅ 관련 정책 -->
-    <div v-if="policy.relatedPolicies?.length" class="mt-4">
+    <!-- <div v-if="policy.relatedPolicies?.length" class="mt-4">
       <div class="font-bold font-20 mb-2">관련 정책</div>
       <div
         class="relatedItem"
@@ -49,7 +49,7 @@ const iconMap = {
         </div>
         <button class="viewButton font-13">자세히 보기</button>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

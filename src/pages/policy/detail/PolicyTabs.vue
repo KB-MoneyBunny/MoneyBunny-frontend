@@ -23,13 +23,15 @@ const selected = defineModel('selectedTab', { type: String });
 .policyTab {
   display: flex;
   border-bottom: 1px solid var(--input-outline);
-  margin: 20px 0;
+  justify-content: space-around;
 }
 
 .tab {
-  padding: 12px 16px;
+  flex: 1;
+  text-align: center;
+  padding: 15px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-bluegray);
   border-bottom: 2px solid transparent;
 }

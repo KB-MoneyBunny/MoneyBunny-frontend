@@ -5,12 +5,12 @@ import { useRoute } from 'vue-router';
 import PolicyHeader from './PolicyHeader.vue';
 import PolicyTab from './PolicyTabs.vue';
 import PolicyTabContent from './PolicyTabContent.vue';
+import PolicyConditionTab from './PolicyConditionTab.vue';
+import PolicyApplyTab from './PolicyApplyTab.vue';
 
-// 라우터에서 id 가져오기
 const route = useRoute();
 const selectedTab = ref('정책 개요');
 
-// 예시 정책 데이터 (id로 필터링할 수 있도록 배열 형태)
 const policyList = [
   {
     id: 1,
@@ -66,19 +66,23 @@ const policyList = [
 const policyId = parseInt(route.params.id);
 const policy = policyList.find((p) => p.id === policyId);
 </script>
+
 <template>
   <div class="policyDetailPage" v-if="policy">
     <PolicyHeader :policy="policy" />
-    <PolicyTab v-model:selectedTab="selectedTab" />
 
     <!-- ✅ 탭 콘텐츠를 감싸는 공통 박스 -->
     <div class="contentBox">
+      <PolicyTab v-model:selectedTab="selectedTab" />
       <PolicyTabContent :policy="policy" :tab="selectedTab">
+        <template #overview><PolicyTabContent /> </template>
+
         <template #condition>
-          <div>신청 조건 내용 들어감</div>
+          <PolicyConditionTab />
         </template>
+
         <template #apply>
-          <div>신청 방법 내용 들어감</div>
+          <PolicyApplyTab />
         </template>
       </PolicyTabContent>
     </div>
@@ -95,7 +99,8 @@ const policy = policyList.find((p) => p.id === policyId);
 .contentBox {
   background-color: white;
   border-radius: 12px;
-  padding: 10x;
+  padding: 10px;
+  margin: 26px 0;
 }
 
 .noData {
