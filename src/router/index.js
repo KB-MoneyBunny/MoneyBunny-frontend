@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 //
 // ─── 레이아웃 ────────────────────────────────────────
 import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
+import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 
 //
 // ─── 인증 / 회원 관련 페이지 ───────────────────────────
@@ -25,8 +26,8 @@ import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
 import HomeMainPage from '@/pages/home/HomeMainPage.vue'; // 홈메인
-import AssetMainTab from '@/pages/asset/tabs/AssetMainTab.vue';
-import PolicyMainTab from '@/pages/policy/PolicyMainTab.vue';
+import AssetMain from '@/pages/asset/AssetMain.vue'; //🥕성빈: 자산 메인탭
+import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
 import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 
 //
@@ -84,12 +85,30 @@ const routes = [
   // ─── 기본 레이아웃 하위 라우트 ──────────────────────
   {
     path: '/',
+    path: '/',
     component: DefaultLayout,
     children: [
       { path: '', redirect: '/home' },
-      { path: 'home', name: 'home', component: HomeMainPage }, //수정
-      { path: 'asset', name: 'asset', component: AssetMainTab },
+      { path: 'home', name: 'home', component: HomeMainPage },
+      { path: 'asset', name: 'asset', component: AssetMain },
+      {
+        path: 'account/:id',
+        name: 'AccountDetail',
+        component: () => import('@/pages/asset/account/AccountDetailPage.vue'),
+        props: true,
+      },
+
       { path: 'mypage', name: 'mypage', component: MypageMain },
+      {
+        path: 'mypage/settings',
+        name: 'myPageSettings',
+        component: SettingMain,
+      },
+      {
+        path: 'mypage/settings/changePassword',
+        name: 'changePassword',
+        component: ChangePassword,
+      },
       {
         path: 'notification',
         name: 'notification',

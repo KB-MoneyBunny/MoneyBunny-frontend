@@ -25,6 +25,9 @@ body.modal-open {
   overflow-x: hidden;
   padding: 20px;
   overflow-y: auto;
+  /*빈: 스크롤 숨기기*/
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
 }
 
 /* 공통 레이아웃 박스 */
