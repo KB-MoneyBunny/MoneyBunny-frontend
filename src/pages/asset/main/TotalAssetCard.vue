@@ -14,10 +14,11 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-// 예시 데이터 (추후 API 연동 가능)
-const totalAsset = ref(26867500);
-const cardUsage = ref(203000);
+// 초기값:  9999999로 설정
+const totalAsset = ref(9999999);
+const cardUsage = ref(9999999);
 
+// 연결 시 API 값으로 자동 갱신
 const totalAssetDisplay = computed(
   () => totalAsset.value.toLocaleString() + '원'
 );
@@ -27,5 +28,5 @@ const cardUsageDisplay = computed(
 </script>
 
 <style scoped>
-@import '@/assets/styles/homecard.css'; /* 기존 카드 스타일 사용 */
+@import '@/assets/styles/homecard.css';
 </style>

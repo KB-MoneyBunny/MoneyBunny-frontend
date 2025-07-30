@@ -1,4 +1,4 @@
-<!--src\pages\asset\tabs\AssetSpendingTab.vue-->
+<!--src\pages\asset\tabs\AssetSpendingTab.vue-2-->
 <template>
   <div class="asset-tab-wrapper">
     <h2>지출 탭</h2>
@@ -6,9 +6,7 @@
   </div>
 </template>
 
-<script setup>
-// TODO: SpendingSummaryCard.vue, MonthlySpendingChart.vue 등 구성 예정
-</script>
+<script setup></script>
 
 <style scoped>
 .asset-tab-wrapper {

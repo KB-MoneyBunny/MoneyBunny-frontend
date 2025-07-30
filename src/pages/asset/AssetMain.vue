@@ -12,8 +12,9 @@
 <script setup>
 import { ref } from 'vue';
 
-import AssetTabSwitcher from './common/AssetTabSwitcher.vue';
+import AssetTabSwitcher from './common/AssetTabSwitcher.vue'; //상단 탭
 
+//각 탭별 화면
 import AssetTotalTab from './tabs/AssetTotalTab.vue';
 import AssetAccountTab from './tabs/AssetAccountTab.vue';
 import AssetCardTab from './tabs/AssetCardTab.vue';
