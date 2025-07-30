@@ -42,6 +42,8 @@ export const bankLogoMap = {
     '@/assets/images/icons/bank/nonghyup.png',
     import.meta.url
   ).href,
+  부산은행: new URL('@/assets/images/icons/bank/busan.jpg', import.meta.url)
+    .href,
 };
 
 import { bankCodeMap } from './bankCodeMap';
