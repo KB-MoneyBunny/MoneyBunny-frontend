@@ -7,7 +7,7 @@
         alt="search icon"
         class="searchIconImage"
       />
-      <input type="text" placeholder="정책 검색" />
+      <input type="text" placeholder="정책 검색" @focus="goToSearchPage" />
     </div>
 
     <!-- 맞춤 정책 TOP 3 추천 -->
@@ -59,6 +59,9 @@ const router = useRouter();
 const goToDetail = (policyId) => {
   router.push({ name: 'policyDetail', params: { id: policyId } });
 };
+const goToSearchPage = () => {
+  router.push({ name: 'policySearch' });
+};
 
 const policyList = ref([
   {
@@ -86,8 +89,7 @@ const policyList = ref([
 </script>
 <style scoped>
 .policyWrapper {
-  padding: 0 20px;
-  padding-bottom: 80px;
+  padding-bottom: 40px;
   background-color: var(--input-bg-2);
   font-family: 'NanumSquareNeo';
 }
@@ -207,11 +209,13 @@ const policyList = ref([
 
 .moreButton {
   width: 100%;
+  height: 50px;
   padding: 11px;
   background-color: white;
   border: none;
   color: var(--base-blue-dark);
   border-radius: 8px;
-  margin-top: 10px;
+  border: 1px solid var(--input-outline);
+  margin-top: 15px;
 }
 </style>
