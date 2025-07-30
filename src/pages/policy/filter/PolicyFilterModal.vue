@@ -398,7 +398,7 @@ function toggleMulti(listRef, option) {
 }
 
 .fieldLabel {
-  margin: 10px 0;
+  margin-bottom: 10px;
 }
 
 .selectDownIcon {
