@@ -11,13 +11,14 @@
     </div>
 
     <!-- 카드 리스트 -->
-    <CardOverviewList :cards="cards" />
+    <CardOverviewList :cards="cards.slice(0, 3)" />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import CardOverviewList from '../card/CardOverviewList.vue';
+import cardsData from '@/assets/data/cards.json'; // json 파일 불러오기
 
 const emit = defineEmits(['switchTab']);
 
@@ -26,25 +27,8 @@ const goToCardTab = () => {
   emit('switchTab', '카드');
 };
 
-// 더미 카드 데이터
-const cards = ref([
-  {
-    issuerCode: '0309',
-    cardName: '카드의정석 I&U+',
-    cardMaskedNumber: '5317********2156',
-    cardImage:
-      'https://pc.wooricard.com/webcontent/cdPrdImgFileList/2024/2/13/1931f194-e38e-4c90-87d3-f084acb6218a.png',
-    amount: 325000,
-  },
-  {
-    issuerCode: '0040',
-    cardName: 'KB국민 Simple카드',
-    cardMaskedNumber: '5211********1002',
-    cardImage:
-      'https://img1.kbcard.com/ST/img/cxc/kbcard/upload/img/product/09122_img.png',
-    amount: 210000,
-  },
-]);
+// 더미 카드 데이터 (JSON 파일에서 로드)
+const cards = ref(cardsData);
 </script>
 
 <style scoped>

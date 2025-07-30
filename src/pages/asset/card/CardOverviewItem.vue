@@ -4,7 +4,7 @@
       <img :src="card.cardImage" class="bank-logo" alt="카드 이미지" />
       <div class="card-info">
         <div class="bank-name">
-          {{ getIssuerName(card.issuerCode) }} {{ card.cardName }}
+          {{ getCardIssuerName(card.issuerCode) }} {{ card.cardName }}
         </div>
         <div class="card-number">{{ card.cardMaskedNumber }}</div>
       </div>
@@ -16,19 +16,22 @@
 </template>
 
 <script setup>
+import cardCodeMap from '@/assets/utils/cardCodeMap.js'; // 카드사 코드 매핑
+
 const props = defineProps({
-  card: { type: Object, required: true },
+  card: Object,
+  isRepresentative: Boolean,
 });
 
-// 카드사 코드 → 이름 매핑
-const issuerCodeMap = {
-  '0309': '우리카드',
-  '0040': 'KB국민카드',
+// 카드사 코드 → 카드사 이름 변환 함수
+const getCardIssuerName = (issuerCode) => {
+  return cardCodeMap[issuerCode] || '알 수 없는 카드사';
 };
-const getIssuerName = (code) => issuerCodeMap[code] || '알 수 없음';
 
-// 금액 포맷
-const formatWon = (value) => `${value.toLocaleString()}원`;
+// 금액 포맷 함수
+const formatWon = (value) => {
+  return `${value.toLocaleString()}원`;
+};
 </script>
 
 <style scoped>

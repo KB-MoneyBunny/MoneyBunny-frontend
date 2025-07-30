@@ -4,10 +4,11 @@
     <img :src="card.cardImage" alt="카드 이미지" class="card-logo" />
 
     <!-- 카드 정보 -->
+    <<!-- 카드 정보 -->
     <div class="card-info">
       <div class="info-top">
         <span class="card-name">
-          {{ getIssuerName(card.issuerCode) }} {{ card.cardName }}
+          {{ getCardIssuerName(card.issuerCode) }} {{ card.cardName }}
         </span>
         <span v-if="isRepresentative" class="main-badge">대표</span>
       </div>
@@ -29,20 +30,22 @@
 </template>
 
 <script setup>
+import cardCodeMap from '@/assets/utils/cardCodeMap.js'; // 카드사 코드 매핑
+
 const props = defineProps({
-  card: { type: Object, required: true },
+  card: Object,
   isRepresentative: Boolean,
 });
 
-// 카드사 코드 매핑
-const issuerCodeMap = {
-  '0309': '우리카드',
-  '0040': 'KB국민카드',
+// 카드사 코드 → 카드사 이름 변환 함수
+const getCardIssuerName = (issuerCode) => {
+  return cardCodeMap[issuerCode] || '알 수 없는 카드사';
 };
-const getIssuerName = (code) => issuerCodeMap[code] || '알 수 없음';
 
-// 금액 포맷
-const formatWon = (value) => `${(value || 0).toLocaleString()}원`;
+// 금액 포맷 함수
+const formatWon = (value) => {
+  return `${value.toLocaleString()}원`;
+};
 </script>
 
 <style scoped>
