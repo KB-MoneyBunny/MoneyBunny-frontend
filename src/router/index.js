@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from "@/stores/auth";
 
 //
 // ─── 레이아웃 ────────────────────────────────────────
@@ -9,6 +9,7 @@ import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
 // ─── 인증 / 회원 관련 페이지 ───────────────────────────
 import LoginPage from "@/pages/auth/LoginPage.vue";
 import FindIdPage from "@/pages/auth/FindIdPage.vue";
+import FindIdCodePage from "@/pages/auth/FindIdCodePage.vue";
 import FindPasswordPage from "@/pages/auth/FindPasswordPage.vue";
 import SignUpEmailVerifyPage from "@/pages/auth/SignUpEmailVerifyPage.vue";
 import SignUpProfilePage from "@/pages/auth/SignUpProfilePage.vue";
@@ -37,7 +38,6 @@ import PolicyQuizStep2 from "@/pages/policy/recommend/PolicyQuizStep2.vue";
 import PolicyQuizStep3 from "@/pages/policy/recommend/PolicyQuizStep3.vue";
 import PolicyResultSummary from "@/pages/policy/recommend/PolicyResultSummary.vue";
 
-
 const routes = [
   //
   // ─── 인증 관련 ──────────────────────────────────────
@@ -65,7 +65,11 @@ const routes = [
     name: "attendanceCheck",
     component: AttendanceCheckModal,
   },
-
+  {
+    path: "/findIdCode",
+    name: "findIdCode",
+    component: FindIdCodePage,
+  },
   //
   // ─── 마이페이지 ─────────────────────────────────────
   { path: "/mypage/settings", name: "myPageSettings", component: SettingMain },
@@ -127,34 +131,37 @@ const router = createRouter({
 // 💪(상일) 인증 가드 활성화 - 로그인하지 않은 사용자는 보호된 페이지 접근 차단
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  
+
   // 인증이 필요없는 공개 페이지
   const publicPages = [
-    '/', 
-    '/findId', 
-    '/findPassword', 
-    '/signUpEmailVerify', 
-    '/signUpProfile',
-    '/resetPassword',
-    '/findIdResult'
+    "/",
+    "/findId",
+    "/findPassword",
+    "/signUpEmailVerify",
+    "/signUpProfile",
+    "/resetPassword",
+    "/findIdResult",
+    "/findIdCode", // 인증코드 입력
   ];
-  
+
   const authRequired = !publicPages.includes(to.path);
-  
-  console.log(`라우터 이동: ${from.path} → ${to.path}, 로그인 상태: ${authStore.isLogin}, 인증 필요: ${authRequired}`);
-  
+
+  console.log(
+    `라우터 이동: ${from.path} → ${to.path}, 로그인 상태: ${authStore.isLogin}, 인증 필요: ${authRequired}`
+  );
+
   if (authRequired && !authStore.isLogin) {
     // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-    console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
-    return next('/?error=auth_required');
+    console.log("인증되지 않은 접근 - 로그인 페이지로 리다이렉트");
+    return next("/?error=auth_required");
   }
-  
-  if (to.path === '/' && authStore.isLogin) {
+
+  if (to.path === "/" && authStore.isLogin) {
     // 이미 로그인한 사용자가 로그인 페이지에 접근하는 경우 홈으로 리다이렉트
-    console.log('이미 로그인된 사용자 - 홈으로 리다이렉트');
-    return next('/home');
+    console.log("이미 로그인된 사용자 - 홈으로 리다이렉트");
+    return next("/home");
   }
-  
+
   next();
 });
 

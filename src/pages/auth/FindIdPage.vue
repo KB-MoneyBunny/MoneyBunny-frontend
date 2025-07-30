@@ -1,32 +1,80 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
-const email = ref('');
-const code = ref('');
+const email = ref("");
+const code = ref("");
+const loginId = ref("");
 const isCodeSent = ref(false);
+const isVerified = ref(false);
+const errorMsg = ref("");
 
-const handleClick = () => {
-  if (!isCodeSent.value) {
-    if (!email.value) {
-      alert('이메일을 입력해주세요.');
-      return;
-    }
-    // 인증코드 전송 로직
+// 1단계: 인증코드 전송
+const sendIdCode = async () => {
+  try {
+    await axios.post("/api/auth/send-find-id-code", { email: email.value });
     isCodeSent.value = true;
-  } else {
-    if (!code.value) {
-      alert('인증코드를 입력해주세요.');
-      return;
-    }
+    errorMsg.value = "";
 
-    // 실제 인증 확인 로직 (API 등)을 여기에 구현할 수 있음
-
-    // 인증 완료되면 아이디 결과 페이지로 이동 (이메일 값을 넘길 수도 있음)
-    router.push({ name: 'findIdResult' });
+    // 인증코드 전송 성공 시 다음 페이지로 이동
+    router.push({ name: "findIdCode", query: { email: email.value } });
+  } catch (err) {
+    errorMsg.value =
+      "인증코드 전송 실패: " +
+      (err.response?.data?.message || "다시 시도해주세요");
   }
 };
+
+// 버튼 핸들러는 단순 호출만
+const handleClick = () => {
+  if (!email.value) {
+    alert("이메일을 입력해주세요.");
+    return;
+  }
+  sendIdCode();
+};
+
+// 2단계: 인증코드 확인 및 아이디 조회
+// const verify = async () => {
+//   if (!email.value || !code.value) {
+//     errorMsg.value = "이메일과 인증코드를 모두 입력해주세요.";
+//     return;
+//   }
+
+//   try {
+//     await axios.post("/api/auth/verify", {
+//       email: email.value,
+//       code: code.value,
+//     });
+
+//     // 인증 성공 → 아이디 조회
+//     const res = await axios.post("/api/auth/find-id", { email: email.value });
+//     const loginId = res.data;
+//     router.push({ name: "findIdResult", query: { loginId } });
+//   } catch (err) {
+//     errorMsg.value =
+//       "인증 실패: " + (err.response?.data?.message || "코드를 확인해주세요");
+//   }
+// };
+// 버튼 클릭 핸들러
+// const handleClick = () => {
+//   if (!email.value) {
+//     alert("이메일을 입력해주세요.");
+//     return;
+//   }
+
+//   if (!isCodeSent.value) sendIdCode();
+//   // } else if (!code.value) {
+//   //   alert("인증코드를 입력해주세요.");
+//   // } else {
+//   //   verify();
+//   // }
+//   if (isCodeSent.value) {
+//     router.push({ name: "findIdCode", query: { email: email.value } });
+//   }
+// };
 </script>
 
 <template>
@@ -49,7 +97,7 @@ const handleClick = () => {
       </div>
 
       <!-- 인증코드 입력: isCodeSent이 true일 때 표시 -->
-      <div v-if="isCodeSent" class="formGroup">
+      <!-- <div v-if="isCodeSent" class="formGroup">
         <label for="code" class="font-15 font-bold">인증코드</label>
         <input
           type="text"
@@ -57,11 +105,13 @@ const handleClick = () => {
           v-model="code"
           placeholder="인증코드를 입력하세요"
         />
-      </div>
+      </div> -->
 
       <!-- 버튼 -->
       <button class="submitButton font-15 font-bold" @click="handleClick">
-        {{ isCodeSent ? '인증하기' : '인증코드 발송' }}
+        <!-- {{ isCodeSent ? "인증하기" : "인증코드 발송" }} -->
+        <!-- {{ isCodeSent ? "인증하기" : "인증코드 발송" }} -->
+        인증코드 발송
       </button>
 
       <!-- 하단 링크 -->
