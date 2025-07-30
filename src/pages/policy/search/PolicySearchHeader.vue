@@ -2,11 +2,22 @@
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 
+import PolicyFilterModal from '../filter/PolicyFilterModal.vue';
+
+const filterData = ref({});
+const showFilterModal = ref(false);
+const openFilter = () => (showFilterModal.value = true);
+const closeFilter = () => (showFilterModal.value = false);
+
 const router = useRouter();
 const searchQuery = ref('');
 const goBack = () => router.back();
 const search = () => {};
-const openFilter = () => {};
+
+function handleConfirm(selected) {
+  filterData.value = selected;
+  showFilterModal.value = false;
+}
 </script>
 <template>
   <div class="policySearchHeader">
@@ -33,6 +44,12 @@ const openFilter = () => {};
       @click="openFilter"
     />
   </div>
+  <!-- 부모 컴포넌트 예시 -->
+  <PolicyFilterModal
+    v-if="showFilterModal"
+    @close="showFilterModal = false"
+    @confirm="handleConfirm"
+  />
 </template>
 
 <style scoped>

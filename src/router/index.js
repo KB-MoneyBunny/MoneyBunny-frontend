@@ -33,11 +33,10 @@ import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 // ─── 정책 추천 흐름 ────────────────────────────────────
 import PolicyIntroForm from '@/pages/policy/recommend/PolicyIntroForm.vue';
 import PolicyQuizStep1 from '@/pages/policy/recommend/PolicyQuizStep1.vue';
-import PolicyQuizStep2 from '@/pages/policy/recommend/PolicyQuizStep4.vue';
-import PolicyQuizStep3 from '@/pages/policy/recommend/PolicyQuizStep5.vue';
+import PolicyQuizStep2 from '@/pages/policy/recommend/PolicyQuizStep2.vue';
+import PolicyQuizStep3 from '@/pages/policy/recommend/PolicyQuizStep3.vue';
 import PolicyQuizStep4 from '@/pages/policy/recommend/PolicyQuizStep4.vue';
 import PolicyQuizStep5 from '@/pages/policy/recommend/PolicyQuizStep5.vue';
-import PolicyQuizStep6 from '@/pages/policy/recommend/PolicyQuizStep6.vue';
 import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vue';
 
 import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
@@ -126,11 +125,7 @@ const routes = [
         name: 'policyQuizStep5',
         component: PolicyQuizStep5,
       },
-      {
-        path: 'policy/quiz/step6',
-        name: 'policyQuizStep6',
-        component: PolicyQuizStep6,
-      },
+
       {
         path: 'policy/quiz/result',
         name: 'policyResultSummary',

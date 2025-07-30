@@ -8,42 +8,45 @@
   <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
     <section class="quizContent">
       <div class="progressBarWrapper">
-        <span class="font-13 font-regular">질문 4 / 5</span>
+        <span class="font-13 font-regular">질문 4 / 4</span>
         <div class="progressBar">
-          <div class="progress" :style="{ width: '80%' }"></div>
+          <div class="progress" :style="{ width: '100%' }"></div>
         </div>
       </div>
 
-      <h3 class="question font-22 font-bold">
-        관심 있는 정책 분야를 선택해주세요
-      </h3>
-      <p class="font-12 font-regular">다중선택 가능</p>
+      <h3 class="question font-22 font-bold">현재 본인의 소득은?</h3>
 
-      <div
-        v-for="(group, index) in policyGroups"
-        :key="index"
-        style="margin-bottom: 24px"
-      >
-        <p class="font-16 font-bold">{{ index + 1 }}. {{ group.title }}</p>
-        <ul class="options">
-          <li
-            v-for="item in group.items"
-            :key="item"
-            class="optionItem"
-            :class="{ selected: selectedOptions.includes(item) }"
-            @click="toggleOption(item)"
+      <ul class="options">
+        <li
+          v-for="option in options"
+          :key="option"
+          class="optionItem"
+          :class="{ selected: selectedOption === option }"
+          @click="selectOption(option)"
+        >
+          <template
+            v-if="option === '직접 입력' && selectedOption === '직접 입력'"
           >
-            {{ item }}
-          </li>
-        </ul>
-      </div>
+            <input
+              v-model="customIncome"
+              type="text"
+              placeholder="직접 입력"
+              class="inlineInput"
+              @click.stop
+            />
+          </template>
+          <template v-else>
+            {{ option }}
+          </template>
+        </li>
+      </ul>
     </section>
 
     <footer class="quizFooter">
       <button class="prevButton font-20" @click="goToPrevStep">이전</button>
       <button
         class="nextButton font-20"
-        :disabled="selectedOptions.length === 0"
+        :disabled="!isFormValid"
         @click="goToNextStep"
       >
         다음
@@ -53,47 +56,36 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default {
-  name: 'PolicyQuizStep2',
+  name: 'PolicyQuizStep4',
   setup() {
     const router = useRouter();
-    const selectedOptions = ref([]);
-
-    const policyGroups = [
-      {
-        title: '취업 및 창업 지원',
-        items: ['교육지원', '인턴', '중소기업', '벤처', '장기미취업청년'],
-      },
-      {
-        title: '금융 지원',
-        items: [
-          '바우처',
-          '보조금',
-          '대출',
-          '금리혜택',
-          '맞춤형상담서비스',
-          '신용회복',
-        ],
-      },
-      {
-        title: '주거 지원',
-        items: ['공공임대주택', '주거지원'],
-      },
-      {
-        title: '가정 및 생계 지원',
-        items: ['청년가장', '출산'],
-      },
+    const options = [
+      '2천만원 미만',
+      '2천만원~4천만원 미만',
+      '4천만원~6천만원 미만',
+      '6천만원 이상',
+      '모르겠어요',
+      '직접 입력',
     ];
+    const selectedOption = ref('');
+    const customIncome = ref('');
 
-    const toggleOption = (item) => {
-      const index = selectedOptions.value.indexOf(item);
-      if (index === -1) {
-        selectedOptions.value.push(item);
-      } else {
-        selectedOptions.value.splice(index, 1);
+    const isFormValid = computed(() => {
+      return (
+        selectedOption.value !== '' &&
+        (selectedOption.value !== '직접 입력' ||
+          customIncome.value.trim() !== '')
+      );
+    });
+
+    const selectOption = (option) => {
+      selectedOption.value = option;
+      if (option !== '직접 입력') {
+        customIncome.value = '';
       }
     };
 
@@ -102,15 +94,17 @@ export default {
     };
 
     const goToNextStep = () => {
-      if (selectedOptions.value.length > 0) {
-        router.push({ name: 'policyQuizStep5' });
-      }
+      if (!isFormValid.value) return;
+      // 추후 저장 로직 필요 시 여기에
+      router.push({ name: 'policyQuizStep5' });
     };
 
     return {
-      selectedOptions,
-      policyGroups,
-      toggleOption,
+      options,
+      selectedOption,
+      customIncome,
+      isFormValid,
+      selectOption,
       goToNextStep,
       goToPrevStep,
     };
@@ -135,6 +129,7 @@ export default {
   max-width: 390px;
   width: 100%;
 }
+
 .quizContainer {
   max-width: 390px;
   margin: 0 auto;
@@ -162,14 +157,14 @@ export default {
 }
 
 .question {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: var(--text-login);
 }
 
 .options {
   list-style: none;
   padding: 0;
-  margin-top: 10px;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -189,9 +184,10 @@ export default {
 }
 
 .quizFooter {
+  margin-top: 32px;
   display: flex;
   gap: 12px;
-  margin-top: 32px;
+  justify-content: center;
 }
 
 .prevButton,
@@ -200,21 +196,33 @@ export default {
   padding: 12px 0;
   border-radius: 10px;
   border: none;
+  cursor: pointer;
 }
 
 .prevButton {
-  background-color: var(--input-bg-2);
+  background-color: var(--input-bg-1);
   color: var(--text-login);
 }
 
 .nextButton {
   background-color: var(--base-blue-dark);
   color: white;
-  cursor: pointer;
 }
 
 .nextButton:disabled {
   background-color: var(--input-disabled-1);
   cursor: default;
+}
+
+.inlineInput {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text-login);
+  padding: 0;
 }
 </style>

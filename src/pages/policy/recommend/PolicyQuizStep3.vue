@@ -8,9 +8,9 @@
   <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
     <section class="quizContent">
       <div class="progressBarWrapper">
-        <span class="font-13 font-regular">질문 3 / 5</span>
+        <span class="font-13 font-regular">질문 3 / 4</span>
         <div class="progressBar">
-          <div class="progress" :style="{ width: '60%' }"></div>
+          <div class="progress" :style="{ width: '75%' }"></div>
         </div>
       </div>
 

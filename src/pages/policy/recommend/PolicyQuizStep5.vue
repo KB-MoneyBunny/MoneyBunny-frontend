@@ -1,43 +1,87 @@
+<script>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+export default {
+  name: 'PolicyQuizStep5',
+  setup() {
+    const router = useRouter();
+
+    const options = ['금액', '조회수', '만료일'];
+    const selectedOptions = ref([]);
+
+    const handleClick = (option) => {
+      const index = selectedOptions.value.indexOf(option);
+
+      if (index > -1) {
+        selectedOptions.value.splice(index, 1); // 선택 해제
+      } else if (selectedOptions.value.length < 3) {
+        selectedOptions.value.push(option); // 선택 추가
+      }
+    };
+
+    const getPriority = (option) => {
+      const index = selectedOptions.value.indexOf(option);
+      return index > -1 ? index + 1 : 0;
+    };
+
+    const getPriorityText = (option) => {
+      const index = selectedOptions.value.indexOf(option);
+      if (index === 0) return '1순위';
+      if (index === 1) return '2순위';
+      if (index === 2) return '3순위';
+      return '';
+    };
+
+    const goToPrevStep = () => {
+      router.push({ name: 'policyQuizStep4' });
+    };
+
+    const goToNextStep = () => {
+      router.push({ name: 'policyResultSummary' });
+    };
+
+    return {
+      options,
+      selectedOptions,
+      handleClick,
+      getPriority,
+      getPriorityText,
+      goToPrevStep,
+      goToNextStep,
+    };
+  },
+};
+</script>
+
 <template>
   <header class="introHeader">
     <div class="quizHeader">
-      <h2 class="font-20 font-bold">맞춤 정책 추천을 위한 간단한 질문</h2>
+      <div class="font-20 font-bold">맞춤 정책 추천을 위한 간단한 질문</div>
     </div>
   </header>
 
   <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
     <section class="quizContent">
-      <div class="progressBarWrapper">
-        <span class="font-13 font-regular">질문 5 / 5</span>
-        <div class="progressBar">
-          <div class="progress" :style="{ width: '100%' }"></div>
-        </div>
+      <div class="question font-18 font-bold mb-4">
+        정책을 신청할 때 중요하게 여기는 순서대로 클릭해주세요
       </div>
 
-      <h3 class="question font-22 font-bold">현재 본인의 소득은?</h3>
-
-      <ul class="options">
+      <ul class="priorityOptions">
         <li
           v-for="option in options"
           :key="option"
           class="optionItem"
-          :class="{ selected: selectedOption === option }"
-          @click="selectOption(option)"
+          :class="{ selected: getPriority(option) !== 0 }"
+          @click="handleClick(option)"
         >
-          <template
-            v-if="option === '직접 입력' && selectedOption === '직접 입력'"
-          >
-            <input
-              v-model="customIncome"
-              type="text"
-              placeholder="직접 입력"
-              class="inlineInput"
-              @click.stop
-            />
-          </template>
-          <template v-else>
-            {{ option }}
-          </template>
+          {{ option }}
+          <!-- <span v-if="getPriority(option) !== 0" class="priorityBadge">
+            {{ getPriority(option) }}
+          </span> -->
+          <span v-if="getPriority(option) !== 0" class="priorityBadge">
+            {{ getPriorityText(option) }}
+          </span>
         </li>
       </ul>
     </section>
@@ -46,71 +90,14 @@
       <button class="prevButton font-20" @click="goToPrevStep">이전</button>
       <button
         class="nextButton font-20"
-        :disabled="!isFormValid"
+        :disabled="selectedOptions.length !== 3"
         @click="goToNextStep"
       >
-        다음
+        결과 보기
       </button>
     </footer>
   </div>
 </template>
-
-<script>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-
-export default {
-  name: 'PolicyQuizStep5',
-  setup() {
-    const router = useRouter();
-    const options = [
-      '2천만원 미만',
-      '2천만원~4천만원 미만',
-      '4천만원~6천만원 미만',
-      '6천만원 이상',
-      '모르겠어요',
-      '직접 입력',
-    ];
-    const selectedOption = ref('');
-    const customIncome = ref('');
-
-    const isFormValid = computed(() => {
-      return (
-        selectedOption.value !== '' &&
-        (selectedOption.value !== '직접 입력' ||
-          customIncome.value.trim() !== '')
-      );
-    });
-
-    const selectOption = (option) => {
-      selectedOption.value = option;
-      if (option !== '직접 입력') {
-        customIncome.value = '';
-      }
-    };
-
-    const goToPrevStep = () => {
-      router.push({ name: 'policyQuizStep4' });
-    };
-
-    const goToNextStep = () => {
-      if (!isFormValid.value) return;
-      // 추후 저장 로직 필요 시 여기에
-      router.push({ name: 'policyQuizStep6' });
-    };
-
-    return {
-      options,
-      selectedOption,
-      customIncome,
-      isFormValid,
-      selectOption,
-      goToNextStep,
-      goToPrevStep,
-    };
-  },
-};
-</script>
 
 <style scoped>
 .introHeader {
@@ -138,49 +125,40 @@ export default {
   border-radius: 16px;
 }
 
-.progressBarWrapper {
-  margin-bottom: 24px;
-}
-
-.progressBar {
-  height: 4px;
-  background-color: var(--input-bg-1);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 17px;
-}
-
-.progress {
-  height: 100%;
-  background-color: var(--base-blue-dark);
-  transition: width 0.3s ease;
-}
-
-.question {
-  margin-bottom: 20px;
-  color: var(--text-login);
-}
-
-.options {
+.priorityOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .optionItem {
-  padding: 12px 16px;
+  position: relative;
+  padding: 14px 16px;
   border: 1px solid var(--input-outline);
   border-radius: 8px;
   background-color: white;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .optionItem.selected {
-  border-color: var(--input-outline);
   background-color: var(--input-bg-2);
+}
+.priorityBadge {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--base-blue-dark);
+  color: white;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .quizFooter {
@@ -211,18 +189,13 @@ export default {
 
 .nextButton:disabled {
   background-color: var(--input-disabled-1);
-  cursor: default;
+  cursor: not-allowed;
 }
 
-.inlineInput {
-  width: 100%;
-  height: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 16px;
-  font-family: inherit;
-  color: var(--text-login);
-  padding: 0;
+.mb-2 {
+  margin-bottom: 8px;
+}
+.mb-4 {
+  margin-bottom: 16px;
 }
 </style>

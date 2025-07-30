@@ -12,7 +12,6 @@ const goBack = () => {
 
 const search = () => {
   console.log(`검색어: ${searchQuery.value}`);
-  // 👉 여기서 검색 API 또는 검색 결과 페이지로 이동 처리
 };
 </script>
 
@@ -53,7 +52,7 @@ const search = () => {
         </div>
       </div>
       <div class="tip">
-        <img src="@/assets/images/icons/policy/filter.png" class="tipIcon" />
+        <img src="@/assets/images/icons/policy/filter.png" class="filterIcon" />
         <div>
           <p class="tipTitle">필터를 활용하세요</p>
           <p class="tipText">연령, 지역, 분야별로 정확한 정책 찾기</p>
@@ -110,7 +109,7 @@ const search = () => {
 
 .popularGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3개씩 한 줄! */
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
@@ -137,6 +136,10 @@ const search = () => {
 }
 
 .tipIcon {
+  width: 28px;
+  height: 28px;
+}
+.filterIcon {
   width: 28px;
   height: 28px;
 }
