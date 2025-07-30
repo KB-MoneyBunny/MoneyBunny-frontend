@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 //
 // ─── 레이아웃 ────────────────────────────────────────
 import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
+import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
 
 //
 // ─── 인증 / 회원 관련 페이지 ───────────────────────────
@@ -26,7 +27,7 @@ import ChangePassword from "@/pages/mypage/settings/ChangePassword.vue";
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
 import HomeMainPage from "@/pages/home/HomeMainPage.vue"; // 홈메인
-import AssetMainTab from "@/pages/asset/tabs/AssetMainTab.vue";
+import AssetMain from "@/pages/asset/AssetMain.vue"; //🥕성빈: 자산 메인탭
 import PolicyMainTab from "@/pages/policy/tabs/PolicyMainTab.vue";
 import NotificationCenter from "@/pages/notification/NotificationCenter.vue";
 
@@ -36,7 +37,13 @@ import PolicyIntroForm from "@/pages/policy/recommend/PolicyIntroForm.vue";
 import PolicyQuizStep1 from "@/pages/policy/recommend/PolicyQuizStep1.vue";
 import PolicyQuizStep2 from "@/pages/policy/recommend/PolicyQuizStep2.vue";
 import PolicyQuizStep3 from "@/pages/policy/recommend/PolicyQuizStep3.vue";
+import PolicyQuizStep4 from "@/pages/policy/recommend/PolicyQuizStep4.vue";
+import PolicyQuizStep5 from "@/pages/policy/recommend/PolicyQuizStep5.vue";
 import PolicyResultSummary from "@/pages/policy/recommend/PolicyResultSummary.vue";
+
+import PolicyDetailPage from "@/pages/policy/detail/PolicyDetailPage.vue";
+
+import PolicySearchPage from "@/pages/policy/search/PolicySearchPage.vue";
 
 const routes = [
   //
@@ -83,12 +90,30 @@ const routes = [
   // ─── 기본 레이아웃 하위 라우트 ──────────────────────
   {
     path: "/",
+    path: "/",
     component: DefaultLayout,
     children: [
       { path: "", redirect: "/home" },
-      { path: "home", name: "home", component: HomeMainPage }, //수정
-      { path: "asset", name: "asset", component: AssetMainTab },
+      { path: "home", name: "home", component: HomeMainPage },
+      { path: "asset", name: "asset", component: AssetMain },
+      {
+        path: "account/:id",
+        name: "AccountDetail",
+        component: () => import("@/pages/asset/account/AccountDetailPage.vue"),
+        props: true,
+      },
+
       { path: "mypage", name: "mypage", component: MypageMain },
+      {
+        path: "mypage/settings",
+        name: "myPageSettings",
+        component: SettingMain,
+      },
+      {
+        path: "mypage/settings/changePassword",
+        name: "changePassword",
+        component: ChangePassword,
+      },
       {
         path: "notification",
         name: "notification",
@@ -115,9 +140,31 @@ const routes = [
         component: PolicyQuizStep3,
       },
       {
+        path: "policy/quiz/step4",
+        name: "policyQuizStep4",
+        component: PolicyQuizStep4,
+      },
+      {
+        path: "policy/quiz/step5",
+        name: "policyQuizStep5",
+        component: PolicyQuizStep5,
+      },
+
+      {
         path: "policy/quiz/result",
         name: "policyResultSummary",
         component: PolicyResultSummary,
+      },
+      {
+        path: "/policy/:id",
+        name: "policyDetail",
+        component: PolicyDetailPage,
+        props: true,
+      },
+      {
+        path: "/policy/search",
+        name: "policySearch",
+        component: PolicySearchPage,
       },
     ],
   },
