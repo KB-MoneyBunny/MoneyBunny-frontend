@@ -8,9 +8,13 @@ import PolicyTabContent from './PolicyTabContent.vue';
 import PolicyConditionTab from './PolicyConditionTab.vue';
 import PolicyApplyTab from './PolicyApplyTab.vue';
 
+import PolicyFooter from './PolicyFooter.vue';
+
+// 라우터에서 id 가져오기
 const route = useRoute();
 const selectedTab = ref('정책 개요');
 
+// 예시 정책 데이터 (id로 필터링할 수 있도록 배열 형태)
 const policyList = [
   {
     id: 1,

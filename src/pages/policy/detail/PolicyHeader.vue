@@ -36,7 +36,6 @@ const toggleShareModal = () => {
         @click="toggleBookmark"
       />
     </div>
-
     <p class="desc font-15 font-regular">{{ policy.description }}</p>
 
     <div class="tags">
