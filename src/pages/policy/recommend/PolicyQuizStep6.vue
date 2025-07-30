@@ -146,7 +146,6 @@ export default {
 
 .optionItem.selected {
   background-color: var(--input-bg-2);
-  /* border-color: var(--base-blue-dark); */
 }
 .priorityBadge {
   position: absolute;

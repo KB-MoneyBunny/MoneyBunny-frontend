@@ -42,7 +42,7 @@ import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vu
 
 import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
 
-import PolicySearchPage from '@/pages/policy/PolicySearchPage.vue';
+import PolicySearchPage from '@/pages/policy/search/PolicySearchPage.vue';
 
 const routes = [
   //
