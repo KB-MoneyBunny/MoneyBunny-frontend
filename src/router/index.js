@@ -4,7 +4,8 @@ import { useAuthStore } from '@/stores/auth';
 // ─── 레이아웃 ──────────────────────────────
 import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 
-// ─── 인증 / 회원 관련 페이지 ───────────────
+//
+// ─── 인증 / 회원 관련 페이지 ───────────────────────────
 import LoginPage from '@/pages/auth/LoginPage.vue';
 import FindIdPage from '@/pages/auth/FindIdPage.vue';
 import FindPasswordPage from '@/pages/auth/FindPasswordPage.vue';
@@ -13,19 +14,23 @@ import SignUpProfilePage from '@/pages/auth/SignUpProfilePage.vue';
 import FindIdResultPage from '@/pages/auth/FindIdResultPage.vue';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage.vue';
 import AttendanceCheckModal from '@/pages/auth/AttendanceCheckModal.vue';
+import FindIdCodePage from '@/pages/auth/FindIdCodePage.vue';
 
-// ─── 마이페이지 관련 ──────────────────────
+//
+// ─── 마이페이지 관련 ──────────────────────────────────
 import MypageMain from '@/pages/mypage/MypageMain.vue';
 import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
 import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 
-// ─── 탭 메인 페이지 ──────────────────────
-import HomeMainPage from '@/pages/home/HomeMainPage.vue';
-import AssetMain from '@/pages/asset/AssetMain.vue';
+//
+// ─── 탭 메인 페이지 ────────────────────────────────────
+import HomeMainPage from '@/pages/home/HomeMainPage.vue'; // 홈메인
+import AssetMain from '@/pages/asset/AssetMain.vue'; //🥕성빈: 자산 메인탭
 import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
 import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 
-// ─── 정책 추천 흐름 ──────────────────────
+//
+// ─── 정책 추천 흐름 ────────────────────────────────────
 import PolicyIntroForm from '@/pages/policy/recommend/PolicyIntroForm.vue';
 import PolicyQuizStep1 from '@/pages/policy/recommend/PolicyQuizStep1.vue';
 import PolicyQuizStep2 from '@/pages/policy/recommend/PolicyQuizStep2.vue';
@@ -35,10 +40,12 @@ import PolicyQuizStep5 from '@/pages/policy/recommend/PolicyQuizStep5.vue';
 import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vue';
 
 import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
+
 import PolicySearchPage from '@/pages/policy/search/PolicySearchPage.vue';
 
 const routes = [
-  // ─── 인증 관련 ───────────────
+  //
+  // ─── 인증 관련 ──────────────────────────────────────
   { path: '/', name: 'login', component: LoginPage },
   { path: '/findId', name: 'findId', component: FindIdPage },
   { path: '/findPassword', name: 'findPassword', component: FindPasswordPage },
@@ -63,8 +70,13 @@ const routes = [
     name: 'attendanceCheck',
     component: AttendanceCheckModal,
   },
-
-  // ─── 마이페이지 ──────────────
+  {
+    path: '/findIdCode',
+    name: 'findIdCode',
+    component: FindIdCodePage,
+  },
+  //
+  // ─── 마이페이지 ─────────────────────────────────────
   { path: '/mypage/settings', name: 'myPageSettings', component: SettingMain },
   {
     path: '/mypage/settings/changePassword',
@@ -86,6 +98,7 @@ const routes = [
         component: () => import('@/pages/asset/account/AccountDetailPage.vue'),
         props: true,
       },
+
       { path: 'mypage', name: 'mypage', component: MypageMain },
       {
         path: 'mypage/settings',
@@ -103,7 +116,8 @@ const routes = [
         component: NotificationCenter,
       },
 
-      // 정책 추천
+      //
+      // ─── 정책 추천 흐름 ──────────────────────────────
       { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
       { path: 'policy/main', name: 'policyMain', component: PolicyMainTab },
       {
@@ -170,9 +184,21 @@ router.beforeEach((to, from, next) => {
   ];
   const authRequired = !publicPages.includes(to.path);
 
-  if (authRequired && !authStore.isLogin)
+  console.log(
+    `라우터 이동: ${from.path} → ${to.path}, 로그인 상태: ${authStore.isLogin}, 인증 필요: ${authRequired}`
+  );
+
+  if (authRequired && !authStore.isLogin) {
+    // 로그인이 필요한 페이지인데 로그인하지 않은 경우
+    console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
     return next({ path: '/', query: { error: 'auth_required' } });
-  if (to.path === '/' && authStore.isLogin) return next('/home');
+  }
+
+  if (to.path === '/' && authStore.isLogin) {
+    // 이미 로그인한 사용자가 로그인 페이지에 접근하는 경우 홈으로 리다이렉트
+    console.log('이미 로그인된 사용자 - 홈으로 리다이렉트');
+    return next('/home');
+  }
 
   next();
 });
