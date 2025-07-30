@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 //
 // ─── 레이아웃 ────────────────────────────────────────
 import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
+import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 
 //
 // ─── 인증 / 회원 관련 페이지 ───────────────────────────
@@ -35,7 +36,13 @@ import PolicyIntroForm from '@/pages/policy/recommend/PolicyIntroForm.vue';
 import PolicyQuizStep1 from '@/pages/policy/recommend/PolicyQuizStep1.vue';
 import PolicyQuizStep2 from '@/pages/policy/recommend/PolicyQuizStep2.vue';
 import PolicyQuizStep3 from '@/pages/policy/recommend/PolicyQuizStep3.vue';
+import PolicyQuizStep4 from '@/pages/policy/recommend/PolicyQuizStep4.vue';
+import PolicyQuizStep5 from '@/pages/policy/recommend/PolicyQuizStep5.vue';
 import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vue';
+
+import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
+
+import PolicySearchPage from '@/pages/policy/search/PolicySearchPage.vue';
 
 const routes = [
   //
@@ -77,6 +84,7 @@ const routes = [
   //
   // ─── 기본 레이아웃 하위 라우트 ──────────────────────
   {
+    path: '/',
     path: '/',
     component: DefaultLayout,
     children: [
@@ -127,9 +135,31 @@ const routes = [
         component: PolicyQuizStep3,
       },
       {
+        path: 'policy/quiz/step4',
+        name: 'policyQuizStep4',
+        component: PolicyQuizStep4,
+      },
+      {
+        path: 'policy/quiz/step5',
+        name: 'policyQuizStep5',
+        component: PolicyQuizStep5,
+      },
+
+      {
         path: 'policy/quiz/result',
         name: 'policyResultSummary',
         component: PolicyResultSummary,
+      },
+      {
+        path: '/policy/:id',
+        name: 'policyDetail',
+        component: PolicyDetailPage,
+        props: true,
+      },
+      {
+        path: '/policy/search',
+        name: 'policySearch',
+        component: PolicySearchPage,
       },
     ],
   },
@@ -164,7 +194,7 @@ router.beforeEach((to, from, next) => {
   if (authRequired && !authStore.isLogin) {
     // 로그인이 필요한 페이지인데 로그인하지 않은 경우
     console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
-    return next('/?error=auth_required');
+    return next({ path: '/', query: { error: 'auth_required' } });
   }
 
   if (to.path === '/' && authStore.isLogin) {
