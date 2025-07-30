@@ -4,7 +4,18 @@
     <div class="card-header">
       <h3 class="header-title">내 카드</h3>
       <div class="header-actions">
-        <button class="add-btn" @click="$emit('add-card')">+ 카드 추가</button>
+        <!-- 버튼 -->
+        <AddItemButton label="카드 추가" @click="isCardModalOpen = true" />
+
+        <!-- 카드 추가 모달 -->
+        <AddItemModal
+          v-if="isCardModalOpen"
+          :isOpen="isCardModalOpen"
+          type="card"
+          @close="isCardModalOpen = false"
+          @update-data="handleCardAdded"
+        />
+
         <span class="drag-text">드래그로 순서 변경</span>
       </div>
     </div>
@@ -15,7 +26,7 @@
         v-for="(card, index) in visibleCards"
         :key="card.id || index"
         :card="card"
-        :isRepresentative="card.id === mainCardId"
+        :isRepresentative="card.isRepresentative"
         @delete="$emit('delete-card', card)"
         @set-main="$emit('set-main', card)"
       />
@@ -35,22 +46,30 @@
 <script setup>
 import { ref, computed } from 'vue';
 import CardItem from './CardItem.vue';
+import AddItemButton from '@/pages/asset/common/AddItemButton.vue';
+import AddItemModal from '@/pages/asset/common/AddItemModal.vue';
 
 // Props
 const props = defineProps({
   cards: { type: Array, required: true },
-  mainCardId: { type: [Number, String], default: null }, // 대표 카드 ID
 });
 
 const showAll = ref(false);
+const isCardModalOpen = ref(false); //모달 상태 변수
 
-// 카드 최대 3개만 보이고 전체보기 누르면 전체 표시
+// 카드 리스트
 const visibleCards = computed(() =>
   showAll.value ? props.cards : props.cards.slice(0, 3)
 );
+
+// 카드 추가 후 리스트 갱신 (부모로 전달된 cards에 push하거나 emit으로 위임)
+const handleCardAdded = (newCard) => {
+  props.cards.push(newCard); // 단순 로컬 push (실제는 상위 emit 방식 추천)
+};
 </script>
 
 <style scoped>
+/* 전체 컨테이너 */
 .card-list-wrapper {
   background: white;
   border-radius: 1rem;
@@ -59,6 +78,7 @@ const visibleCards = computed(() =>
   margin-top: 1rem;
 }
 
+/* 상단 헤더 */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -95,12 +115,14 @@ const visibleCards = computed(() =>
   color: var(--text-lightgray);
 }
 
+/* 카드 리스트 */
 .card-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
+/* 전체보기 버튼 */
 .view-all-btn {
   width: 100%;
   margin-top: 1rem;

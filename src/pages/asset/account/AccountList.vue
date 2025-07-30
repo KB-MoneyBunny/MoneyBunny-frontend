@@ -1,13 +1,21 @@
-<!--src\pages\asset\account\AccountList.vue-->
 <template>
   <div class="account-list-wrapper">
     <!-- 상단 컨트롤 바 -->
     <div class="account-header">
       <h3 class="header-title">내 계좌</h3>
       <div class="header-actions">
-        <button class="add-btn" @click="$emit('add-account')">
-          + 계좌 추가
-        </button>
+        <!-- 버튼 -->
+        <AddItemButton label="계좌 추가" @click="isAccountModalOpen = true" />
+
+        <!-- 계좌 추가 모달 -->
+        <AddItemModal
+          v-if="isAccountModalOpen"
+          :isOpen="isAccountModalOpen"
+          type="account"
+          @close="isAccountModalOpen = false"
+          @update-data="handleAccountAdded"
+        />
+
         <span class="drag-text">드래그로 순서 변경</span>
       </div>
     </div>
@@ -37,18 +45,26 @@
 <script setup>
 import { ref, computed } from 'vue';
 import AccountItem from './AccountItem.vue';
+import AddItemButton from '@/pages/asset/common/AddItemButton.vue';
+import AddItemModal from '@/pages/asset/common/AddItemModal.vue';
 
-//// 부모 컴포넌트로부터 전달받는 props 정의
+// Props
 const props = defineProps({
   accounts: { type: Array, required: true },
 });
 
 const showAll = ref(false);
+const isAccountModalOpen = ref(false); //모달 상태 변수
 
-//계좌 3개
+// 계좌 리스트 (최대 3개만 표시)
 const visibleAccounts = computed(() =>
   showAll.value ? props.accounts : props.accounts.slice(0, 3)
 );
+
+// 계좌 추가 후 리스트 갱신
+const handleAccountAdded = (newAccount) => {
+  props.accounts.push(newAccount); // 상위 상태 관리 시 emit 방식 추천
+};
 </script>
 
 <style scoped>
@@ -83,22 +99,12 @@ const visibleAccounts = computed(() =>
   gap: 0.75rem;
 }
 
-.add-btn {
-  background: var(--base-blue-dark);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
 .drag-text {
   font-size: 0.75rem;
   color: var(--text-lightgray);
 }
 
-/* 리스트 */
+/* 계좌 리스트 */
 .account-list {
   display: flex;
   flex-direction: column;

@@ -82,10 +82,14 @@ const handleDelete = (event) => {
 }
 
 .card-logo {
-  width: 48px;
-  height: 48px;
+  width: 3rem; /* 반응형 단위(rem) 사용 */
+  height: 3rem;
   margin-right: 0.8rem;
   flex-shrink: 0;
+  object-fit: contain; /* 비율 유지하면서 잘림 방지 */
+  object-position: center; /* 이미지 중앙 정렬 */
+  background-color: var(--input-bg-1); /* 배경색 (투명 PNG 대비) */
+  border-radius: 0.25rem; /* 필요 시 살짝 둥글림 */
 }
 
 .card-info {

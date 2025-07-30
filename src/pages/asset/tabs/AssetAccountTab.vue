@@ -30,7 +30,7 @@ import { ref, computed, onMounted } from 'vue';
 import AccountSummaryCard from '../account/AccountSummaryCard.vue';
 import AccountList from '../account/AccountList.vue';
 import NoDataCard from '../common/NoDataCard.vue';
-import accountsData from '@/assets/data/accounts.json'; //계좌 데이터
+import accountsData from '@/assets/data/accounts.json'; //계좌데이터
 
 const accounts = ref([]); // 빈 배열 시 '계좌 없음' 화면 표시
 const monthlyChange = ref(0); // 이번 달 순입출금
