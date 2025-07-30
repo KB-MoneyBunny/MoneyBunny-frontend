@@ -13,11 +13,11 @@
     <div class="card-list">
       <CardItem
         v-for="(card, index) in visibleCards"
-        :key="index"
+        :key="card.id || index"
         :card="card"
-        :isRepresentative="card.isRepresentative"
-        @delete="$emit('delete', index)"
-        @set-rep="$emit('set-rep', index)"
+        :isRepresentative="card.id === mainCardId"
+        @delete="$emit('delete-card', card)"
+        @set-main="$emit('set-main', card)"
       />
     </div>
 
@@ -36,20 +36,21 @@
 import { ref, computed } from 'vue';
 import CardItem from './CardItem.vue';
 
+// Props
 const props = defineProps({
   cards: { type: Array, required: true },
+  mainCardId: { type: [Number, String], default: null }, // 대표 카드 ID
 });
 
 const showAll = ref(false);
 
-// 카드 3개만 보이도록 제한
+// 카드 최대 3개만 보이고 전체보기 누르면 전체 표시
 const visibleCards = computed(() =>
   showAll.value ? props.cards : props.cards.slice(0, 3)
 );
 </script>
 
 <style scoped>
-/* 전체 컨테이너 */
 .card-list-wrapper {
   background: white;
   border-radius: 1rem;
@@ -58,7 +59,6 @@ const visibleCards = computed(() =>
   margin-top: 1rem;
 }
 
-/* 상단 헤더 */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -95,14 +95,12 @@ const visibleCards = computed(() =>
   color: var(--text-lightgray);
 }
 
-/* 카드 리스트 */
 .card-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-/* 전체보기 버튼 */
 .view-all-btn {
   width: 100%;
   margin-top: 1rem;

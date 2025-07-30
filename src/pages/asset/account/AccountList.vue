@@ -38,6 +38,7 @@
 import { ref, computed } from 'vue';
 import AccountItem from './AccountItem.vue';
 
+//// 부모 컴포넌트로부터 전달받는 props 정의
 const props = defineProps({
   accounts: { type: Array, required: true },
 });

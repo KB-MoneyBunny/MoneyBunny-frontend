@@ -11,7 +11,7 @@
 
       <!-- 중앙 아이콘 -->
       <img
-        src="@/assets/images/icons/bunny/crying_bunny.png"
+        src="@/assets/images/icons/bunny/delete_bunny.png"
         alt="토끼 아이콘"
         class="bunny-icon"
       />
@@ -112,8 +112,8 @@ export default {
 .bunny-icon {
   display: block;
   margin: 0 auto 1rem auto;
-  width: 60px;
-  height: 70px;
+  width: 5rem;
+  height: 5rem;
 }
 
 .modal-text {

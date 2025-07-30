@@ -110,11 +110,6 @@ const handleDelete = (event) => {
   flex-shrink: 0;
 }
 
-.account-info {
-  flex: 1;
-  cursor: pointer; /* 클릭 가능 영역임을 표시 */
-}
-
 .info-top {
   display: flex;
   align-items: center;
