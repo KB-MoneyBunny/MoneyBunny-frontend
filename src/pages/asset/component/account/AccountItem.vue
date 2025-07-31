@@ -1,5 +1,4 @@
 <template>
-  <!-- 루트 요소에서는 클릭 이벤트 제거 -->
   <div class="account-item">
     <!-- 은행 로고 -->
     <img
@@ -8,8 +7,8 @@
       class="bank-logo"
     />
 
-    <!-- 계좌 정보: 이 영역에서만 상세 페이지로 이동 -->
-    <div class="account-info" @click="goToDetail">
+    <!-- 계좌 정보 (클릭 시 상세 모달 열림) -->
+    <div class="account-info" @click="openDetail">
       <div class="info-top">
         <span class="bank-name">
           {{ getBankName(account.bankCode) }} {{ account.accountName }}
@@ -23,13 +22,11 @@
       <p class="balance">{{ formatWon(account.balance) }}</p>
     </div>
 
-    <!-- 계좌 컨트롤 영역 -->
+    <!-- 계좌 컨트롤 -->
     <div class="account-control" @click.stop>
-      <!-- 대표 계좌 라벨 -->
       <button v-if="account.isMain" class="main-label" disabled>
         대표 계좌
       </button>
-      <!-- 대표 계좌 설정 버튼 -->
       <button
         v-else
         class="set-main-btn"
@@ -37,7 +34,6 @@
       >
         대표 설정
       </button>
-      <!-- 삭제 버튼 (버블링 방지 위해 @click.stop 사용) -->
       <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
         <img src="@/assets/images/icons/common/Trash.png" alt="삭제" />
       </button>
@@ -55,35 +51,35 @@
       @close="isDeleteModalOpen = false"
       @confirm="handleDelete"
     />
+
+    <!-- 계좌 상세 모달 -->
+    <DetailModal :visible="showDetail" @close="showDetail = false">
+      <AccountDetail :accountData="account" @close="showDetail = false" />
+    </DetailModal>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import DeleteConfirmModal from '@/pages/asset/component/common/DeleteConfirmModal.vue';
+import DetailModal from '../common/DetailModal.vue';
+import AccountDetail from './AccountDetail.vue';
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
 
 const props = defineProps({
   account: { type: Object, required: true },
 });
-const emit = defineEmits(['set-main', 'delete']); // 상위 이벤트 전달
-const router = useRouter();
+const emit = defineEmits(['set-main', 'delete']);
+
 const isDeleteModalOpen = ref(false);
+const showDetail = ref(false);
 
-// 계좌 상세 페이지 이동 (계좌 정보 영역 클릭 시만 실행)
-const goToDetail = () => {
-  router.push(`/account/${props.account.id}`);
-};
-
-// 금액 포맷
+const openDetail = () => (showDetail.value = true);
 const formatWon = (value) => `${value.toLocaleString()}원`;
-// 계좌번호 포맷 (###-###-####)
 const formatAccountNumber = (number) =>
   number.replace(/(\d{3})(\d{3})(\d{3,4})/, '$1-$2-$3');
 
-// 삭제 처리 (이벤트 버블링 차단 후 상위로 삭제 이벤트 전달)
 const handleDelete = (event) => {
   event?.stopPropagation();
   emit('delete', props.account);

@@ -1,5 +1,5 @@
 <template>
-  <div class="card-item">
+  <div class="card-item" @click="openDetail">
     <!-- 카드 이미지 -->
     <img
       :src="card.cardImage"
@@ -19,15 +19,12 @@
 
     <!-- 카드 컨트롤 영역 -->
     <div class="card-control" @click.stop>
-      <!-- 대표 카드 라벨 -->
       <button v-if="isRepresentative" class="main-label" disabled>
         대표 카드
       </button>
-      <!-- 대표 카드 설정 버튼 -->
       <button v-else class="set-main-btn" @click.stop="$emit('set-main', card)">
         대표 설정
       </button>
-      <!-- 삭제 버튼 -->
       <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
         <img src="@/assets/images/icons/common/Trash.png" alt="삭제" />
       </button>
@@ -43,25 +40,33 @@
       @close="isDeleteModalOpen = false"
       @confirm="handleDelete"
     />
+    <!-- 상세 모달 -->
+    <DetailModal :visible="showDetail" @close="showDetail = false">
+      <CardDetail :cardData="card" @close="showDetail = false" />
+    </DetailModal>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import DeleteConfirmModal from '@/pages/asset/component/common/DeleteConfirmModal.vue';
+import DetailModal from '../common/DetailModal.vue'; // 공통 전체화면 모달
+import CardDetail from './CardDetail.vue';
 
 const props = defineProps({
   card: { type: Object, required: true },
-  isRepresentative: { type: Boolean, default: false }, // 대표 카드 여부
+  isRepresentative: { type: Boolean, default: false },
 });
-const emit = defineEmits(['set-main', 'delete']); // 상위 이벤트 전달
+
+const emit = defineEmits(['set-main', 'delete']);
 
 const isDeleteModalOpen = ref(false);
+// 상세 모달 상태
+const showDetail = ref(false);
+const openDetail = () => (showDetail.value = true);
 
-// 금액 포맷
 const formatWon = (value) => `${value.toLocaleString()}원`;
 
-// 삭제 처리 (버블링 차단 후 상위로 이벤트 전달)
 const handleDelete = (event) => {
   event?.stopPropagation();
   emit('delete', props.card);
