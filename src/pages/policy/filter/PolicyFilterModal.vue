@@ -1,13 +1,14 @@
 <script setup>
 import { ref } from 'vue';
-import RegionSelectModal from '../recommend/RegionSelectModal.vue';
+// import RegionSelectModal from '../recommend/RegionSelectModal.vue';
+import AreaSelectModal from './AreaSelectModal.vue';
 
 const page = ref('main');
 
 const maritalOptions = ['기혼', '미혼', '제한없음'];
 const selectedMarital = ref([]);
 
-const selectedRegion = ref('');
+const selectedRegion = ref([]);
 const showRegionModal = ref(false);
 
 const age = ref('');
@@ -99,7 +100,10 @@ const handleRegionSelected = (value) => {
   selectedRegion.value = value;
   showRegionModal.value = false;
 };
-
+// 개별 지역 제거
+const removeRegionTag = (idx) => {
+  selectedRegion.value.splice(idx, 1);
+};
 function getSelectedList(page) {
   if (page === 'education') return selectedEducation;
   if (page === 'major') return selectedMajor;
@@ -176,14 +180,28 @@ function toggleMulti(listRef, option) {
         <div
           class="regionField font-15 font-regular"
           @click="showRegionModal = true"
+          style="min-height: 40px; flex-wrap: wrap; gap: 8px"
         >
-          <span v-if="selectedRegion">{{ selectedRegion }}</span>
+          <template v-if="selectedRegion.length">
+            <span
+              v-for="(item, idx) in selectedRegion"
+              :key="item"
+              class="regionTag"
+              @click.stop
+            >
+              {{ item }}
+              <!-- <button class="removeBtn" @click.stop="removeRegionTag(idx)">
+                ✕
+              </button> -->
+            </span>
+          </template>
           <span v-else class="regionPlaceholder">지역 선택</span>
           <img
             src="@/assets/images/icons/policy/select_down.png"
             class="selectDownIcon"
           />
         </div>
+
         <!-- 혼인여부 -->
         <div class="fieldLabel font-16 font-bold">혼인 여부</div>
         <div class="selectGroup">
@@ -310,7 +328,8 @@ function toggleMulti(listRef, option) {
         </button>
       </div>
     </div>
-    <RegionSelectModal
+
+    <AreaSelectModal
       v-if="showRegionModal"
       @close="showRegionModal = false"
       @selected="handleRegionSelected"
@@ -609,5 +628,25 @@ function toggleMulti(listRef, option) {
 .optionList::-webkit-scrollbar-thumb {
   background: var(--input-outline-2);
   border-radius: 6px;
+}
+
+.regionTag {
+  background: var(--input-bg-2);
+  color: var(--text-login);
+  border-radius: 12px;
+  padding: 4px 13px 4px 12px;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-right: 4px;
+}
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--text-lightgray);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 0 0 2px;
 }
 </style>

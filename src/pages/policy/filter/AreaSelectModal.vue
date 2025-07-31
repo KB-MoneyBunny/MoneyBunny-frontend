@@ -6,7 +6,6 @@ import { onMounted, onUnmounted } from 'vue';
 onMounted(() => {
   document.body.classList.add('modal-open');
 });
-
 onUnmounted(() => {
   document.body.classList.remove('modal-open');
 });
@@ -16,6 +15,9 @@ const emit = defineEmits(['close', 'selected']);
 const search = ref('');
 const selectedSido = ref('');
 const selectedGugun = ref('');
+
+// 복수 선택된 지역 배열
+const selectedRegions = ref([]); // [{ sido: '서울특별시', gugun: '동작구' }, ...]
 
 const filteredSidoList = computed(() => {
   if (!search.value) return regions;
@@ -27,29 +29,46 @@ const filteredSidoList = computed(() => {
   );
 });
 
+// 시/도 선택
 const selectSido = (sido) => {
   selectedSido.value = sido;
   selectedGugun.value = '';
 };
-
+// 구/군 선택 → 배열에 추가
 const selectGugun = (gugun) => {
-  selectedGugun.value = gugun;
+  // 이미 같은 조합이 있으면 추가 안 함
+  const already = selectedRegions.value.some(
+    (item) => item.sido === selectedSido.value && item.gugun === gugun
+  );
+  if (!already) {
+    selectedRegions.value.push({
+      sido: selectedSido.value,
+      gugun,
+    });
+  }
+  // 선택 후 초기화
+  selectedSido.value = '';
+  selectedGugun.value = '';
+};
+// 선택된 태그 제거
+const removeRegion = (idx) => {
+  selectedRegions.value.splice(idx, 1);
 };
 
 const reset = () => {
   selectedSido.value = '';
   selectedGugun.value = '';
   search.value = '';
+  selectedRegions.value = [];
 };
-
 const apply = () => {
-  if (canApply.value) {
-    emit('selected', `${selectedSido.value} ${selectedGugun.value}`);
-    emit('close');
-  }
+  emit(
+    'selected',
+    selectedRegions.value.map((r) => `${r.sido} ${r.gugun}`)
+  );
+  emit('close');
 };
-
-const canApply = computed(() => selectedSido.value && selectedGugun.value);
+const canApply = computed(() => selectedRegions.value.length > 0);
 </script>
 
 <template>
@@ -76,7 +95,6 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
               </div>
             </div>
           </div>
-
           <!-- 구/군 -->
           <div class="gugunColumn">
             <h4>구/군</h4>
@@ -85,16 +103,44 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
                 <div
                   v-for="gugun in regions[selectedSido]"
                   :key="gugun"
-                  :class="['gugunItem', { selected: selectedGugun === gugun }]"
+                  :class="[
+                    'gugunItem',
+                    {
+                      selected: selectedGugun === gugun,
+                      already: selectedRegions.some(
+                        (r) => r.sido === selectedSido && r.gugun === gugun
+                      ),
+                    },
+                  ]"
                   @click="selectGugun(gugun)"
                 >
                   {{ gugun }}
+                  <span
+                    v-if="
+                      selectedRegions.some(
+                        (r) => r.sido === selectedSido && r.gugun === gugun
+                      )
+                    "
+                    class="alreadyText"
+                    >✔️</span
+                  >
                 </div>
               </div>
               <div v-else class="emptyText">시/도를 먼저 선택하세요</div>
             </div>
           </div>
         </div>
+      </div>
+      <!-- 선택된 지역 태그 -->
+      <div v-if="selectedRegions.length" class="selectedRegions">
+        <span
+          v-for="(region, idx) in selectedRegions"
+          :key="region.sido + region.gugun"
+          class="regionTag"
+        >
+          {{ region.sido }} {{ region.gugun }}
+          <button class="removeBtn" @click="removeRegion(idx)">✕</button>
+        </span>
       </div>
 
       <div class="modalFooter">
@@ -117,7 +163,6 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   justify-content: center;
   align-items: center;
 }
-
 .modalContainer {
   background: rgba(255, 255, 255, 0.97);
   border-radius: 12px;
@@ -128,18 +173,15 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   display: flex;
   flex-direction: column;
 }
-
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
 .modalTitle {
   font-size: 18px;
   font-weight: bold;
 }
-
 .closeBtn {
   background: none;
   border: none;
@@ -147,54 +189,84 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   cursor: pointer;
 }
 
-.regionSelectBox {
-  margin: 20px 10px;
-  flex-grow: 1;
+/* ---- 선택된 지역 태그 ---- */
+.selectedRegions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 7px;
+  margin: 12px 0 6px 0;
+  min-height: 32px;
+}
+.regionTag {
+  background: var(--input-bg-2);
+  color: var(--text-login);
+  border-radius: 16px;
+  padding: 4px 13px 4px 12px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--text-lightgray);
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 2px;
+  padding: 0;
 }
 
+/* ---- 지역 선택 컬럼 ---- */
+.regionSelectBox {
+  margin: 16px 6px 8px 6px;
+  flex-grow: 1;
+}
 .columnsWrapper {
   display: flex;
   max-height: 340px;
   gap: 6px;
 }
-
 .sidoColumn,
 .gugunColumn {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-
 .sidoColumn h4,
 .gugunColumn h4 {
   font-size: 15px;
   color: var(--text-bluegray);
-  /* margin-bottom: 10px; */
   margin-left: 4px;
   position: sticky;
   top: 0;
   z-index: 2;
   padding-left: 4px;
 }
-
 .scrollArea {
   max-height: 340px;
   overflow-y: auto;
   padding-right: 6px;
 }
-
 .sidoItem,
 .gugunItem {
   padding: 9px;
   border-radius: 6px;
   cursor: pointer;
 }
-
 .sidoItem.selected,
 .gugunItem.selected {
-  background-color: rgba(160, 160, 180, 0.1); /* 옅은 파스텔 톤 + 투명도 */
+  background-color: rgba(160, 160, 180, 0.14);
 }
-
+.gugunItem.already {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.alreadyText {
+  font-size: 13px;
+  margin-left: 2px;
+  color: var(--base-blue-dark);
+}
 .emptyText {
   font-size: 14px;
   color: var(--text-disabled);
@@ -207,7 +279,6 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   gap: 8px;
   margin-top: 10px;
 }
-
 .resetBtn {
   flex: 1;
   background-color: var(--input-bg-1);
@@ -218,7 +289,6 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   font-size: 16px;
   cursor: pointer;
 }
-
 .applyBtn {
   flex: 1;
   background-color: var(--base-blue-dark);
@@ -229,17 +299,14 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   border-radius: 8px;
   cursor: pointer;
 }
-
 .applyBtn:disabled {
   background-color: var(--input-bg-2);
   color: var(--text-bluegray);
   cursor: not-allowed;
 }
-
 .scrollArea::-webkit-scrollbar {
   width: 3.5px;
 }
-
 .scrollArea::-webkit-scrollbar-thumb {
   background-color: var(--input-disabled-2);
   border-radius: 3px;
