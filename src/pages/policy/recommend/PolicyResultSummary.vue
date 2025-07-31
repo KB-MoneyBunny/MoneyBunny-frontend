@@ -1,60 +1,3 @@
-<template>
-  <header class="introHeader">
-    <div class="resultHeader">
-      <h3>맞춤 정책 분석 완료!</h3>
-      <img
-        src="@/assets/images/icons/bunny/personality_done_bunny.png"
-        alt="토끼"
-        class="bunny"
-      />
-    </div>
-  </header>
-  <div class="resultContainer" style="font-family: 'NanumSquareNeo'">
-    <section class="summarySection">
-      <h3 class="font-18 font-bold">당신의 응답 결과</h3>
-      <div class="summaryRow" v-for="(value, label) in summary" :key="label">
-        <span class="summaryLabel">{{ label }}</span>
-        <span class="summaryValue">{{ value }}</span>
-      </div>
-    </section>
-
-    <div class="prioritySection">
-      <div class="font-18 font-bold">정책 신청 시 중요하게 여긴 항목</div>
-      <ul class="priorityList">
-        <li
-          v-for="(item, index) in priorityOrder"
-          :key="index"
-          class="priorityItem"
-        >
-          <span class="priorityRank"> {{ index + 1 }}순위 </span>
-          <span class="priorityLabel"> {{ item }} </span>
-        </li>
-      </ul>
-    </div>
-
-    <section class="recommendSection">
-      <h3 class="font-18 font-bold">추천 정책 미리보기</h3>
-      <div
-        class="policyCard"
-        v-for="policy in previewPolicies"
-        :key="policy.title"
-      >
-        <div class="tag">{{ policy.tag }}</div>
-        <p class="title font-bold">{{ policy.title }}</p>
-        <p class="desc">{{ policy.description }}</p>
-        <p class="match">매칭도: {{ policy.match }}</p>
-      </div>
-    </section>
-
-    <footer class="buttonGroup">
-      <button class="btn-grey" @click="redoQuiz">다시 검사하기</button>
-      <button class="btn-blue" @click="goToAllPolicies">
-        맞춤 정책 전체 보기
-      </button>
-    </footer>
-  </div>
-</template>
-
 <script>
 import { useRouter } from 'vue-router';
 
@@ -104,6 +47,63 @@ export default {
 };
 </script>
 
+<template>
+  <header class="introHeader">
+    <div class="resultHeader">
+      <h3>맞춤 정책 분석 완료!</h3>
+      <img
+        src="@/assets/images/icons/bunny/personality_done_bunny.png"
+        alt="토끼"
+        class="bunny"
+      />
+    </div>
+  </header>
+  <div class="resultContainer">
+    <section class="summarySection">
+      <div class="font-18 font-bold">당신의 응답 결과</div>
+      <div class="summaryRow" v-for="(value, label) in summary" :key="label">
+        <span class="summaryLabel">{{ label }}</span>
+        <span class="summaryValue">{{ value }}</span>
+      </div>
+    </section>
+
+    <div class="prioritySection">
+      <div class="font-18 font-bold">정책 신청 시 중요하게 여긴 항목</div>
+      <ul class="priorityList">
+        <li
+          v-for="(item, index) in priorityOrder"
+          :key="index"
+          class="priorityItem"
+        >
+          <span class="priorityRank"> {{ index + 1 }}순위 </span>
+          <span class="priorityLabel"> {{ item }} </span>
+        </li>
+      </ul>
+    </div>
+
+    <section class="recommendSection">
+      <h3 class="font-18 font-bold">추천 정책 미리보기</h3>
+      <div
+        class="policyCard"
+        v-for="policy in previewPolicies"
+        :key="policy.title"
+      >
+        <div class="tag">{{ policy.tag }}</div>
+        <p class="title font-bold">{{ policy.title }}</p>
+        <p class="desc">{{ policy.description }}</p>
+        <p class="match">매칭도: {{ policy.match }}</p>
+      </div>
+    </section>
+
+    <footer class="buttonGroup">
+      <button class="btn-grey" @click="redoQuiz">다시 검사하기</button>
+      <button class="btn-blue" @click="goToAllPolicies">
+        맞춤 정책 전체 보기
+      </button>
+    </footer>
+  </div>
+</template>
+
 <style scoped>
 .introHeader {
   display: flex;
@@ -130,8 +130,7 @@ export default {
 }
 
 .resultHeader .bunny {
-  height: 60px;
-  margin-left: 12px;
+  height: 50px;
   flex-shrink: 0;
 }
 
@@ -184,7 +183,7 @@ export default {
 
 .policyCard .tag {
   display: inline-block;
-  font-size: 12px;
+  font-size: 11px;
   background: var(--input-outline);
   padding: 2px 8px;
   border-radius: 6px;
@@ -192,18 +191,18 @@ export default {
 }
 
 .policyCard .title {
-  font-size: 16px;
+  font-size: 15px;
   margin-bottom: 6px;
 }
 
 .policyCard .desc {
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 8px;
   color: #555;
 }
 
 .policyCard .match {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   color: var(--base-blue-dark);
 }
@@ -218,7 +217,7 @@ export default {
 .btn-grey,
 .btn-blue {
   padding: 12px 0;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 10px;
   width: 100%;
 }
@@ -260,16 +259,14 @@ export default {
 .priorityRank {
   background-color: var(--base-blue-dark);
   color: white;
-  font-size: 13px;
-  font-weight: bold;
-  border-radius: 20px;
-  padding: 4px 12px;
-  margin-right: 10px;
+  font-size: 12px;
+  border-radius: 10px;
+  padding: 4px 8px;
+  margin-right: 12px;
 }
 
 .priorityLabel {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
   color: var(--text-login);
 }
 </style>

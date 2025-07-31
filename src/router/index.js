@@ -27,7 +27,7 @@ import PolicyRetestPage from '@/pages/mypage/settings/PolicyRetestPage.vue';
 // ─── 탭 메인 페이지 ────────────────────────────────────
 import HomeMainPage from '@/pages/home/HomeMainPage.vue'; // 홈메인
 import AssetMain from '@/pages/asset/AssetMain.vue'; //🥕성빈: 자산 메인탭
-import PolicyMainTab from '@/pages/policy/tabs/PolicyMainTab.vue';
+import PolicyMainTab from '@/pages/policy/PolicyMainTab.vue';
 import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 
 //
@@ -41,7 +41,6 @@ import PolicyQuizStep5 from '@/pages/policy/recommend/PolicyQuizStep5.vue';
 import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vue';
 
 import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
-
 import PolicySearchPage from '@/pages/policy/search/PolicySearchPage.vue';
 
 const routes = [
@@ -122,8 +121,7 @@ const routes = [
         component: NotificationCenter,
       },
 
-      //
-      // ─── 정책 추천 흐름 ──────────────────────────────
+      // 정책 추천 플로우
       { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
       { path: 'policy/main', name: 'policyMain', component: PolicyMainTab },
       {
@@ -188,7 +186,6 @@ router.beforeEach((to, from, next) => {
     '/resetPassword',
     '/findIdResult',
     '/findIdCode',
-    '/home', // temp
   ];
   const authRequired = !publicPages.includes(to.path);
 

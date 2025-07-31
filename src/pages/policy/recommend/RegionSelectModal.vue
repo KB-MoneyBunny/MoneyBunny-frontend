@@ -136,14 +136,14 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
 }
 
 .modalTitle {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
 }
 
 .closeBtn {
   background: none;
   border: none;
-  font-size: 22px;
+  font-size: 20px;
   cursor: pointer;
 }
 
@@ -163,13 +163,13 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   flex: 1;
   display: flex;
   flex-direction: column;
+  font-size: 15px;
 }
 
 .sidoColumn h4,
 .gugunColumn h4 {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-bluegray);
-  /* margin-bottom: 10px; */
   margin-left: 4px;
   position: sticky;
   top: 0;
@@ -196,7 +196,7 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
 }
 
 .emptyText {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-disabled);
   text-align: center;
   margin-top: 15px;
@@ -215,7 +215,7 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   border: none;
   padding: 12px;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -225,7 +225,7 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
   color: white;
   border: none;
   padding: 12px;
-  font-size: 16px;
+  font-size: 15px;
   border-radius: 8px;
   cursor: pointer;
 }
@@ -237,7 +237,7 @@ const canApply = computed(() => selectedSido.value && selectedGugun.value);
 }
 
 .scrollArea::-webkit-scrollbar {
-  width: 3.5px;
+  width: 3px;
 }
 
 .scrollArea::-webkit-scrollbar-thumb {

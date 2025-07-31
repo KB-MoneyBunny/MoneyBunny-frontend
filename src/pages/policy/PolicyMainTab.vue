@@ -1,24 +1,30 @@
 <template>
   <div class="policyWrapper">
     <!-- 정책 검색창 -->
-    <div class="searchBar">
+    <div class="searchBar" @click="goToSearchPage" style="cursor: pointer">
       <img
         src="@/assets/images/icons/policy/search.png"
         alt="search icon"
         class="searchIconImage"
       />
-      <input type="text" placeholder="정책 검색" @focus="goToSearchPage" />
+      <input
+        type="text"
+        placeholder="정책 검색"
+        @focus="goToSearchPage"
+        @click="goToSearchPage"
+        class="fakeInput"
+        readonly
+      />
     </div>
 
-    <!-- 맞춤 정책 TOP 3 추천 -->
-    <div class="topThreeBanner">
+    <!-- <div class="topThreeBanner">
       <img
         src="@/assets/images/icons/policy/award.png"
         alt="award icon"
         class="topThreeIconImage"
       />
       <span class="font-bold font-18">맞춤 정책 TOP 3 추천</span>
-    </div>
+    </div> -->
 
     <!-- 정책 카드 리스트 -->
     <div v-for="(policy, index) in policyList" :key="index" class="policyCard">
@@ -217,5 +223,9 @@ const policyList = ref([
   border-radius: 8px;
   border: 1px solid var(--input-outline);
   margin-top: 15px;
+}
+
+.fakeInput {
+  pointer-events: auto; /* input도 클릭 이벤트 받게! */
 }
 </style>

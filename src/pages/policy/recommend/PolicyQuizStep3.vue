@@ -1,20 +1,20 @@
 <template>
   <header class="introHeader">
     <div class="quizHeader">
-      <h2 class="font-20 font-bold">맞춤 정책 추천을 위한 간단한 질문</h2>
+      <div class="font-18">맞춤 정책 추천을 위한 간단한 질문</div>
     </div>
   </header>
 
-  <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
+  <div class="quizContainer">
     <section class="quizContent">
       <div class="progressBarWrapper">
-        <span class="font-13 font-regular">질문 3 / 4</span>
+        <span class="font-13">질문 3 / 4</span>
         <div class="progressBar">
           <div class="progress" :style="{ width: '75%' }"></div>
         </div>
       </div>
 
-      <h3 class="question font-22 font-bold">현재 어떤 상황에 계신가요?</h3>
+      <div class="question font-20">현재 어떤 상황에 계신가요?</div>
 
       <ul class="options">
         <li
@@ -30,9 +30,9 @@
     </section>
 
     <footer class="quizFooter">
-      <button class="prevButton font-20" @click="goToPrevStep">이전</button>
+      <button class="prevButton font-18" @click="goToPrevStep">이전</button>
       <button
-        class="nextButton font-20"
+        class="nextButton font-18"
         :disabled="!selectedOption"
         @click="goToNextStep"
       >
@@ -146,11 +146,12 @@ export default {
   border-radius: 8px;
   background-color: white;
   cursor: pointer;
+  font-size: 15px;
 }
 
 .optionItem.selected {
-  border-color: var(--input-outline);
-  background-color: var(--input-bg-2);
+  border-color: var(--input-bg-3);
+  background-color: var(--input-bg-3);
 }
 
 .quizFooter {
@@ -166,7 +167,6 @@ export default {
   padding: 12px 0;
   border-radius: 10px;
   border: none;
-  font-weight: bold;
 }
 
 .prevButton {

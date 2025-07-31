@@ -60,22 +60,22 @@ const contactList = [
 
 <template>
   <div class="applyTab">
-    <div class="font-20 font-bold mb-3">신청 절차</div>
+    <div class="font-18 font-bold mb-3">신청 절차</div>
 
     <div v-for="(step, idx) in steps" :key="idx" class="step">
       <div class="stepNum">{{ idx + 1 }}</div>
       <div class="stepContent">
-        <div class="font-15 font-bold">{{ step.title }}</div>
-        <div class="font-13 text-bluegray">{{ step.desc }}</div>
+        <div class="font-14 font-bold">{{ step.title }}</div>
+        <div class="font-12 text-bluegray">{{ step.desc }}</div>
       </div>
     </div>
 
-    <div class="font-20 font-bold mb-3 mt-4">필요 서류</div>
-    <ul class="docsBox font-14">
+    <div class="font-18 font-bold mb-3 mt-4">필요 서류</div>
+    <ul class="docsBox font-13">
       <li v-for="(doc, idx) in submitDocuments" :key="idx">{{ doc }}</li>
     </ul>
 
-    <div class="font-20 font-bold mb-3 mt-4">신청 기간</div>
+    <div class="font-18 font-bold mb-3 mt-4">신청 기간</div>
     <div class="periodBox">
       <img
         src="@/assets/images/icons/policy/calendar.png"
@@ -83,18 +83,18 @@ const contactList = [
         class="calendarIcon"
       />
       <div class="periodContent">
-        <div class="periodText font-16 font-bold">
+        <div class="periodText font-15 font-bold">
           {{ bizStartDate[0] }}년 {{ bizStartDate[1] }}월
           {{ bizStartDate[2] }}일 ~ {{ bizEndDate[0] }}년 {{ bizEndDate[1] }}월
           {{ bizEndDate[2] }}일
         </div>
-        <span class="periodSub font-14">
+        <span class="periodSub font-13">
           연중 상시 접수 (예산 소진 시 조기 마감)
         </span>
       </div>
     </div>
 
-    <div class="font-20 font-bold mt-3 mb-3">문의처</div>
+    <div class="font-18 font-bold mt-3 mb-3">문의처</div>
     <div class="contactBox">
       <div v-for="(item, idx) in contactList" :key="idx" class="contactItem">
         <img :src="item.icon" :alt="item.alt" />
@@ -129,7 +129,7 @@ const contactList = [
   border-radius: 50%;
   background-color: var(--base-blue-dark);
   color: white;
-  font-size: 13px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,13 +212,13 @@ const contactList = [
 }
 
 .contactTitle {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   margin-bottom: 2px;
 }
 
 .contactDesc {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-bluegray);
   line-height: 1.6;
 }
