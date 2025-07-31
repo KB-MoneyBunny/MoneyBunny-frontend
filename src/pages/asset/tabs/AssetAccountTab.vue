@@ -26,9 +26,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import AccountSummaryCard from '../account/AccountSummaryCard.vue';
-import AccountList from '../account/AccountList.vue';
-import NoDataCard from '../common/NoDataCard.vue';
+import AccountSummaryCard from '../component/account/AccountSummaryCard.vue';
+import AccountList from '../component/account/AccountList.vue';
+import NoDataCard from '../component/common/NoDataCard.vue';
 import accountsData from '@/assets/data/accounts.json';
 
 const accounts = ref([]); // 계좌 데이터 배열

@@ -61,7 +61,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import DeleteConfirmModal from '@/pages/asset/common/DeleteConfirmModal.vue';
+import DeleteConfirmModal from '@/pages/asset/component/common/DeleteConfirmModal.vue';
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
 

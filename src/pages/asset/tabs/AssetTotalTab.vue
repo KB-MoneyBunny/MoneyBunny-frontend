@@ -16,9 +16,9 @@
 </template>
 
 <script setup>
-import TotalAssetCard from '@/pages/asset/main/TotalAssetCard.vue';
-import AccountOverviewCard from '../main/AccountOverviewCard.vue';
-import CardOverviewCard from '../main/CardOverviewCard.vue';
+import TotalAssetCard from '../component/total/TotalAssetCard.vue';
+import AccountOverviewCard from '../component/total/AccountOverviewCard.vue';
+import CardOverviewCard from '../component/total/CardOverviewCard.vue';
 
 defineEmits(['switchTab']);
 </script>

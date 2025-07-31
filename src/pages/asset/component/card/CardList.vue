@@ -35,11 +35,12 @@
     </button>
   </div>
 </template>
+
 <script setup>
 import { ref, computed, watch } from 'vue';
 import CardItem from './CardItem.vue';
-import AddItemButton from '@/pages/asset/common/AddItemButton.vue';
-import AddItemModal from '@/pages/asset/common/AddItemModal.vue';
+import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
+import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
 
 const props = defineProps({ cards: Array });
 const emit = defineEmits(['delete-card', 'update-cards']);

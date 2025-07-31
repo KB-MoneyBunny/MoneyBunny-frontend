@@ -21,9 +21,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import CardSummaryCard from '../card/CardSummaryCard.vue';
-import CardList from '../card/CardList.vue';
-import NoDataCard from '../common/NoDataCard.vue';
+import CardSummaryCard from '../component/card/CardSummaryCard.vue';
+import CardList from '../component/card/CardList.vue';
+import NoDataCard from '../component/common/NoDataCard.vue';
 import cardsData from '@/assets/data/cards.json';
 
 const cards = ref([]);

@@ -48,7 +48,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import DeleteConfirmModal from '@/pages/asset/common/DeleteConfirmModal.vue';
+import DeleteConfirmModal from '@/pages/asset/component/common/DeleteConfirmModal.vue';
 
 const props = defineProps({
   card: { type: Object, required: true },

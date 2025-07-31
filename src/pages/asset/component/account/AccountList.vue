@@ -37,8 +37,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import AccountItem from './AccountItem.vue';
-import AddItemButton from '@/pages/asset/common/AddItemButton.vue';
-import AddItemModal from '@/pages/asset/common/AddItemModal.vue';
+import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
+import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
 
 const props = defineProps({ accounts: Array });
 const emit = defineEmits(['delete-account', 'update-accounts']);
