@@ -2,8 +2,6 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import AttendanceCheckModal from './AttendanceCheckModal.vue';
 
 const router = useRouter();
