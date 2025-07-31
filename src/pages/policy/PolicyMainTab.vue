@@ -1,3 +1,42 @@
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import BottomNav from '@/components/layouts/NavBar.vue';
+
+const router = useRouter();
+
+const goToDetail = (policyId) => {
+  router.push({ name: 'policyDetail', params: { id: policyId } });
+};
+const goToSearchPage = () => {
+  router.push('/policy/main/search');
+};
+
+const policyList = ref([
+  {
+    id: 1,
+    title: '청년 주택드림 청약통장',
+    tag: '주택',
+    desc: '만 19~34세 청년층을 위한 주택 구입 지원 정책으로...',
+    deadline: '2024.12.31',
+  },
+  {
+    id: 2,
+    title: '청년 내일채움공제',
+    tag: '취업',
+    desc: '중소기업 취업 청년을 위한 장기재직 지원제도...',
+    deadline: '2024.11.30',
+  },
+  {
+    id: 3,
+    title: '청년 창업지원금',
+    tag: '창업',
+    desc: '만 39세 이하 예비창업자 및 창업 3년 이내 기업 대상...',
+    deadline: '2024.10.15',
+  },
+]);
+</script>
+
 <template>
   <div class="policyWrapper">
     <!-- 정책 검색창 -->
@@ -7,7 +46,12 @@
         alt="search icon"
         class="searchIconImage"
       />
-      <input type="text" placeholder="정책 검색" @focus="goToSearchPage" />
+      <input
+        type="text"
+        placeholder="정책 검색"
+        @click="goToSearchPage"
+        readonly
+      />
     </div>
 
     <!-- 맞춤 정책 TOP 3 추천 -->
@@ -49,44 +93,6 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import BottomNav from '@/components/layouts/NavBar.vue';
-
-const router = useRouter();
-
-const goToDetail = (policyId) => {
-  router.push({ name: 'policyDetail', params: { id: policyId } });
-};
-const goToSearchPage = () => {
-  router.push({ name: 'policySearch' });
-};
-
-const policyList = ref([
-  {
-    id: 1,
-    title: '청년 주택드림 청약통장',
-    tag: '주택',
-    desc: '만 19~34세 청년층을 위한 주택 구입 지원 정책으로...',
-    deadline: '2024.12.31',
-  },
-  {
-    id: 2,
-    title: '청년 내일채움공제',
-    tag: '취업',
-    desc: '중소기업 취업 청년을 위한 장기재직 지원제도...',
-    deadline: '2024.11.30',
-  },
-  {
-    id: 3,
-    title: '청년 창업지원금',
-    tag: '창업',
-    desc: '만 39세 이하 예비창업자 및 창업 3년 이내 기업 대상...',
-    deadline: '2024.10.15',
-  },
-]);
-</script>
 <style scoped>
 .policyWrapper {
   padding-bottom: 40px;

@@ -4,7 +4,6 @@ import { useAuthStore } from '@/stores/auth';
 //
 // ─── 레이아웃 ────────────────────────────────────────
 import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
-import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 
 //
 // ─── 인증 / 회원 관련 페이지 ───────────────────────────
@@ -85,7 +84,6 @@ const routes = [
   // ─── 기본 레이아웃 하위 라우트 ──────────────────────
   {
     path: '/',
-    path: '/',
     component: DefaultLayout,
     children: [
       { path: '', redirect: '/home' },
@@ -119,6 +117,11 @@ const routes = [
       // ─── 정책 추천 흐름 ──────────────────────────────
       { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
       { path: 'policy/main', name: 'policyMain', component: PolicyMainTab },
+      {
+        path: 'policy/search',
+        name: 'policySearch',
+        component: PolicySearchPage,
+      },
       {
         path: 'policy/quiz/step1',
         name: 'policyQuizStep1',
@@ -155,11 +158,6 @@ const routes = [
         name: 'policyDetail',
         component: PolicyDetailPage,
         props: true,
-      },
-      {
-        path: '/policy/search',
-        name: 'policySearch',
-        component: PolicySearchPage,
       },
     ],
   },
