@@ -54,27 +54,29 @@ const formattedBalance = computed(() =>
 .info-card {
   display: flex;
   align-items: center;
-  background-color: var(--base-blue-dark);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  color: white;
+  background-color: #ffffff; /* 화이트 배경 */
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem; /* 여백 확대 */
   margin: 1rem;
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* 자연스러운 그림자 */
+  border: 1px solid var(--input-bg-3); /* 은은한 경계선 */
 }
 
 .info-left {
   margin-right: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .card-img {
-  width: 4rem;
+  width: 3.25rem;
   height: auto;
   border-radius: 0.5rem;
 }
 
 .bank-logo {
-  width: 3rem;
-  height: 3rem;
+  width: 2.75rem;
+  height: 2.75rem;
   object-fit: contain;
   border-radius: 50%;
   background: white;
@@ -89,23 +91,26 @@ const formattedBalance = computed(() =>
   font-size: 1rem;
   font-weight: 600;
   margin: 0;
+  color: var(--base-blue-dark);
 }
 
 .info-number {
-  font-size: 0.875rem;
-  color: var(--text-rate);
-  margin: 0.25rem 0;
+  font-size: 0.8125rem;
+  color: var(--text-bluegray);
+  margin: 0.25rem 0 0.5rem;
 }
 
 .info-balance {
   font-size: 1.375rem;
   font-weight: 700;
-  margin-top: 0.5rem;
+  margin: 0;
+  color: var(--base-blue-dark);
 }
 
 .unit {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 400;
   margin-left: 0.25rem;
+  color: var(--text-lightgray);
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <header class="detail-header">
-    <button class="back-btn" @click="emit('back')">
+    <button class="back-btn" @click="$emit('back')">
       <img
         src="@/assets/images/icons/common/arrow_left.png"
         alt="뒤로가기"
@@ -22,20 +22,18 @@ const emit = defineEmits(['back']);
 .detail-header {
   display: flex;
   align-items: center;
-  height: 3.75rem;
+  height: 3.5rem;
   padding: 0 1rem;
-  background-color: var(--input-bg-2);
-  border-bottom: 1px solid var(--base-lavender);
+
+  background-color: #fff;
+  border-bottom: 1px solid var(--input-bg-3);
 }
 
 .back-btn {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
-  margin-right: 0.5rem;
-  display: flex;
-  align-items: center;
+  margin-right: 0.75rem;
 }
 
 .back-icon {
@@ -44,8 +42,8 @@ const emit = defineEmits(['back']);
 }
 
 .detail-title {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.125rem;
+  font-weight: 600;
   color: var(--base-blue-dark);
   margin: 0;
 }

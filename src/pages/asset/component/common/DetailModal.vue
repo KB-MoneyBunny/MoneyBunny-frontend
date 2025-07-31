@@ -19,14 +19,14 @@ const onOverlayClick = () => emit('close');
 <style scoped>
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: white; /* 풀스크린 배경 */
+  top: 60px; /* 메인 헤더 높이만큼 아래에서 시작 */
+  left: 50%; /* 화면 중앙 기준 */
+  transform: translateX(-50%); /* 중앙 정렬 */
+  background: var(--input-bg-2); /* 배경색 */
   z-index: 9999;
-  width: 100%;
-  height: 100%;
+  width: 474px; /* main.css의 #app 기준 폭 */
+  height: calc(100% - 60px); /* 헤더 영역 제외 */
+  max-width: 100%; /* 작은 화면 대응 */
 }
 .modal-content {
   width: 100%;

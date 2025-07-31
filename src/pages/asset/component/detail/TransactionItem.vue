@@ -47,21 +47,25 @@ const amountSign = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--input-bg-2);
-  padding: 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.02);
+  padding: 0.75rem 0; /* 카드 내부 간격 축소 */
+  background: transparent; /* 개별 아이템 배경 제거 (리스트 카드 내 배경 유지) */
+  border-bottom: 1px solid var(--input-bg-3); /* 리스트 구분선 */
+}
+
+.transaction-item:last-child {
+  border-bottom: none; /* 마지막 아이템은 구분선 제거 */
 }
 
 .transaction-left {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 }
 
 .transaction-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0;
   color: var(--base-blue-dark);
 }
 
@@ -76,17 +80,17 @@ const amountSign = computed(() => {
 }
 
 .transaction-amount {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 600;
   margin: 0;
 }
 
 .transaction-amount.positive {
-  color: var(--text-green);
+  color: var(--text-green); /* 입금 파란색 강조 */
 }
 
 .transaction-amount.negative {
-  color: var(--alert-red);
+  color: var(--alert-red); /* 출금 빨간색 */
 }
 
 .transaction-balance {

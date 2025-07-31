@@ -22,27 +22,27 @@ const filterOptions = ['전체', '입금', '출금'];
 <style scoped>
 .transaction-filter {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1rem 0;
+  justify-content: flex-start; /* 좌측 정렬 */
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #fff;
+  border-bottom: 1px solid var(--input-bg-3);
 }
 
 .filter-btn {
-  flex: 1;
-  padding: 0.5rem 0;
-  border: 1px solid var(--base-lavender);
-  border-radius: 0.5rem;
-  background-color: var(--input-bg-2);
-  color: var(--text-darkgray);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--input-bg-3); /* 기본 배경 연한 회색 */
+  color: var(--text-bluegray);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .filter-btn.active {
-  background-color: var(--base-blue-dark);
-  color: white;
-  border-color: var(--base-blue-dark);
+  background: var(--base-blue-dark); /* 활성화 시 블루 배경 */
+  color: #fff;
 }
 </style>
