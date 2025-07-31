@@ -17,8 +17,10 @@ import { computed } from 'vue';
 
 import Header from '@/components/layouts/Header.vue';
 import NavBar from '@/components/layouts/NavBar.vue';
-import NotificationHeader from '@/pages/notification/common/NotificationHeader.vue'; //알림센터 헤더
-import PolicySearchHeader from '@/pages/policy/search/PolicySearchHeader.vue'; // 새로 만듦!
+import NotificationHeader from '@/pages/notification/common/NotificationHeader.vue';
+import PolicySearchHeader from '@/pages/policy/search/PolicySearchHeader.vue';
+import ChangePasswordHeader from '@/pages/mypage/settings/ChangePasswordHeader.vue';
+
 //현재 라우트 정보 가져오기
 const route = useRoute();
 
@@ -34,10 +36,15 @@ const isSearchPage = computed(
   () =>
     route.name === 'policySearchPage' || route.path.startsWith('/policy/search')
 );
-
+// ★ 비밀번호 변경 라우트 추가! (라우트 name에 따라)
+const isChangePasswordPage = computed(
+  () =>
+    route.name === 'changePassword' || route.path.startsWith('/changePassword')
+);
 const activeHeader = computed(() => {
   if (isNotificationPage.value) return NotificationHeader;
   if (isSearchPage.value) return PolicySearchHeader;
+  if (isChangePasswordPage.value) return ChangePasswordHeader;
   return Header;
 });
 </script>

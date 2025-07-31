@@ -86,13 +86,13 @@ export default {
     ];
 
     const redoQuiz = () => {
-      router.push({ name: 'policyQuizStep1' });
+      router.push({ name: 'policyIntroForm' });
     };
 
     const goToAllPolicies = () => {
       router.push({ name: 'policyMain' });
     };
-    const priorityOrder = ['조회수', '만료일', '금액']; // 실제 선택된 순서로 동적으로 받아오면 여기에 바인딩
+    const priorityOrder = ['조회수', '만료일', '금액'];
     return {
       summary,
       previewPolicies,

@@ -1,4 +1,3 @@
-
 <template>
   <div class="myPageContainer">
     <!-- 고정 프로필 카드 -->
@@ -25,6 +24,7 @@
       :name="userInfo.name"
       :email="userInfo.email"
       :phone="userInfo.phone"
+      :profileImage="userInfo.profileImage"
       @close="isModalOpen = false"
       @update="handleUpdate"
     />
@@ -42,13 +42,21 @@ import EditProfileModal from './profile/EditProfileModal.vue';
 import BookmarkList from './bookmark/BookmarkList.vue';
 import SettingMain from './settings/SettingMain.vue';
 
+import imgSprout from '@/assets/images/icons/profile/profile_edit_sprout.png';
+import imgBeard from '@/assets/images/icons/profile/profile_edit_beard.png';
+import imgEyelash from '@/assets/images/icons/profile/profile_edit_eyelash.png';
+import imgCarrot from '@/assets/images/icons/profile/profile_edit_carrot.png';
+
 const currentTab = ref('profile');
 const isModalOpen = ref(false);
+
+const profileImages = [imgSprout, imgBeard, imgEyelash, imgCarrot];
 
 const userInfo = ref({
   name: '서루피',
   email: 'loopy@gmail.com',
   phone: '010-1234-5678',
+  profileImage: imgBeard,
 });
 
 const bookmarks = ref([]);
@@ -80,10 +88,6 @@ const handleUpdate = (data) => {
   border-radius: 20px;
   padding: 20px;
 }
-
-/* .tabContent {
-  margin-top: 100px;
-} */
 
 .userCard {
   background-color: white;
@@ -165,6 +169,5 @@ const handleUpdate = (data) => {
 
 .infoValue {
   color: var(--text-login);
-
 }
 </style>
