@@ -24,10 +24,6 @@ defineEmits(['switchTab']);
 </script>
 
 <style scoped>
-.asset-main-wrapper {
-  padding: 1rem;
-}
-
 .asset-section {
   margin-top: 1.5rem;
   background-color: white;
