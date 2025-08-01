@@ -86,7 +86,7 @@ export default {
       const payload = policyQuizStore.getRequestPayload();
 
       try {
-        await api.post('/api/userPolicy', payload);
+        await api.put('/api/userPolicy', payload);
         router.push({
           name: 'policyResultSummary',
           query: {

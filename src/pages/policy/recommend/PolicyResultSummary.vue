@@ -1,52 +1,3 @@
-<script>
-import { useRouter } from 'vue-router';
-
-export default {
-  name: 'PolicyResultSummary',
-  setup() {
-    const router = useRouter();
-
-    const summary = {
-      학력: '대학 졸업',
-      '전공 요건': '공학계열',
-      '현재 상황': '취업 준비 중',
-      '필요한 지원': '전셋집 보증금 지원',
-    };
-
-    const previewPolicies = [
-      {
-        tag: '주택',
-        title: '청년 주택드림 청약통장',
-        description: '만 19~34세 청년층을 위한 주택 구입 지원 정책',
-        match: '95%',
-      },
-      {
-        tag: '취업',
-        title: '청년 내일채움공제',
-        description: '중소기업 취업 청년을 위한 장기재직 지원제도',
-        match: '88%',
-      },
-    ];
-
-    const redoQuiz = () => {
-      router.push({ name: 'policyIntroForm' });
-    };
-
-    const goToAllPolicies = () => {
-      router.push({ name: 'policyMain' });
-    };
-    const priorityOrder = ['조회수', '만료일', '금액'];
-    return {
-      summary,
-      previewPolicies,
-      redoQuiz,
-      goToAllPolicies,
-      priorityOrder,
-    };
-  },
-};
-</script>
-
 <template>
   <header class="introHeader">
     <div class="resultHeader">
@@ -96,7 +47,7 @@ export default {
     </section>
 
     <footer class="buttonGroup">
-      <b부ㅂtton class="btn-grey" @click="redoQuiz">다시 검사하기</b부ㅂtton>
+      <button class="btn-grey" @click="redoQuiz">다시 검사하기</button>
       <button class="btn-blue" @click="goToAllPolicies">
         맞춤 정책 전체 보기
       </button>
