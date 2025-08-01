@@ -42,6 +42,7 @@ import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vu
 
 import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
 import PolicySearchPage from '@/pages/policy/search/PolicySearchPage.vue';
+import PolicySearchResult from '@/pages/policy/search/PolicySearchResult.vue';
 
 const routes = [
   //
@@ -155,7 +156,7 @@ const routes = [
         component: PolicyResultSummary,
       },
       {
-        path: 'policy/:id',
+        path: 'policy/:policyId',
         name: 'policyDetail',
         component: PolicyDetailPage,
         props: true,
@@ -164,6 +165,11 @@ const routes = [
         path: 'policy/search',
         name: 'policySearch',
         component: PolicySearchPage,
+      },
+      {
+        path: 'policy/search/result',
+        name: 'policySearchResult',
+        component: PolicySearchResult,
       },
     ],
   },

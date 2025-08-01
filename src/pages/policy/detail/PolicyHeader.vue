@@ -28,7 +28,7 @@ const toggleShareModal = () => {
 <template>
   <div class="policyHeader">
     <div class="headerTop">
-      <div class="title font-bold font-22">{{ policy.title }}</div>
+      <div class="title font-bold font-20">{{ policy.title }}</div>
       <img
         :src="bookmark ? bookmarkAfter : bookmarkBefore"
         alt="bookmark icon"
@@ -36,7 +36,7 @@ const toggleShareModal = () => {
         @click="toggleBookmark"
       />
     </div>
-    <p class="desc font-15 font-regular">{{ policy.description }}</p>
+    <p class="desc font-14 font-regular">{{ policy.description }}</p>
 
     <div class="tags">
       <span v-for="(tag, i) in policy.tags" :key="i" class="tag">{{
@@ -44,13 +44,13 @@ const toggleShareModal = () => {
       }}</span>
     </div>
 
-    <p class="supportAmount font-bold font-20">
-      {{ policy.supportAmount }} 지원
+    <p class="supportAmount font-bold font-18">
+      {{ policy.supportAmount }}
     </p>
 
     <div class="actions">
-      <button class="applyButton font-15 font-bold">바로 신청하기</button>
-      <button class="shareButton font-15 font-bold" @click="toggleShareModal">
+      <button class="applyButton font-14">바로 신청하기</button>
+      <button class="shareButton font-14" @click="toggleShareModal">
         <img :src="shareIcon" alt="공유" class="shareIcon" />
         공유하기
       </button>
