@@ -137,7 +137,7 @@ const handleCardAdded = (newCard) => {
   transition: background 0.2s ease;
 }
 
-.view-all-btn:active {
+.view-all-btn:hover {
   background: var(--base-blue-dark);
   color: white;
 }

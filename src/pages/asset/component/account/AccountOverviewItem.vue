@@ -38,48 +38,5 @@ const formatType = (type) => {
 </script>
 
 <style scoped>
-.overview-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--input-bg-2);
-  padding: 0.9rem 1rem;
-  border-radius: 0.75rem;
-}
-
-.bank-logo {
-  width: 40px;
-  height: 40px;
-  margin-right: 0.75rem;
-  object-fit: contain;
-}
-
-.info {
-  flex: 1;
-}
-
-.name {
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.number {
-  font-size: 0.8rem;
-  color: var(--text-lightgray);
-}
-
-.balance {
-  text-align: right;
-}
-
-.amount {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--base-blue-dark);
-}
-
-.type {
-  font-size: 0.75rem;
-  color: var(--text-lightgray);
-}
+@import '@/assets/styles/overview-item-styles.css';
 </style>
