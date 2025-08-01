@@ -9,6 +9,19 @@ onMounted(() => {
 onUnmounted(() => {
   document.body.classList.remove('modal-open');
 });
+// ‘시’를 붙일 시/도 리스트
+const needsSi = [
+  '서울',
+  '부산',
+  '대구',
+  '인천',
+  '광주',
+  '대전',
+  '울산',
+  '세종',
+];
+// 시/도에 ‘시’ 붙여 렌더링
+const formatSido = (sido) => (needsSi.includes(sido) ? `${sido}시` : sido);
 
 const emit = defineEmits(['close', 'selected']);
 
@@ -34,22 +47,42 @@ const selectSido = (sido) => {
   selectedSido.value = sido;
   selectedGugun.value = '';
 };
-// 구/군 선택 → 배열에 추가
+
 const selectGugun = (gugun) => {
-  // 이미 같은 조합이 있으면 추가 안 함
-  const already = selectedRegions.value.some(
-    (item) => item.sido === selectedSido.value && item.gugun === gugun
-  );
-  if (!already) {
+  // '전체' 선택 시
+  if (gugun === '전체') {
+    // 해당 시/도의 기존 선택 모두 제거
+    selectedRegions.value = selectedRegions.value.filter(
+      (r) => r.sido !== selectedSido.value
+    );
+    // 시/도만 추가 (gugun 빈문자열로 처리)
     selectedRegions.value.push({
       sido: selectedSido.value,
-      gugun,
+      gugun: '',
     });
+  } else {
+    // '전체'가 이미 선택된 상태면 개별 구군 추가 불가
+    const hasFullSido = selectedRegions.value.some(
+      (r) =>
+        r.sido === selectedSido.value && (r.gugun === '' || r.gugun === '전체')
+    );
+    if (hasFullSido) return;
+
+    // 이미 선택된 구군인지 확인
+    const already = selectedRegions.value.some(
+      (item) => item.sido === selectedSido.value && item.gugun === gugun
+    );
+    if (!already) {
+      selectedRegions.value.push({
+        sido: selectedSido.value,
+        gugun,
+      });
+    }
   }
-  // 선택 후 초기화
-  selectedSido.value = '';
+
   selectedGugun.value = '';
 };
+
 // 선택된 태그 제거
 const removeRegion = (idx) => {
   selectedRegions.value.splice(idx, 1);
@@ -83,7 +116,7 @@ const canApply = computed(() => selectedRegions.value.length > 0);
         <div class="columnsWrapper">
           <!-- 시/도 -->
           <div class="sidoColumn">
-            <h4>시/도</h4>
+            <div class="sidoTitle">시/도</div>
             <div class="scrollArea">
               <div
                 v-for="(guguns, sido) in filteredSidoList"
@@ -97,8 +130,9 @@ const canApply = computed(() => selectedRegions.value.length > 0);
           </div>
           <!-- 구/군 -->
           <div class="gugunColumn">
-            <h4>구/군</h4>
+            <div class="gugunTitle">구/군</div>
             <div class="scrollArea">
+              <!-- '전체' 선택지 따로 만들지 말고 그냥 regions[selectedSido] 그대로 렌더링 -->
               <div v-if="selectedSido">
                 <div
                   v-for="gugun in regions[selectedSido]"
@@ -106,10 +140,17 @@ const canApply = computed(() => selectedRegions.value.length > 0);
                   :class="[
                     'gugunItem',
                     {
-                      selected: selectedGugun === gugun,
-                      already: selectedRegions.some(
-                        (r) => r.sido === selectedSido && r.gugun === gugun
-                      ),
+                      selected:
+                        // 현재 클릭해서 선택 중인 구군
+                        selectedGugun === gugun,
+                      already:
+                        // 이미 선택된 구군이거나,
+                        // 또는 해당 시/도의 전체가 선택된 상태면 모두 이미 선택 상태로 표시
+                        selectedRegions.some(
+                          (r) =>
+                            r.sido === selectedSido &&
+                            (r.gugun === gugun || r.gugun === '')
+                        ),
                     },
                   ]"
                   @click="selectGugun(gugun)"
@@ -118,36 +159,41 @@ const canApply = computed(() => selectedRegions.value.length > 0);
                   <span
                     v-if="
                       selectedRegions.some(
-                        (r) => r.sido === selectedSido && r.gugun === gugun
+                        (r) =>
+                          r.sido === selectedSido &&
+                          (r.gugun === gugun || r.gugun === '')
                       )
                     "
                     class="alreadyText"
-                    >✔️</span
-                  >
+                  ></span>
                 </div>
               </div>
+
               <div v-else class="emptyText">시/도를 먼저 선택하세요</div>
             </div>
           </div>
         </div>
       </div>
+
       <!-- 선택된 지역 태그 -->
-      <div v-if="selectedRegions.length" class="selectedRegions">
+      <div v-if="selectedRegions.length" class="selectedRegions horizontal">
         <span
           v-for="(region, idx) in selectedRegions"
           :key="region.sido + region.gugun"
           class="regionTag"
         >
-          {{ region.sido }} {{ region.gugun }}
+          <!-- formatSido 함수로 ‘시’ 붙이고 -->
+          {{ formatSido(region.sido) }}
+          <template v-if="region.gugun">
+            {{ region.gugun }}
+          </template>
           <button class="removeBtn" @click="removeRegion(idx)">✕</button>
         </span>
       </div>
 
       <div class="modalFooter">
         <button class="resetBtn" @click="reset">초기화</button>
-        <button class="applyBtn" @click="apply" :disabled="!canApply">
-          적용
-        </button>
+        <button class="applyBtn" @click="apply">적용</button>
       </div>
     </div>
   </div>
@@ -168,7 +214,8 @@ const canApply = computed(() => selectedRegions.value.length > 0);
   border-radius: 12px;
   width: 90%;
   max-width: 400px;
-  max-height: 90vh;
+  max-height: 95vh;
+  /* height: 630px; */
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -193,20 +240,42 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 .selectedRegions {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px 7px;
-  margin: 12px 0 6px 0;
-  min-height: 32px;
+  gap: 7px;
+  margin: 20px 0 0 0;
+  min-height: 40px;
 }
-.regionTag {
-  background: var(--input-bg-2);
-  color: var(--text-login);
-  border-radius: 16px;
-  padding: 4px 13px 4px 12px;
-  font-size: 15px;
+.selectedRegions.horizontal {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 5px;
+  margin: 20px 0 0 0;
+  min-height: 40px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--input-disabled-1) transparent;
+
+  /* scrollbar-width: none;
+  -ms-overflow-style: none; */
 }
+.selectedRegions.horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+.regionTag {
+  height: 30px;
+  background: var(--input-bg-1);
+  color: var(--text-login);
+  border-radius: 8px;
+  padding: 6px 11px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+  word-break: normal;
+}
+
 .removeBtn {
   background: none;
   border: none;
@@ -219,54 +288,54 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 
 /* ---- 지역 선택 컬럼 ---- */
 .regionSelectBox {
-  margin: 16px 6px 8px 6px;
-  flex-grow: 1;
+  margin: 16px 6px 26px 6px;
+  flex: none;
 }
 .columnsWrapper {
   display: flex;
-  max-height: 340px;
+  max-height: 370px;
   gap: 6px;
 }
-.sidoColumn,
-.gugunColumn {
-  flex: 1;
+
+.sidoColumn {
+  flex: 0.7;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
-.sidoColumn h4,
-.gugunColumn h4 {
-  font-size: 15px;
+
+.gugunColumn {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.sidoTitle,
+.gugunTitle {
+  font-size: 16px;
+  font-weight: bold;
   color: var(--text-bluegray);
-  margin-left: 4px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  padding-left: 4px;
+  margin-bottom: 12px;
+  text-align: center;
 }
-.scrollArea {
-  max-height: 340px;
-  overflow-y: auto;
-  padding-right: 6px;
-}
+
 .sidoItem,
 .gugunItem {
   padding: 9px;
   border-radius: 6px;
   cursor: pointer;
+  text-align: center;
 }
 .sidoItem.selected,
 .gugunItem.selected {
   background-color: rgba(160, 160, 180, 0.14);
 }
 .gugunItem.already {
-  opacity: 0.55;
+  cursor: default;
+  opacity: 0.8;
   pointer-events: none;
 }
-.alreadyText {
-  font-size: 13px;
-  margin-left: 2px;
-  color: var(--base-blue-dark);
-}
+
 .emptyText {
   font-size: 14px;
   color: var(--text-disabled);
@@ -275,40 +344,57 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 }
 
 .modalFooter {
+  margin-top: 10px;
   display: flex;
   gap: 8px;
-  margin-top: 10px;
 }
+
 .resetBtn {
   flex: 1;
-  background-color: var(--input-bg-1);
+  border-radius: 8px;
+  border: 1.5px solid var(--input-outline-2);
+  background: var(--reset-button);
   color: var(--text-bluegray);
-  border: none;
-  padding: 12px;
+  padding: 12px 0;
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
 }
 .applyBtn {
-  flex: 1;
+  flex: 2;
   background-color: var(--base-blue-dark);
   color: white;
   border: none;
-  padding: 12px;
+  padding: 12px 0;
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
 }
-.applyBtn:disabled {
+/* .applyBtn:disabled {
   background-color: var(--input-bg-2);
   color: var(--text-bluegray);
   cursor: not-allowed;
+} */
+
+.scrollArea {
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 6px;
+  /* 크롬, 사파리, 엣지용 스크롤바 숨기기 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
+
 .scrollArea::-webkit-scrollbar {
   width: 3.5px;
+  display: none;
 }
 .scrollArea::-webkit-scrollbar-thumb {
   background-color: var(--input-disabled-2);
   border-radius: 3px;
+}
+.gugunItem.already {
+  opacity: 0.55;
+  pointer-events: none;
 }
 </style>

@@ -57,7 +57,7 @@ export default {
 <template>
   <header class="introHeader">
     <div class="quizHeader">
-      <div class="font-20">맞춤 정책 추천을 위한 간단한 질문</div>
+      <div class="font-18">맞춤 정책 추천을 위한 간단한 질문</div>
     </div>
   </header>
 

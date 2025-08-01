@@ -74,8 +74,12 @@ const search = () => {
 
 <style scoped>
 .policySearchPage {
-  /* min-height: 100vh; */
   padding: 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+}
+.policySearchPage::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .section {
