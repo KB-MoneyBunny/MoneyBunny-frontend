@@ -3,7 +3,7 @@
     <div class="account-header">
       <h3 class="header-title">내 계좌</h3>
       <div class="header-actions">
-        <AddItemButton label="계좌 추가" @click="isAccountModalOpen = true" />
+        <AddItemButton @click="isAccountModalOpen = true" />
         <AddItemModal
           v-if="isAccountModalOpen"
           :isOpen="isAccountModalOpen"

@@ -3,7 +3,7 @@
     <div class="card-header">
       <h3 class="header-title">내 카드</h3>
       <div class="header-actions">
-        <AddItemButton label="카드 추가" @click="isCardModalOpen = true" />
+        <AddItemButton @click="isCardModalOpen = true" />
         <AddItemModal
           v-if="isCardModalOpen"
           :isOpen="isCardModalOpen"
@@ -26,6 +26,7 @@
       />
     </div>
 
+    <!--전체보기-->
     <button
       v-if="!showAll && cards.length > 3"
       class="view-all-btn"
