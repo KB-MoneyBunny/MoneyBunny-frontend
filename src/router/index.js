@@ -93,12 +93,15 @@ const routes = [
       { path: '', redirect: '/home' },
       { path: 'home', name: 'home', component: HomeMainPage },
       { path: 'asset', name: 'asset', component: AssetMain },
-      {
-        path: 'account/:id',
-        name: 'AccountDetail',
-        component: () => import('@/pages/asset/account/AccountDetailPage.vue'),
-        props: true,
-      },
+      //  🥕성빈: 경로 수정(0801)
+
+      // {
+      //   path: 'account/:id',
+      //   name: 'AccountDetail',
+      //   component: () =>
+      //     import('@/pages/asset/component/account/AccountDetail.vue'),
+      //   props: true,
+      // },
 
       { path: 'mypage', name: 'mypage', component: MypageMain },
       {

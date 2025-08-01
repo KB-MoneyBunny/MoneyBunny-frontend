@@ -9,24 +9,46 @@
     <p class="no-data-subtext">
       첫 번째 {{ typeLabel }}를 추가하여 자산 관리를 시작해보세요
     </p>
-    <button class="add-btn" @click="$emit('add')">
-      + {{ addButtonLabel }}
-    </button>
+
+    <!-- AddItemButton (클릭 시 모달 열기) -->
+    <AddItemButton :type="type" @click="openModal" />
+
+    <!-- AddItemModal (버튼 클릭 시 표시) -->
+    <AddItemModal
+      v-if="isModalOpen"
+      :isOpen="isModalOpen"
+      :type="type"
+      @close="isModalOpen = false"
+      @update-data="handleUpdateData"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'; // 데이터 없는 경우
+import { ref, computed } from 'vue';
+import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
+import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
+
 const props = defineProps({
-  type: { type: String, required: true },
-  // 'account' 또는 'card'
+  type: { type: String, required: true }, // 'account' 또는 'card'
 });
+const emit = defineEmits(['update-data']);
+
+const isModalOpen = ref(false);
 
 // 문구 매핑
 const typeLabel = computed(() => (props.type === 'account' ? '계좌' : '카드'));
-const addButtonLabel = computed(() =>
-  props.type === 'account' ? '계좌 추가' : '카드 추가'
-);
+
+// 모달 열기
+const openModal = () => {
+  isModalOpen.value = true;
+};
+
+// 추가 후 부모로 emit
+const handleUpdateData = (newItem) => {
+  emit('update-data', newItem);
+  isModalOpen.value = false;
+};
 </script>
 
 <style scoped>
