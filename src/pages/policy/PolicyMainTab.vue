@@ -48,7 +48,9 @@
         >
           자세히 보기
         </button>
-        <button class="buttonPrimary font-14">신청하기</button>
+        <button class="buttonPrimary font-14" @click="openApplyModal(policy)">
+          신청하기
+        </button>
       </div>
     </div>
 
@@ -62,14 +64,25 @@
     </button>
     <BottomNav />
   </div>
+
+  <PolicyApplyModal
+    v-if="showApplyModal"
+    :policyTitle="selectedPolicy?.title"
+    :applyUrl="selectedPolicy?.applyUrl"
+    @close="closeApplyModal"
+  />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import BottomNav from '@/components/layouts/NavBar.vue';
+import PolicyApplyModal from './component/PolicyApplyModal.vue'; // 위치 맞게 수정
 
 const router = useRouter();
+
+const showApplyModal = ref(false);
+const selectedPolicy = ref(null);
 
 const goToDetail = (policyId) => {
   router.push({ name: 'policyDetail', params: { policyId } });
@@ -97,6 +110,7 @@ const ALL_POLICIES = [
     policyBenefitDescription: '일시금 30만원 지급',
     endDate: '20250220 ~ 20251015',
     tag: '청년',
+    applyUrl: 'https://youthdream.daegu.go.kr/support/introduce/02',
   },
   {
     policyId: 5,
@@ -317,11 +331,20 @@ const loadMore = () => {
     ALL_POLICIES.length
   );
 };
+
+function openApplyModal(policy) {
+  selectedPolicy.value = policy;
+  showApplyModal.value = true;
+}
+
+function closeApplyModal() {
+  showApplyModal.value = false;
+}
 </script>
 
 <style scoped>
 .policyWrapper {
-  padding-bottom: 40px;
+  padding: 10px;
   background-color: var(--input-bg-2);
 }
 .searchBar {
