@@ -15,8 +15,6 @@ const router = useRouter();
 // 이메일 전송 및 인증 관련 변수
 const route = useRoute();
 
-const errorMsg = ref("");
-
 // 타이머 관련 변수
 const time = 180; // 180초 == 3분
 const timeLeft = ref(time); // 남은 시간
@@ -33,6 +31,11 @@ const handleSubmit = async () => {
       });
       isCodeSent.value = true;
       errorMessage.value = "";
+
+      // 타이머 시작
+      timeLeft.value = time; // 남은 시간 초기화
+      clearInterval(timerInterval); // 기존 타이머 제거 (중복 방지)
+      startTimer();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         errorMessage.value = "아이디와 이메일이 일치하지 않습니다.";
@@ -68,15 +71,10 @@ const startTimer = () => {
       timeLeft.value--;
     } else {
       clearInterval(timerInterval);
-      errorMsg.value = "인증 시간이 만료되었습니다. 다시 시도해주세요.";
+      errorMessage.value = "인증 시간이 만료되었습니다. 다시 시도해주세요.";
     }
   }, 1000);
 };
-
-// 컴포넌트 마운트 시 타이머 시작
-onMounted(() => {
-  startTimer();
-});
 
 // 컴포넌트 언마운트 시 타이머 제거
 onBeforeUnmount(() => {
@@ -98,6 +96,11 @@ const formattedTime = computed(() => {
       <p class="subtitle font-15 font-regular">
         비밀번호를 재설정하기 위해 이메일을 입력해주세요
       </p>
+
+      <!-- 에러 메시지 표시 -->
+      <div v-if="errorMessage" class="errorMessage font-13">
+        {{ errorMessage }}
+      </div>
 
       <!-- 아이디 입력칸 추가 -->
       <div class="formGroup">
@@ -249,5 +252,14 @@ input {
   border: none;
   margin-top: 16px;
   cursor: pointer;
+}
+.errorMessage {
+  background-color: #fee;
+  color: #c33;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  text-align: center;
+  border: 1px solid #fcc;
 }
 </style>

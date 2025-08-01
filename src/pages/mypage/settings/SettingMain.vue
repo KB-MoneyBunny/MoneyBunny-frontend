@@ -8,7 +8,7 @@
         :class="{ on: notificationEnabled, off: !notificationEnabled }"
         @click="toggleNotification"
       >
-        {{ notificationEnabled ? 'ON' : 'OFF' }}
+        {{ notificationEnabled ? "ON" : "OFF" }}
       </button>
     </div>
 
@@ -57,14 +57,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 import {
   subscribeToPush,
   unsubscribeFromPush,
-} from '@/firebase/notificationPermission.js';
-import LogoutConfirmModal from './LogoutConfirmModal.vue';
+} from "@/firebase/notificationPermission.js";
+import LogoutConfirmModal from "./LogoutConfirmModal.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -88,7 +88,7 @@ const toggleNotification = async () => {
     }
     notificationEnabled.value = !notificationEnabled.value;
   } catch (err) {
-    console.error('알림 토글 중 오류 발생:', err.message);
+    console.error("알림 토글 중 오류 발생:", err.message);
   }
 };
 
@@ -96,17 +96,16 @@ const handleLogout = () => {
   showLogoutModal.value = true;
 };
 
-// 💪(상일) auth store를 통한 실제 로그아웃 처리 
+// 💪(상일) auth store를 통한 실제 로그아웃 처리
 const confirmLogout = () => {
   showLogoutModal.value = false;
   authStore.logout(); // auth store의 logout 메서드 사용
-  router.push('/'); // 로그인 페이지로 이동
+  router.push("/"); // 로그인 페이지로 이동
 };
 
 const goToChangePassword = () => {
-  router.push({ name: 'changePassword' });
+  router.push({ name: "changePassword" });
 };
-
 
 onMounted(() => {
   checkSubscription();
