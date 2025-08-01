@@ -18,11 +18,11 @@ const iconMap = {
 <template>
   <div class="tabContent">
     <!-- ✅ 정책 목적 -->
-    <div class="font-bold font-20 mb-2">정책 목적</div>
-    <p class="font-15 text-bluegray mb-4">{{ policy.objective }}</p>
+    <div class="font-bold font-18 mb-2">정책 목적</div>
+    <p class="font-14 text-bluegray mb-4">{{ policy.objective }}</p>
 
     <!-- ✅ 지원 내용 -->
-    <div class="font-bold font-20 mb-2">지원 내용</div>
+    <div class="font-bold font-18 mb-2">지원 내용</div>
     <div
       class="supportBox"
       v-for="(item, index) in policy.supportDetails"
@@ -30,26 +30,10 @@ const iconMap = {
     >
       <div class="titleRow">
         <img :src="iconMap[item.title]" alt="icon" class="supportIcon" />
-        <div class="font-bold font-15 mb-1">{{ item.title }}</div>
+        <div class="font-bold font-14 mb-1">{{ item.title }}</div>
       </div>
-      <p class="font-14 text-bluegray">{{ item.desc }}</p>
+      <p class="font-13 text-bluegray">{{ item.desc }}</p>
     </div>
-
-    <!-- ✅ 관련 정책 -->
-    <!-- <div v-if="policy.relatedPolicies?.length" class="mt-4">
-      <div class="font-bold font-20 mb-2">관련 정책</div>
-      <div
-        class="relatedItem"
-        v-for="(related, index) in policy.relatedPolicies"
-        :key="index"
-      >
-        <div class="info">
-          <p class="font-bold font-15 mb-2">{{ related.title }}</p>
-          <p class="font-13 text-bluegray">{{ related.desc }}</p>
-        </div>
-        <button class="viewButton font-13">자세히 보기</button>
-      </div>
-    </div> -->
   </div>
 </template>
 

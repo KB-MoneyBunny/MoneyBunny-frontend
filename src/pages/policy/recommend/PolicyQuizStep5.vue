@@ -57,13 +57,13 @@ export default {
 <template>
   <header class="introHeader">
     <div class="quizHeader">
-      <div class="font-20 font-bold">맞춤 정책 추천을 위한 간단한 질문</div>
+      <div class="font-18">맞춤 정책 추천을 위한 간단한 질문</div>
     </div>
   </header>
 
-  <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
+  <div class="quizContainer">
     <section class="quizContent">
-      <div class="question font-18 font-bold mb-4">
+      <div class="question font-16 mb-4">
         정책을 신청할 때 중요하게 여기는 순서대로 클릭해주세요
       </div>
 
@@ -87,9 +87,9 @@ export default {
     </section>
 
     <footer class="quizFooter">
-      <button class="prevButton font-20" @click="goToPrevStep">이전</button>
+      <button class="prevButton font-18" @click="goToPrevStep">이전</button>
       <button
-        class="nextButton font-20"
+        class="nextButton font-18"
         :disabled="selectedOptions.length !== 3"
         @click="goToNextStep"
       >
@@ -141,7 +141,7 @@ export default {
   border-radius: 8px;
   background-color: white;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .optionItem.selected {
@@ -154,7 +154,7 @@ export default {
   transform: translateY(-50%);
   background-color: var(--base-blue-dark);
   color: white;
-  font-size: 14px;
+  font-size: 13px;
   padding: 6px 12px;
   border-radius: 999px;
   line-height: 1;
