@@ -1,14 +1,34 @@
 <script>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import api from '@/api';
+import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 
 export default {
   name: 'PolicyQuizStep5',
   setup() {
     const router = useRouter();
+    const route = useRoute();
 
     const options = ['금액', '조회수', '만료일'];
     const selectedOptions = ref([]);
+    const policyQuizStore = usePolicyQuizStore(); // 스토어 인스턴스 생성
+
+    onMounted(() => {
+      // 스토어에서 이전에 저장된 값 불러오기 (선택 사항)
+      // 각 랭크 값을 기반으로 selectedOptions를 재구성
+      const storedOptions = [];
+      if (policyQuizStore.moneyRank) {
+        storedOptions[policyQuizStore.moneyRank - 1] = '금액';
+      }
+      if (policyQuizStore.popularityRank) {
+        storedOptions[policyQuizStore.popularityRank - 1] = '조회수';
+      }
+      if (policyQuizStore.periodRank) {
+        storedOptions[policyQuizStore.periodRank - 1] = '만료일';
+      }
+      selectedOptions.value = storedOptions.filter(Boolean); // null/undefined 제거
+    });
 
     const handleClick = (option) => {
       const index = selectedOptions.value.indexOf(option);
@@ -34,11 +54,50 @@ export default {
     };
 
     const goToPrevStep = () => {
+      // 현재 우선순위 저장
+      selectedOptions.value.forEach((option, index) => {
+        const rank = index + 1;
+        if (option === '금액') {
+          policyQuizStore.setMoneyRank(rank);
+        } else if (option === '조회수') {
+          policyQuizStore.setPopularityRank(rank);
+        } else if (option === '만료일') {
+          policyQuizStore.setPeriodRank(rank);
+        }
+      });
       router.push({ name: 'policyQuizStep4' });
     };
 
-    const goToNextStep = () => {
-      router.push({ name: 'policyResultSummary' });
+    const goToNextStep = async () => {
+      if (selectedOptions.value.length !== 3) return;
+
+      // 각 항목의 랭크를 스토어에 저장
+      selectedOptions.value.forEach((option, index) => {
+        const rank = index + 1;
+        if (option === '금액') {
+          policyQuizStore.setMoneyRank(rank);
+        } else if (option === '조회수') {
+          policyQuizStore.setPopularityRank(rank);
+        } else if (option === '만료일') {
+          policyQuizStore.setPeriodRank(rank);
+        }
+      });
+
+      const payload = policyQuizStore.getRequestPayload();
+
+      try {
+        await api.post('/api/userPolicy', payload);
+        router.push({
+          name: 'policyResultSummary',
+          query: {
+            ...payload,
+            priority: selectedOptions.value.join(','),
+          },
+        });
+      } catch (error) {
+        console.error('Failed to save user policy:', error);
+        alert('추천 결과를 불러오지 못했습니다.');
+      }
     };
 
     return {

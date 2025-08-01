@@ -33,7 +33,13 @@ const selectSido = (sido) => {
 };
 
 const selectGugun = (gugun) => {
-  selectedGugun.value = gugun;
+  if (gugun === '전체') {
+    selectedGugun.value = gugun;
+    emit('selected', selectedSido.value);
+    emit('close');
+  } else {
+    selectedGugun.value = gugun;
+  }
 };
 
 const reset = () => {

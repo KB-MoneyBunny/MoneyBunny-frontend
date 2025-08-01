@@ -1,11 +1,11 @@
 <template>
   <header class="introHeader">
     <div class="quizHeader">
-      <div class="font-18">맞춤 정책 추천을 위한 간단한 질문</div>
+      <h2 class="font-20 font-bold">맞춤 정책 추천을 위한 간단한 질문</h2>
     </div>
   </header>
 
-  <div class="quizContainer">
+  <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
     <section class="quizContent">
       <div class="progressBarWrapper">
         <span class="font-13 font-regular">질문 4 / 4</span>
@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <div class="question font-20">현재 본인의 소득은?</div>
+      <h3 class="question font-22 font-bold">현재 본인의 소득은?</h3>
 
       <ul class="options">
         <li
@@ -43,9 +43,9 @@
     </section>
 
     <footer class="quizFooter">
-      <button class="prevButton font-18" @click="goToPrevStep">이전</button>
+      <button class="prevButton font-20" @click="goToPrevStep">이전</button>
       <button
-        class="nextButton font-18"
+        class="nextButton font-20"
         :disabled="!isFormValid"
         @click="goToNextStep"
       >
@@ -56,13 +56,15 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 
 export default {
   name: 'PolicyQuizStep4',
   setup() {
     const router = useRouter();
+    const route = useRoute();
     const options = [
       '2천만원 미만',
       '2천만원~4천만원 미만',
@@ -73,6 +75,24 @@ export default {
     ];
     const selectedOption = ref('');
     const customIncome = ref('');
+
+    const policyQuizStore = usePolicyQuizStore();
+
+    onMounted(() => {
+      // 스토어에서 이전에 저장된 값 불러오기
+      // 기존 값이 숫자면 직접입력으로 복원
+      if (policyQuizStore.income) {
+        if (options.includes(policyQuizStore.income)) {
+          selectedOption.value = policyQuizStore.income;
+        } else if (
+          typeof policyQuizStore.income === 'number' ||
+          /^\d+$/.test(policyQuizStore.income)
+        ) {
+          selectedOption.value = '직접 입력';
+          customIncome.value = policyQuizStore.income;
+        }
+      }
+    });
 
     const isFormValid = computed(() => {
       return (
@@ -89,13 +109,35 @@ export default {
       }
     };
 
+    function getIncomeValue() {
+      switch (selectedOption.value) {
+        case '2천만원 미만':
+          return 0;
+        case '2천만원~4천만원 미만':
+          return 3000;
+        case '4천만원~6천만원 미만':
+          return 5000;
+        case '6천만원 이상':
+          return 7000;
+        case '모르겠어요':
+          return 0;
+        case '직접 입력':
+          // 입력값에서 숫자만 추출, 만원 단위로 저장
+          const num = parseInt(customIncome.value.replace(/[^0-9]/g, ''), 10);
+          return isNaN(num) ? 0 : num;
+        default:
+          return 0;
+      }
+    }
+
     const goToPrevStep = () => {
+      policyQuizStore.setIncome(getIncomeValue());
       router.push({ name: 'policyQuizStep3' });
     };
 
     const goToNextStep = () => {
       if (!isFormValid.value) return;
-      // 추후 저장 로직 필요 시 여기에
+      policyQuizStore.setIncome(getIncomeValue());
       router.push({ name: 'policyQuizStep5' });
     };
 
@@ -176,12 +218,11 @@ export default {
   border-radius: 8px;
   background-color: white;
   cursor: pointer;
-  font-size: 15px;
 }
 
 .optionItem.selected {
-  border-color: var(--input-bg-3);
-  background-color: var(--input-bg-3);
+  border-color: var(--input-outline);
+  background-color: var(--input-bg-2);
 }
 
 .quizFooter {
