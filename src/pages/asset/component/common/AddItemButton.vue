@@ -1,14 +1,21 @@
 <template>
   <button class="add-item-button" @click="$emit('click')">
     <span class="plus-icon">+</span>
-    <span class="label">{{ label }}</span>
+    <span class="label">{{ computedLabel }}</span>
   </button>
 </template>
 
 <script setup>
-defineProps({
-  label: { type: String, required: true },
+import { computed } from 'vue';
+
+const props = defineProps({
+  type: { type: String, required: true }, // 'account' 또는 'card'
 });
+
+// type에 따라 label 자동 결정
+const computedLabel = computed(() =>
+  props.type === 'account' ? '계좌 추가' : '카드 추가'
+);
 </script>
 
 <style scoped>
