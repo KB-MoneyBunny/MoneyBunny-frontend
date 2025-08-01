@@ -1,3 +1,52 @@
+<script>
+import { useRouter } from 'vue-router';
+
+export default {
+  name: 'PolicyResultSummary',
+  setup() {
+    const router = useRouter();
+
+    const summary = {
+      학력: '대학 졸업',
+      '전공 요건': '공학계열',
+      '현재 상황': '취업 준비 중',
+      '필요한 지원': '전셋집 보증금 지원',
+    };
+
+    const previewPolicies = [
+      {
+        tag: '주택',
+        title: '청년 주택드림 청약통장',
+        description: '만 19~34세 청년층을 위한 주택 구입 지원 정책',
+        match: '95%',
+      },
+      {
+        tag: '취업',
+        title: '청년 내일채움공제',
+        description: '중소기업 취업 청년을 위한 장기재직 지원제도',
+        match: '88%',
+      },
+    ];
+
+    const redoQuiz = () => {
+      router.push({ name: 'policyIntroForm' });
+    };
+
+    const goToAllPolicies = () => {
+      router.push({ name: 'policyMain' });
+    };
+    const priorityOrder = ['조회수', '만료일', '금액'];
+    return {
+      summary,
+      previewPolicies,
+      redoQuiz,
+      goToAllPolicies,
+      priorityOrder,
+    };
+  },
+};
+</script>
+
 <template>
   <header class="introHeader">
     <div class="resultHeader">
@@ -9,9 +58,9 @@
       />
     </div>
   </header>
-  <div class="resultContainer" style="font-family: 'NanumSquareNeo'">
+  <div class="resultContainer">
     <section class="summarySection">
-      <h3 class="font-18 font-bold">당신의 응답 결과</h3>
+      <div class="font-18 font-bold">당신의 응답 결과</div>
       <div class="summaryRow" v-for="(value, label) in summary" :key="label">
         <span class="summaryLabel">{{ label }}</span>
         <span class="summaryValue">{{ value }}</span>
@@ -55,6 +104,7 @@
   </div>
 </template>
 
+<<<<<<< HEAD
 <script>
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -128,6 +178,8 @@ export default {
 };
 </script>
 
+=======
+>>>>>>> origin/dev
 <style scoped>
 .introHeader {
   display: flex;
@@ -154,8 +206,7 @@ export default {
 }
 
 .resultHeader .bunny {
-  height: 60px;
-  margin-left: 12px;
+  height: 50px;
   flex-shrink: 0;
 }
 
@@ -208,7 +259,7 @@ export default {
 
 .policyCard .tag {
   display: inline-block;
-  font-size: 12px;
+  font-size: 11px;
   background: var(--input-outline);
   padding: 2px 8px;
   border-radius: 6px;
@@ -216,18 +267,18 @@ export default {
 }
 
 .policyCard .title {
-  font-size: 16px;
+  font-size: 15px;
   margin-bottom: 6px;
 }
 
 .policyCard .desc {
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 8px;
   color: #555;
 }
 
 .policyCard .match {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   color: var(--base-blue-dark);
 }
@@ -242,7 +293,7 @@ export default {
 .btn-grey,
 .btn-blue {
   padding: 12px 0;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 10px;
   width: 100%;
 }
@@ -284,16 +335,14 @@ export default {
 .priorityRank {
   background-color: var(--base-blue-dark);
   color: white;
-  font-size: 13px;
-  font-weight: bold;
-  border-radius: 20px;
-  padding: 4px 12px;
-  margin-right: 10px;
+  font-size: 12px;
+  border-radius: 10px;
+  padding: 4px 8px;
+  margin-right: 12px;
 }
 
 .priorityLabel {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
   color: var(--text-login);
 }
 </style>

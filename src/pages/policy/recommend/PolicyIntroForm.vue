@@ -90,14 +90,14 @@ onMounted(() => {
 <template>
   <header class="introHeader">
     <div class="headerCard">
-      <h1 class="title font-20 font-bold">정책 추천을 위한 기본 정보</h1>
-      <p class="subtitle font-15 font-regular">개인 맞춤 분석</p>
+      <h1 class="title font-18">정책 추천을 위한 기본 정보</h1>
+      <p class="subtitle font-15">개인 맞춤 분석</p>
     </div>
   </header>
 
   <div class="introContainer">
     <section class="formSection">
-      <label class="label font-20 font-regular">생년월일을 입력해주세요</label>
+      <label class="label font-18">생년월일을 입력해주세요</label>
       <div class="birthSelects">
         <Dropdown
           v-model="birth.year"
@@ -122,7 +122,7 @@ onMounted(() => {
         />
       </div>
 
-      <label class="label font-20 font-regular regionLabel">
+      <label class="label font-18 regionLabel">
         지역을 선택해주세요
         <img
           :src="rightArrow"
@@ -133,7 +133,7 @@ onMounted(() => {
       </label>
 
       <!-- 선택된 주소 미리보기 -->
-      <p v-if="address" class="selectedAddress font-15 font-regular">
+      <p v-if="address" class="selectedAddress font-15">
         {{ address }}
       </p>
 
@@ -148,7 +148,7 @@ onMounted(() => {
 
   <div class="footer">
     <button
-      class="nextButton font-18 font-bold"
+      class="nextButton font-16"
       :disabled="!isFormValid"
       :class="{ disabled: !isFormValid }"
       @click="goToPolicyQuiz1"

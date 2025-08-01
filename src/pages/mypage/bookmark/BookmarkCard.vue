@@ -50,8 +50,7 @@ export default {
   width: fit-content;
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
 }
 
 .badgeActive {
@@ -65,19 +64,18 @@ export default {
 }
 
 .title {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
   color: var(--text-main);
 }
 
 .desc {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-sub);
 }
 
 .info,
 .meta {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-gray);
   display: flex;
   justify-content: space-between;
@@ -87,7 +85,6 @@ export default {
 .detailBtn {
   background: none;
   color: #3452e0;
-  font-weight: 500;
   border: none;
   cursor: pointer;
   padding: 0;

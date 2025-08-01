@@ -1,37 +1,29 @@
 <template>
   <div class="account-list-wrapper">
-    <!-- 상단 컨트롤 바 -->
     <div class="account-header">
       <h3 class="header-title">내 계좌</h3>
       <div class="header-actions">
-        <!-- 버튼 -->
-        <AddItemButton label="계좌 추가" @click="isAccountModalOpen = true" />
-
-        <!-- 계좌 추가 모달 -->
+        <AddItemButton type="account" @click="isAccountModalOpen = true" />
         <AddItemModal
           v-if="isAccountModalOpen"
           :isOpen="isAccountModalOpen"
           type="account"
           @close="isAccountModalOpen = false"
-          @update-data="handleAccountAdded"
         />
-
         <span class="drag-text">드래그로 순서 변경</span>
       </div>
     </div>
 
-    <!-- 계좌 리스트 -->
     <div class="account-list">
       <AccountItem
-        v-for="(account, index) in visibleAccounts"
-        :key="index"
+        v-for="account in visibleAccounts"
+        :key="account.id"
         :account="account"
         @delete="$emit('delete-account', account)"
-        @set-main="$emit('set-main', account)"
+        @set-main="setMainItem"
       />
     </div>
 
-    <!-- 전체보기 버튼 -->
     <button
       v-if="!showAll && accounts.length > 5"
       class="view-all-btn"
@@ -43,28 +35,29 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, toRef } from 'vue';
 import AccountItem from './AccountItem.vue';
-import AddItemButton from '@/pages/asset/common/AddItemButton.vue';
-import AddItemModal from '@/pages/asset/common/AddItemModal.vue';
+import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
+import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
+import { useMainItem } from '../utils/useMainItem';
 
-// Props
-const props = defineProps({
-  accounts: { type: Array, required: true },
-});
+const props = defineProps({ accounts: Array });
+const emit = defineEmits(['delete-account', 'update-accounts']);
 
 const showAll = ref(false);
-const isAccountModalOpen = ref(false); //모달 상태 변수
+const isAccountModalOpen = ref(false);
 
-// 계좌 리스트 (최대 3개만 표시)
+// 대표 계좌 관리 composable 사용
+const { processedItems: processedAccounts, setMainItem } = useMainItem({
+  type: 'account',
+  items: toRef(props, 'accounts'),
+  onUpdate: (reorderedAccounts) => emit('update-accounts', reorderedAccounts),
+});
+
+// 보여질 계좌 목록
 const visibleAccounts = computed(() =>
-  showAll.value ? props.accounts : props.accounts.slice(0, 3)
+  showAll.value ? processedAccounts.value : processedAccounts.value.slice(0, 3)
 );
-
-// 계좌 추가 후 리스트 갱신
-const handleAccountAdded = (newAccount) => {
-  props.accounts.push(newAccount); // 상위 상태 관리 시 emit 방식 추천
-};
 </script>
 
 <style scoped>
@@ -125,7 +118,6 @@ const handleAccountAdded = (newAccount) => {
   cursor: pointer;
   transition: background 0.2s ease;
 }
-
 .view-all-btn:hover {
   background: var(--base-blue-dark);
   color: white;

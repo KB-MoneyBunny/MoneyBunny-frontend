@@ -1,35 +1,35 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import axios from "axios";
+import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import axios from 'axios';
 
 const route = useRoute();
-const email = ref(route.query.email || "");
+const email = ref(route.query.email || '');
 
 const router = useRouter();
-const code = ref("");
-const errorMsg = ref("");
+const code = ref('');
+const errorMsg = ref('');
 
 // 2단계: 인증코드 확인 및 아이디 조회
 const verify = async () => {
   if (!email.value || !code.value) {
-    errorMsg.value = "이메일과 인증코드를 모두 입력해주세요.";
+    errorMsg.value = '이메일과 인증코드를 모두 입력해주세요.';
     return;
   }
 
   try {
-    await axios.post("/api/auth/verify", {
+    await axios.post('/api/auth/verify', {
       email: email.value,
       code: code.value,
     });
 
     // 인증 성공 → 아이디 조회
-    const res = await axios.post("/api/auth/find-id", { email: email.value });
+    const res = await axios.post('/api/auth/find-id', { email: email.value });
     const loginId = res.data;
-    router.push({ name: "findIdResult", query: { loginId } });
+    router.push({ name: 'findIdResult', query: { loginId } });
   } catch (err) {
     errorMsg.value =
-      "인증 실패: " + (err.response?.data?.message || "코드를 확인해주세요");
+      '인증 실패: ' + (err.response?.data?.message || '코드를 확인해주세요');
   }
 };
 </script>
