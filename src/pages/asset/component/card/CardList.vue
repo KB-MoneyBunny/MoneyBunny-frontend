@@ -22,7 +22,7 @@
         :card="card"
         :isRepresentative="card.isRepresentative"
         @delete="$emit('delete-card', card)"
-        @set-main="handleSetMain"
+        @set-main="setMainItem"
       />
     </div>
 
@@ -38,55 +38,26 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, toRef } from 'vue';
 import CardItem from './CardItem.vue';
 import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
 import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
+import { useMainItem } from '../utils/useMainItem';
 
 const props = defineProps({ cards: Array });
 const emit = defineEmits(['delete-card', 'update-cards']);
 
 const showAll = ref(false);
 const isCardModalOpen = ref(false);
-const mainCardId = ref(null);
 
-// 초기화 시 대표 카드 복원
-watch(
-  () => props.cards,
-  (newCards) => {
-    if (!mainCardId.value && newCards.length > 0) {
-      const saved = localStorage.getItem('mainCardId');
-      mainCardId.value = saved ? parseInt(saved) : newCards[0].id;
-    }
-  },
-  { immediate: true }
-);
+// 대표 카드 관리 composable 사용
+const { processedItems: processedCards, setMainItem } = useMainItem({
+  type: 'card',
+  items: toRef(props, 'cards'),
+  onUpdate: (reorderedCards) => emit('update-cards', reorderedCards),
+});
 
-// 대표 카드 설정
-const handleSetMain = (card) => {
-  mainCardId.value = card.id;
-
-  // 리스트 재정렬 (대표 카드 맨 위로 이동)
-  const reordered = [...props.cards];
-  const index = reordered.findIndex((c) => c.id === card.id);
-  if (index > -1) {
-    const [selected] = reordered.splice(index, 1);
-    reordered.unshift(selected);
-  }
-
-  // 로컬스토리지 저장
-  localStorage.setItem('mainCardId', String(card.id));
-  emit('update-cards', reordered);
-};
-
-// 대표 필드 포함한 카드 리스트
-const processedCards = computed(() =>
-  props.cards.map((card) => ({
-    ...card,
-    isRepresentative: card.id === mainCardId.value,
-  }))
-);
-
+// 보여질 카드 목록
 const visibleCards = computed(() =>
   showAll.value ? processedCards.value : processedCards.value.slice(0, 3)
 );

@@ -20,7 +20,7 @@
         :key="account.id"
         :account="account"
         @delete="$emit('delete-account', account)"
-        @set-main="handleSetMain"
+        @set-main="setMainItem"
       />
     </div>
 
@@ -35,54 +35,26 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, toRef } from 'vue';
 import AccountItem from './AccountItem.vue';
 import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
 import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
+import { useMainItem } from '../utils/useMainItem';
 
 const props = defineProps({ accounts: Array });
 const emit = defineEmits(['delete-account', 'update-accounts']);
 
 const showAll = ref(false);
 const isAccountModalOpen = ref(false);
-const mainAccountId = ref(null);
 
-// 초기화 시 대표 계좌 복원
-watch(
-  () => props.accounts,
-  (newAccounts) => {
-    if (!mainAccountId.value && newAccounts.length > 0) {
-      const saved = localStorage.getItem('mainAccountId');
-      mainAccountId.value = saved ? parseInt(saved) : newAccounts[0].id;
-    }
-  },
-  { immediate: true }
-);
+// 대표 계좌 관리 composable 사용
+const { processedItems: processedAccounts, setMainItem } = useMainItem({
+  type: 'account',
+  items: toRef(props, 'accounts'),
+  onUpdate: (reorderedAccounts) => emit('update-accounts', reorderedAccounts),
+});
 
-// 대표 계좌 설정
-const handleSetMain = (account) => {
-  mainAccountId.value = account.id;
-
-  // 리스트 재정렬
-  const reordered = [...props.accounts];
-  const index = reordered.findIndex((a) => a.id === account.id);
-  if (index > -1) {
-    const [selected] = reordered.splice(index, 1);
-    reordered.unshift(selected);
-  }
-
-  localStorage.setItem('mainAccountId', account.id.toString());
-  emit('update-accounts', reordered);
-};
-
-// 대표 계좌 포함한 리스트
-const processedAccounts = computed(() =>
-  props.accounts.map((acc) => ({
-    ...acc,
-    isMain: acc.id === mainAccountId.value,
-  }))
-);
-
+// 보여질 계좌 목록
 const visibleAccounts = computed(() =>
   showAll.value ? processedAccounts.value : processedAccounts.value.slice(0, 3)
 );
