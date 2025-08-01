@@ -18,17 +18,17 @@ const excludedTargets = [
 
 <template>
   <div class="conditionTab">
-    <div class="font-20 font-bold mb-4">신청 자격</div>
+    <div class="font-18 font-bold mb-4">신청 자격</div>
 
     <div v-for="(item, index) in eligibility" :key="index" class="label mb-4">
-      <div class="font-17 font-bold mb-2">
+      <div class="font-16 font-bold mb-2">
         {{ item.title }}
       </div>
-      <p class="font-14 text-bluegray">{{ item.desc }}</p>
+      <p class="font-15 text-bluegray">{{ item.desc }}</p>
     </div>
 
-    <div class="font-20 font-bold mt-6 mb-3">제외 대상</div>
-    <ul class="excludeList font-15">
+    <div class="font-18 font-bold mt-6 mb-3">제외 대상</div>
+    <ul class="excludeList font-14">
       <li v-for="(item, index) in excludedTargets" :key="index">
         {{ item }}
       </li>

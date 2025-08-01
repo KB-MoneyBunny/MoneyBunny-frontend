@@ -9,9 +9,9 @@
       />
     </div>
   </header>
-  <div class="resultContainer" style="font-family: 'NanumSquareNeo'">
+  <div class="resultContainer">
     <section class="summarySection">
-      <h3 class="font-18 font-bold">당신의 응답 결과</h3>
+      <div class="font-18 font-bold">당신의 응답 결과</div>
       <div class="summaryRow" v-for="(value, label) in summary" :key="label">
         <span class="summaryLabel">{{ label }}</span>
         <span class="summaryValue">{{ value }}</span>
@@ -56,43 +56,67 @@
 </template>
 
 <script>
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 
 export default {
   name: 'PolicyResultSummary',
   setup() {
     const router = useRouter();
+    const policyQuizStore = usePolicyQuizStore();
 
-    const summary = {
-      학력: '대학 졸업',
-      '전공 요건': '공학계열',
-      '현재 상황': '취업 준비 중',
-      '필요한 지원': '전셋집 보증금 지원',
-    };
+    const summary = computed(() => ({
+      학력: policyQuizStore.educationLevels || '-',
+      '전공 요건': policyQuizStore.majors || '-',
+      '현재 상황': policyQuizStore.employmentStatuses || '-',
+      소득: policyQuizStore.income || '-',
+    }));
 
-    const previewPolicies = [
-      {
-        tag: '주택',
-        title: '청년 주택드림 청약통장',
-        description: '만 19~34세 청년층을 위한 주택 구입 지원 정책',
-        match: '95%',
-      },
-      {
-        tag: '취업',
-        title: '청년 내일채움공제',
-        description: '중소기업 취업 청년을 위한 장기재직 지원제도',
-        match: '88%',
-      },
-    ];
+    const priorityOrder = computed(() => {
+      const arr = [];
+      const { moneyRank, popularityRank, periodRank } = policyQuizStore;
+      if (moneyRank === 1) arr[0] = '금액';
+      if (moneyRank === 2) arr[1] = '금액';
+      if (moneyRank === 3) arr[2] = '금액';
+      if (popularityRank === 1) arr[0] = '조회수';
+      if (popularityRank === 2) arr[1] = '조회수';
+      if (popularityRank === 3) arr[2] = '조회수';
+      if (periodRank === 1) arr[0] = '만료일';
+      if (periodRank === 2) arr[1] = '만료일';
+      if (periodRank === 3) arr[2] = '만료일';
+      return arr;
+    });
+
+    const previewPolicies = ref([]); // API를 통해 받아온 추천 정책
+
+    onMounted(() => {
+      // TODO: API를 통해 추천 정책 목록을 가져오는 로직 추가
+      // 예시 데이터
+      previewPolicies.value = [
+        {
+          tag: '주택',
+          title: '청년 주택드림 청약통장',
+          description: '만 19~34세 청년층을 위한 주택 구입 지원 정책',
+          match: '95%',
+        },
+        {
+          tag: '취업',
+          title: '청년 내일채움공제',
+          description: '중소기업 취업 청년을 위한 장기재직 지원제도',
+          match: '88%',
+        },
+      ];
+    });
 
     const redoQuiz = () => {
-      router.push({ name: 'policyQuizStep1' });
+      router.push({ name: 'policyIntroForm' });
     };
 
     const goToAllPolicies = () => {
       router.push({ name: 'policyMain' });
     };
-    const priorityOrder = ['조회수', '만료일', '금액']; // 실제 선택된 순서로 동적으로 받아오면 여기에 바인딩
+
     return {
       summary,
       previewPolicies,
@@ -130,8 +154,7 @@ export default {
 }
 
 .resultHeader .bunny {
-  height: 60px;
-  margin-left: 12px;
+  height: 50px;
   flex-shrink: 0;
 }
 
@@ -184,7 +207,7 @@ export default {
 
 .policyCard .tag {
   display: inline-block;
-  font-size: 12px;
+  font-size: 11px;
   background: var(--input-outline);
   padding: 2px 8px;
   border-radius: 6px;
@@ -192,18 +215,18 @@ export default {
 }
 
 .policyCard .title {
-  font-size: 16px;
+  font-size: 15px;
   margin-bottom: 6px;
 }
 
 .policyCard .desc {
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 8px;
   color: #555;
 }
 
 .policyCard .match {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   color: var(--base-blue-dark);
 }
@@ -218,7 +241,7 @@ export default {
 .btn-grey,
 .btn-blue {
   padding: 12px 0;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 10px;
   width: 100%;
 }
@@ -260,16 +283,14 @@ export default {
 .priorityRank {
   background-color: var(--base-blue-dark);
   color: white;
-  font-size: 13px;
-  font-weight: bold;
-  border-radius: 20px;
-  padding: 4px 12px;
-  margin-right: 10px;
+  font-size: 12px;
+  border-radius: 10px;
+  padding: 4px 8px;
+  margin-right: 12px;
 }
 
 .priorityLabel {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
   color: var(--text-login);
 }
 </style>

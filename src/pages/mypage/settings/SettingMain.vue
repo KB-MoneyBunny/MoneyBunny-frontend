@@ -1,10 +1,9 @@
 <template>
   <div class="settingMain">
-    <!-- 알림 설정 (settingItem으로 통일) -->
     <div class="settingItem">
-      <span class="text font-18 font-regular">알림 설정</span>
+      <span class="text font-16">알림 설정</span>
       <button
-        class="toggleBtn font-14 font-bold"
+        class="toggleBtn font-13 font-bold"
         :class="{ on: notificationEnabled, off: !notificationEnabled }"
         @click="toggleNotification"
       >
@@ -15,7 +14,7 @@
     <!-- 설정 리스트 -->
     <div class="settingList">
       <div class="settingItem">
-        <span class="text font-18 font-regular">비밀번호 변경</span>
+        <span class="text font-16">비밀번호 변경</span>
         <img
           src="@/assets/images/icons/mypage/right_arrow.png"
           alt="arrow"
@@ -24,26 +23,35 @@
         />
       </div>
       <div class="settingItem">
-        <span class="text font-18 font-regular">개인정보 처리 방침</span>
+        <span class="text font-16">정책유형 재설정</span>
+        <img
+          src="@/assets/images/icons/mypage/right_arrow.png"
+          class="arrowIcon"
+          @click="goToPolicyRetest"
+        />
+      </div>
+
+      <div class="settingItem">
+        <span class="text font-16">개인정보 처리 방침</span>
         <img
           src="@/assets/images/icons/mypage/right_arrow.png"
           class="arrowIcon"
         />
       </div>
       <div class="settingItem">
-        <span class="text font-18 font-regular">서비스 이용약관</span>
+        <span class="text font-16">서비스 이용약관</span>
         <img
           src="@/assets/images/icons/mypage/right_arrow.png"
           class="arrowIcon"
         />
       </div>
       <div class="settingItem">
-        <span class="text font-18 font-regular">버전 정보</span>
-        <span class="version font-15 font-regular">v1.2.3</span>
+        <span class="text font-16">버전 정보</span>
+        <span class="version font-14">v1.2.3</span>
       </div>
       <!-- ✅ 로그아웃 항목 (리스트처럼 보이게) -->
       <div class="settingItem logoutItem" @click="handleLogout">
-        <span class="text font-18 font-regular logout">로그아웃</span>
+        <span class="text font-16 logout">로그아웃</span>
       </div>
     </div>
 
@@ -107,6 +115,10 @@ const goToChangePassword = () => {
   router.push({ name: "changePassword" });
 };
 
+const goToPolicyRetest = () => {
+  router.push({ name: "myPageSettingsPolicy" });
+};
+
 onMounted(() => {
   checkSubscription();
 });
@@ -131,9 +143,9 @@ onMounted(() => {
 }
 
 .toggleBtn {
-  width: 56px;
-  height: 30px;
-  border-radius: 20px;
+  width: 50px;
+  height: 28px;
+  border-radius: 10px;
   border: none;
   color: white;
   cursor: pointer;
@@ -170,8 +182,8 @@ onMounted(() => {
 }
 
 .arrowIcon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }
 

@@ -21,12 +21,13 @@ import FindIdCodePage from "@/pages/auth/FindIdCodePage.vue";
 import MypageMain from "@/pages/mypage/MypageMain.vue";
 import SettingMain from "@/pages/mypage/settings/SettingMain.vue";
 import ChangePassword from "@/pages/mypage/settings/ChangePassword.vue";
+import PolicyRetestPage from "@/pages/mypage/settings/PolicyRetestPage.vue";
 
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
 import HomeMainPage from "@/pages/home/HomeMainPage.vue"; // 홈메인
 import AssetMain from "@/pages/asset/AssetMain.vue"; //🥕성빈: 자산 메인탭
-import PolicyMainTab from "@/pages/policy/tabs/PolicyMainTab.vue";
+import PolicyMainTab from "@/pages/policy/PolicyMainTab.vue";
 import NotificationCenter from "@/pages/notification/NotificationCenter.vue";
 
 //
@@ -40,8 +41,8 @@ import PolicyQuizStep5 from "@/pages/policy/recommend/PolicyQuizStep5.vue";
 import PolicyResultSummary from "@/pages/policy/recommend/PolicyResultSummary.vue";
 
 import PolicyDetailPage from "@/pages/policy/detail/PolicyDetailPage.vue";
-
 import PolicySearchPage from "@/pages/policy/search/PolicySearchPage.vue";
+import PolicySearchResult from "@/pages/policy/search/PolicySearchResult.vue";
 
 const routes = [
   //
@@ -92,12 +93,15 @@ const routes = [
       { path: "", redirect: "/home" },
       { path: "home", name: "home", component: HomeMainPage },
       { path: "asset", name: "asset", component: AssetMain },
-      {
-        path: "account/:id",
-        name: "AccountDetail",
-        component: () => import("@/pages/asset/account/AccountDetailPage.vue"),
-        props: true,
-      },
+      //  🥕성빈: 경로 수정(0801)
+
+      // {
+      //   path: 'account/:id',
+      //   name: 'AccountDetail',
+      //   component: () =>
+      //     import('@/pages/asset/component/account/AccountDetail.vue'),
+      //   props: true,
+      // },
 
       { path: "mypage", name: "mypage", component: MypageMain },
       {
@@ -111,13 +115,17 @@ const routes = [
         component: ChangePassword,
       },
       {
+        path: "mypage/settings/policy",
+        name: "myPageSettingsPolicy",
+        component: PolicyRetestPage,
+      },
+      {
         path: "notification",
         name: "notification",
         component: NotificationCenter,
       },
 
-      //
-      // ─── 정책 추천 흐름 ──────────────────────────────
+      // 정책 추천 플로우
       { path: "policy", name: "policyIntroForm", component: PolicyIntroForm },
       { path: "policy/main", name: "policyMain", component: PolicyMainTab },
       {
@@ -151,15 +159,20 @@ const routes = [
         component: PolicyResultSummary,
       },
       {
-        path: "/policy/:id",
+        path: "policy/:policyId",
         name: "policyDetail",
         component: PolicyDetailPage,
         props: true,
       },
       {
-        path: "/policy/search",
+        path: "policy/search",
         name: "policySearch",
         component: PolicySearchPage,
+      },
+      {
+        path: "policy/search/result",
+        name: "policySearchResult",
+        component: PolicySearchResult,
       },
     ],
   },
@@ -189,11 +202,12 @@ router.beforeEach((to, from, next) => {
     `라우터 이동: ${from.path} → ${to.path}, 로그인 상태: ${authStore.isLogin}, 인증 필요: ${authRequired}`
   );
 
-  if (authRequired && !authStore.isLogin) {
-    // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-    console.log("인증되지 않은 접근 - 로그인 페이지로 리다이렉트");
-    return next({ path: "/", query: { error: "auth_required" } });
-  }
+  // 👸🏻 은진
+  // if (authRequired && !authStore.isLogin) {
+  //   // 로그인이 필요한 페이지인데 로그인하지 않은 경우
+  //   console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
+  //   return next({ path: '/', query: { error: 'auth_required' } });
+  // }
 
   if (to.path === "/" && authStore.isLogin) {
     // 이미 로그인한 사용자가 로그인 페이지에 접근하는 경우 홈으로 리다이렉트
