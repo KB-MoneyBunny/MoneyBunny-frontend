@@ -1,13 +1,9 @@
 <template>
   <div class="card-list-wrapper">
-    <!-- 상단 컨트롤 바 -->
     <div class="card-header">
       <h3 class="header-title">내 카드</h3>
       <div class="header-actions">
-        <!-- 버튼 -->
-        <AddItemButton label="카드 추가" @click="isCardModalOpen = true" />
-
-        <!-- 카드 추가 모달 -->
+        <AddItemButton type="card" @click="isCardModalOpen = true" />
         <AddItemModal
           v-if="isCardModalOpen"
           :isOpen="isCardModalOpen"
@@ -15,24 +11,22 @@
           @close="isCardModalOpen = false"
           @update-data="handleCardAdded"
         />
-
         <span class="drag-text">드래그로 순서 변경</span>
       </div>
     </div>
 
-    <!-- 카드 리스트 -->
     <div class="card-list">
       <CardItem
-        v-for="(card, index) in visibleCards"
-        :key="card.id || index"
+        v-for="card in visibleCards"
+        :key="card.id"
         :card="card"
         :isRepresentative="card.isRepresentative"
         @delete="$emit('delete-card', card)"
-        @set-main="$emit('set-main', card)"
+        @set-main="setMainItem"
       />
     </div>
 
-    <!-- 전체보기 버튼 -->
+    <!--전체보기-->
     <button
       v-if="!showAll && cards.length > 3"
       class="view-all-btn"
@@ -44,27 +38,33 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, toRef } from 'vue';
 import CardItem from './CardItem.vue';
-import AddItemButton from '@/pages/asset/common/AddItemButton.vue';
-import AddItemModal from '@/pages/asset/common/AddItemModal.vue';
+import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
+import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
+import { useMainItem } from '../utils/useMainItem';
 
-// Props
-const props = defineProps({
-  cards: { type: Array, required: true },
-});
+const props = defineProps({ cards: Array });
+const emit = defineEmits(['delete-card', 'update-cards']);
 
 const showAll = ref(false);
-const isCardModalOpen = ref(false); //모달 상태 변수
+const isCardModalOpen = ref(false);
 
-// 카드 리스트
+// 대표 카드 관리 composable 사용
+const { processedItems: processedCards, setMainItem } = useMainItem({
+  type: 'card',
+  items: toRef(props, 'cards'),
+  onUpdate: (reorderedCards) => emit('update-cards', reorderedCards),
+});
+
+// 보여질 카드 목록
 const visibleCards = computed(() =>
-  showAll.value ? props.cards : props.cards.slice(0, 3)
+  showAll.value ? processedCards.value : processedCards.value.slice(0, 3)
 );
 
-// 카드 추가 후 리스트 갱신 (부모로 전달된 cards에 push하거나 emit으로 위임)
+// 카드 추가
 const handleCardAdded = (newCard) => {
-  props.cards.push(newCard); // 단순 로컬 push (실제는 상위 emit 방식 추천)
+  emit('update-cards', [...props.cards, newCard]);
 };
 </script>
 
