@@ -96,7 +96,7 @@ export default {
     </section>
 
     <footer class="buttonGroup">
-      <button class="btn-grey" @click="redoQuiz">다시 검사하기</button>
+      <b부ㅂtton class="btn-grey" @click="redoQuiz">다시 검사하기</b부ㅂtton>
       <button class="btn-blue" @click="goToAllPolicies">
         맞춤 정책 전체 보기
       </button>
@@ -104,7 +104,6 @@ export default {
   </div>
 </template>
 
-<<<<<<< HEAD
 <script>
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -178,8 +177,6 @@ export default {
 };
 </script>
 
-=======
->>>>>>> origin/dev
 <style scoped>
 .introHeader {
   display: flex;

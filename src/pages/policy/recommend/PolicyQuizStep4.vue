@@ -1,11 +1,11 @@
 <template>
   <header class="introHeader">
     <div class="quizHeader">
-      <div class="font-18">맞춤 정책 추천을 위한 간단한 질문</div>
+      <h2 class="font-20 font-bold">맞춤 정책 추천을 위한 간단한 질문</h2>
     </div>
   </header>
 
-  <div class="quizContainer">
+  <div class="quizContainer" style="font-family: 'NanumSquareNeo'">
     <section class="quizContent">
       <div class="progressBarWrapper">
         <span class="font-13 font-regular">질문 4 / 4</span>
@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <div class="question font-20">현재 본인의 소득은?</div>
+      <h3 class="question font-22 font-bold">현재 본인의 소득은?</h3>
 
       <ul class="options">
         <li
@@ -24,7 +24,9 @@
           :class="{ selected: selectedOption === option }"
           @click="selectOption(option)"
         >
-          <template v-if="option === '직접 입력' && selectedOption === '직접 입력'">
+          <template
+            v-if="option === '직접 입력' && selectedOption === '직접 입력'"
+          >
             <input
               v-model="customIncome"
               type="text"
@@ -41,9 +43,9 @@
     </section>
 
     <footer class="quizFooter">
-      <button class="prevButton font-18" @click="goToPrevStep">이전</button>
+      <button class="prevButton font-20" @click="goToPrevStep">이전</button>
       <button
-        class="nextButton font-18"
+        class="nextButton font-20"
         :disabled="!isFormValid"
         @click="goToNextStep"
       >
@@ -216,12 +218,11 @@ export default {
   border-radius: 8px;
   background-color: white;
   cursor: pointer;
-  font-size: 15px;
 }
 
 .optionItem.selected {
-  border-color: var(--input-bg-3);
-  background-color: var(--input-bg-3);
+  border-color: var(--input-outline);
+  background-color: var(--input-bg-2);
 }
 
 .quizFooter {
@@ -265,7 +266,5 @@ export default {
   font-family: inherit;
   color: var(--text-login);
   padding: 0;
-}
-</style>
 }
 </style>
