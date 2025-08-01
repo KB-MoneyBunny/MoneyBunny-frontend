@@ -3,7 +3,7 @@
     <div class="card-header">
       <h3 class="header-title">내 카드</h3>
       <div class="header-actions">
-        <AddItemButton @click="isCardModalOpen = true" />
+        <AddItemButton type="card" @click="isCardModalOpen = true" />
         <AddItemModal
           v-if="isCardModalOpen"
           :isOpen="isCardModalOpen"
@@ -137,7 +137,7 @@ const handleCardAdded = (newCard) => {
   transition: background 0.2s ease;
 }
 
-.view-all-btn:hover {
+.view-all-btn:active {
   background: var(--base-blue-dark);
   color: white;
 }

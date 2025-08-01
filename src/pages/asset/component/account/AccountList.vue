@@ -3,7 +3,7 @@
     <div class="account-header">
       <h3 class="header-title">내 계좌</h3>
       <div class="header-actions">
-        <AddItemButton @click="isAccountModalOpen = true" />
+        <AddItemButton type="account" @click="isAccountModalOpen = true" />
         <AddItemModal
           v-if="isAccountModalOpen"
           :isOpen="isAccountModalOpen"
@@ -117,5 +117,9 @@ const visibleAccounts = computed(() =>
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
+}
+.view-all-btn:active {
+  background: var(--base-blue-dark);
+  color: white;
 }
 </style>

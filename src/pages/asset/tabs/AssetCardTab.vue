@@ -1,7 +1,13 @@
 <template>
   <div class="card-tab">
     <!-- 카드 요약 -->
-    <CardSummaryCard :totalUsage="totalUsage" :cardCount="cards.length" />
+    <SummaryCard
+      title="이번 달 총 사용액"
+      :mainAmount="totalUsage"
+      rightLabel="카드 수"
+      :rightValue="cards.length"
+      rightUnit="개"
+    />
 
     <!-- 카드가 있을 때 -->
     <div v-if="cards.length > 0">
@@ -21,7 +27,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import CardSummaryCard from '../component/card/CardSummaryCard.vue';
+import SummaryCard from '../component/common/SummaryCard.vue';
 import CardList from '../component/card/CardList.vue';
 import NoDataCard from '../component/common/NoDataCard.vue';
 import cardsData from '@/assets/data/cards.json';

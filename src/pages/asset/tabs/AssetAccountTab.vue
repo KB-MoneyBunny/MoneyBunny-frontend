@@ -1,12 +1,13 @@
 <template>
   <div class="account-tab">
     <!--상단 요약 카드 -->
-    <AccountSummaryCard
-      :totalBalance="totalBalance"
-      :monthlyChange="monthlyChange"
-      :accountCount="accounts.length"
+    <SummaryCard
+      title="총 계좌 잔액"
+      :mainAmount="totalBalance"
+      rightLabel="계좌 수"
+      :rightValue="accounts.length"
+      rightUnit="개"
     />
-
     <!--계좌 데이터 있는 경우-->
     <div v-if="accounts.length > 0">
       <AccountControllerBar @add-account="onAddAccount" />
@@ -26,7 +27,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import AccountSummaryCard from '../component/account/AccountSummaryCard.vue';
+import SummaryCard from '../component/common/SummaryCard.vue';
 import AccountList from '../component/account/AccountList.vue';
 import NoDataCard from '../component/common/NoDataCard.vue';
 import accountsData from '@/assets/data/accounts.json';
