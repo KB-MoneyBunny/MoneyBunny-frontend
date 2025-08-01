@@ -43,13 +43,15 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 
 export default {
   name: 'PolicyQuizStep3',
   setup() {
     const router = useRouter();
+    const route = useRoute();
     const selectedOption = ref('');
     const options = [
       '제한없음',
@@ -63,13 +65,27 @@ export default {
       '영농종사자',
       '기타',
     ];
+
+    const policyQuizStore = usePolicyQuizStore(); // 스토어 인스턴스 생성
+
+    onMounted(() => {
+      // 스토어에서 이전에 저장된 값 불러오기
+      if (policyQuizStore.employmentStatuses) {
+        selectedOption.value = policyQuizStore.employmentStatuses;
+      }
+    });
+
     const goToPrevStep = () => {
+      policyQuizStore.setEmploymentStatuses(selectedOption.value); // 현재 선택값 저장
       router.push({ name: 'policyQuizStep2' });
     };
 
     const goToNextStep = () => {
       if (selectedOption.value) {
-        router.push({ name: 'policyQuizStep4' });
+        policyQuizStore.setEmploymentStatuses(selectedOption.value); // 스토어에 저장
+        router.push({
+          name: 'policyQuizStep4',
+        });
       }
     };
 

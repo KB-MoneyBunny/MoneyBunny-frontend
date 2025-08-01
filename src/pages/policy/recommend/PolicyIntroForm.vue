@@ -1,11 +1,13 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import RegionSelectModal from './RegionSelectModal.vue';
 import rightArrow from '@/assets/images/icons/policy/right_arrow.png';
 import Dropdown from '../component/CustomDropdown.vue';
+import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 
 const router = useRouter();
+const policyQuizStore = usePolicyQuizStore();
 
 const birth = ref({ year: '', month: '', day: '' });
 const address = ref('');
@@ -21,6 +23,17 @@ const handleRegionSelected = (value) => {
   showRegionModal.value = false;
 };
 
+onMounted(() => {
+  if (policyQuizStore.birthYear) birth.value.year = policyQuizStore.birthYear;
+  if (policyQuizStore.birthMonth)
+    birth.value.month = policyQuizStore.birthMonth;
+  if (policyQuizStore.birthDay) birth.value.day = policyQuizStore.birthDay;
+  // regionName이 있으면 address에 복원
+  if (policyQuizStore.regionName) {
+    address.value = policyQuizStore.regionName;
+  }
+});
+
 const isFormValid = computed(() => {
   return (
     birth.value.year && birth.value.month && birth.value.day && address.value
@@ -29,6 +42,12 @@ const isFormValid = computed(() => {
 
 const goToPolicyQuiz1 = () => {
   if (!isFormValid.value) return;
+  policyQuizStore.setBasicInfo({
+    year: birth.value.year,
+    month: birth.value.month,
+    day: birth.value.day,
+    region: address.value,
+  });
   router.push({ name: 'policyQuizStep1' });
 };
 
@@ -36,6 +55,36 @@ const goToPolicyQuiz1 = () => {
 const handleDropdownOpen = (id) => {
   openDropdown.value = id;
 };
+
+// 스토어에 값이 있으면 초기값 세팅
+onMounted(() => {
+  if (policyQuizStore.birthYear) birth.value.year = policyQuizStore.birthYear;
+  if (policyQuizStore.birthMonth)
+    birth.value.month = policyQuizStore.birthMonth;
+  if (policyQuizStore.birthDay) birth.value.day = policyQuizStore.birthDay;
+  if (
+    policyQuizStore.birthYear &&
+    policyQuizStore.birthMonth &&
+    policyQuizStore.birthDay
+  ) {
+    if (policyQuizStore.regions && policyQuizStore.regions !== '') {
+      address.value =
+        policyQuizStore.birthYear &&
+        policyQuizStore.birthMonth &&
+        policyQuizStore.birthDay
+          ? policyQuizStore.birthYear &&
+            policyQuizStore.birthMonth &&
+            policyQuizStore.birthDay
+            ? policyQuizStore.birthYear &&
+              policyQuizStore.birthMonth &&
+              policyQuizStore.birthDay
+              ? address.value
+              : ''
+            : ''
+          : '';
+    }
+  }
+});
 </script>
 
 <template>
