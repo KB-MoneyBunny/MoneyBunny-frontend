@@ -95,6 +95,7 @@ function handleGoApply() {
   color: var(--text-bluegray);
 }
 .tipList {
+  margin-left: -8px;
   color: var(--text-bluegray);
   margin-bottom: 25px;
 }
