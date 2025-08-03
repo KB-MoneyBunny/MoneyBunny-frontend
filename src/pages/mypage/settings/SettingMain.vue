@@ -1,14 +1,13 @@
 <template>
   <div class="settingMain">
-    <div class="settingItem">
+    <!-- 💪(상일) 알림 설정 항목 수정 -->
+    <div class="settingItem" @click="goToNotificationSettings">
       <span class="text font-16">알림 설정</span>
-      <button
-        class="toggleBtn font-13 font-bold"
-        :class="{ on: notificationEnabled, off: !notificationEnabled }"
-        @click="toggleNotification"
-      >
-        {{ notificationEnabled ? "ON" : "OFF" }}
-      </button>
+      <img
+        src="@/assets/images/icons/mypage/right_arrow.png"
+        alt="arrow"
+        class="arrowIcon"
+      />
     </div>
 
     <!-- 설정 리스트 -->
@@ -65,39 +64,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import {
-  subscribeToPush,
-  unsubscribeFromPush,
-} from "@/firebase/notificationPermission.js";
 import LogoutConfirmModal from "./LogoutConfirmModal.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
-const notificationEnabled = ref(false);
 const showLogoutModal = ref(false);
 
-// 현재 FCM 구독 상태를 확인
-const checkSubscription = async () => {
-  const registration = await navigator.serviceWorker.ready;
-  const subscription = await registration.pushManager.getSubscription();
-  notificationEnabled.value = !!subscription;
-};
-
-// 토글 시 FCM 구독/해제
-const toggleNotification = async () => {
-  try {
-    if (notificationEnabled.value) {
-      await unsubscribeFromPush();
-    } else {
-      await subscribeToPush();
-    }
-    notificationEnabled.value = !notificationEnabled.value;
-  } catch (err) {
-    console.error("알림 토글 중 오류 발생:", err.message);
-  }
+// 💪(상일) 알림 설정 페이지로 이동
+const goToNotificationSettings = () => {
+  router.push({ name: "notificationSettings" });
 };
 
 const handleLogout = () => {
@@ -118,10 +96,6 @@ const goToChangePassword = () => {
 const goToPolicyRetest = () => {
   router.push({ name: "myPageSettingsPolicy" });
 };
-
-onMounted(() => {
-  checkSubscription();
-});
 </script>
 
 <style scoped>
