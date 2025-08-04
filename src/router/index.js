@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import api from '@/api'; // 🛠️ 제승 추가: api import
 
 // ─── 레이아웃 ──────────────────────────────
 import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
@@ -184,7 +185,33 @@ const router = createRouter({
 });
 
 // 인증 가드
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  // 🛠️ 제승 추가: 정책 메인 접근 전 조건 체크 네비게이션 가드
+  if (to.path === '/policy' || to.path === '/policy/main') {
+    try {
+      const res = await api.get('/api/userPolicy');
+      if (res.data && Object.keys(res.data).length > 0) {
+        // 조건이 있으면 /policy/main 으로만 진입 허용
+        if (to.path !== '/policy/main') {
+          return next('/policy/main');
+        }
+        return next();
+      } else {
+        // 조건이 없으면 /policy 로만 진입 허용
+        if (to.path !== '/policy') {
+          return next('/policy');
+        }
+        return next();
+      }
+    } catch (e) {
+      // 에러 시 정책 인트로로 이동
+      if (to.path !== '/policy') {
+        return next('/policy');
+      }
+      return next();
+    }
+  }
+
   const authStore = useAuthStore();
   const publicPages = [
     '/',
