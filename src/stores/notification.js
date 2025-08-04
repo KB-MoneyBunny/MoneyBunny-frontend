@@ -50,7 +50,6 @@ export const useNotificationStore = defineStore('notification', () => {
     error.value = null;
     try {
       const response = await notificationAPI.getNotifications();
-      console.log('💪(상일) 알림 API 응답:', response);
       
       // 💪(상일) API 응답을 컴포넌트가 기대하는 형태로 변환
       const transformedData = response.data.map(notification => ({
@@ -133,7 +132,6 @@ export const useNotificationStore = defineStore('notification', () => {
       
       // 💪(상일) 404나 구독 데이터가 없는 경우 초기 구독 설정 필요
       if (err.response?.status === 404 || err.response?.status === 400) {
-        console.log('구독 데이터 없음 - 초기 구독 설정 필요');
         await createInitialSubscription();
       }
     }

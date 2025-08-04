@@ -53,11 +53,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
       today.setHours(0, 0, 0, 0);
       deadlineDate.setHours(23, 59, 59, 999); // 마감일 끝까지
       
-      console.log('💪(상일) 상태 판단:', {
-        today: today.toDateString(),
-        deadline: deadlineDate.toDateString(),
-        isExpired: today > deadlineDate
-      });
       
       return today > deadlineDate ? '신청마감' : '신청가능';
     }
@@ -67,10 +62,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
 
   // 💪(상일) 마감일 포맷팅 함수 - 다양한 형식 지원
   const formatDeadline = (applyPeriod) => {
-    console.log('💪(상일) formatDeadline 입력값:', applyPeriod);
-    
     if (!applyPeriod) {
-      console.log('💪(상일) applyPeriod가 없음 → 상시 반환');
       return '상시';
     }
     
@@ -92,7 +84,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     
     for (const pattern of patterns) {
       const dates = [...originalValue.matchAll(pattern)];
-      console.log('💪(상일) 패턴 매칭 결과:', pattern, dates);
       
       if (dates.length > 0) {
         // 마지막 날짜를 마감일로 사용 (보통 종료일)
@@ -102,13 +93,11 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         const day = lastDate[3].padStart(2, '0');
         const formatted = `${year}.${month}.${day}`;
         
-        console.log('💪(상일) 포맷팅 완료:', originalValue, '→', formatted);
         return formatted;
       }
     }
     
     // 모든 패턴이 실패하면 원본 텍스트 그대로 반환
-    console.log('💪(상일) 패턴 매칭 실패 → 원본 반환:', originalValue);
     return originalValue;
   };
 
@@ -118,26 +107,11 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     error.value = null;
     try {
       const response = await bookmarkAPI.getBookmarks();
-      console.log('💪(상일) 북마크 API 응답:', response);
-      
-      // 💪(상일) 실제 데이터 형식 확인을 위한 디버깅
-      if (response.data.length > 0) {
-        console.log('💪(상일) 첫 번째 북마크 원본 데이터:', response.data[0]);
-        console.log('💪(상일) applyPeriod 값:', response.data[0].applyPeriod);
-      }
       
       // 💪(상일) API 응답을 컴포넌트가 기대하는 형태로 변환
-      const transformedData = response.data.map((bookmark, index) => {
-        console.log(`💪(상일) ${index + 1}번째 북마크 applyPeriod:`, bookmark.applyPeriod);
-        
+      const transformedData = response.data.map((bookmark) => {
         const formattedDeadline = formatDeadline(bookmark.applyPeriod);
         const policyStatus = getPolicyStatus(bookmark.applyPeriod);
-        
-        console.log(`💪(상일) ${index + 1}번째 북마크 변환:`, {
-          원본마감일: bookmark.applyPeriod,
-          포맷된마감일: formattedDeadline,
-          상태: policyStatus
-        });
         
         return {
         // 북마크 정보
@@ -196,7 +170,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
       //   bookmark.isBookmarked = false;
       // }
       
-      console.log('💪(상일) 북마크 제거 완료, 현재 북마크 수:', bookmarks.value.length);
       return true;
     } catch (err) {
       console.error('북마크 제거 실패:', err);
