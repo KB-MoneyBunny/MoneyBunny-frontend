@@ -21,11 +21,14 @@
         <p>저장된 정책</p>
         <span>{{ filteredBookmarks.length }}개</span>
       </div>
-      <BookmarkCard
-        v-for="(item, index) in filteredBookmarks"
-        :key="item.bookmarkId || index"
-        :item="item"
-      />
+      <div class="card-container">
+        <BookmarkCard
+          v-for="(item, index) in filteredBookmarks"
+          :key="item.bookmarkId || index"
+          :item="item"
+          :class="{ 'not-last': index < filteredBookmarks.length - 1 }"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -59,10 +62,18 @@ const { fetchBookmarks } = bookmarkStore;
   margin-bottom: 12px;
 }
 
-.card-list {
+.card-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+}
+
+.card-container :deep(.bookmarkCard.not-last) {
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 0;
+}
+
+.card-container :deep(.bookmarkCard:not(.not-last)) {
+  margin-bottom: 0;
 }
 
 /* 💪(상일) 로딩 상태 스타일 */

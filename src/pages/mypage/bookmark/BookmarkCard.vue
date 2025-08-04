@@ -54,11 +54,8 @@ const handleDetailClick = () => {
 // 💪(상일) 북마크 제거 처리
 const handleRemoveBookmark = async () => {
   if (confirm('이 정책을 북마크에서 제거하시겠습니까?')) {
-    console.log('💪(상일) 북마크 제거 시작:', props.item.policyId, props.item.title);
     const success = await bookmarkStore.removeBookmark(props.item.policyId);
-    if (success) {
-      console.log('💪(상일) 북마크 제거 성공, UI에서 카드가 사라져야 함');
-    } else {
+    if (!success) {
       alert('북마크 제거에 실패했습니다. 다시 시도해주세요.');
     }
   }
@@ -67,14 +64,13 @@ const handleRemoveBookmark = async () => {
 
 <style scoped>
 .bookmarkCard {
-  padding: 16px;
+  padding: 16px 0;
   background-color: white;
   border-radius: 16px;
   box-shadow: var(--card-shadow);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 16px;
 }
 
 /* 💪(상일) 카드 헤더 스타일 */
