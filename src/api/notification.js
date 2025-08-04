@@ -21,7 +21,7 @@ export const subscriptionAPI = {
   subscribe: (data) => axios.post('/api/push/subscriptions', data),
   
   // 현재 구독 상태 조회
-  getStatus: () => axios.get('/api/push/subscriptions/status'),
+  getStatus: (token) => axios.get('/api/push/subscriptions/status', { params: { token } }),
   
   // 개별 알림 타입 토글
   toggleBookmark: (data) => axios.put('/api/push/subscriptions/bookmark', data),

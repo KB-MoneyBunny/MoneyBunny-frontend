@@ -30,13 +30,48 @@ export const useNotificationStore = defineStore('notification', () => {
     notifications.value.filter(n => n.type === 'FEEDBACK')
   );
 
+  // 💪(상일) 날짜 변환 유틸리티 함수들
+  const transformDate = (dateArray) => {
+    if (!dateArray || !Array.isArray(dateArray)) return null;
+    // [2025, 8, 4, 12, 0, 2] 형태를 Date 객체로 변환
+    const [year, month, day, hour = 0, minute = 0, second = 0] = dateArray;
+    return new Date(year, month - 1, day, hour, minute, second); // month는 0부터 시작
+  };
+
+  const formatDateToString = (dateArray) => {
+    if (!dateArray || !Array.isArray(dateArray)) return '';
+    const [year, month, day] = dateArray;
+    return `${month}월 ${day}일`;
+  };
+
   // 💪(상일) 알림 목록 조회
   const fetchNotifications = async () => {
     loading.value = true;
     error.value = null;
     try {
       const response = await notificationAPI.getNotifications();
-      notifications.value = response.data;
+      console.log('💪(상일) 알림 API 응답:', response);
+      
+      // 💪(상일) API 응답을 컴포넌트가 기대하는 형태로 변환
+      const transformedData = response.data.map(notification => ({
+        id: notification.id,
+        type: notification.type, // BOOKMARK, TOP3, NEW_POLICY, FEEDBACK
+        title: notification.title,
+        description: notification.message, // message → description 매핑
+        message: notification.message, // 기존 필드도 유지
+        target_url: notification.targetUrl, // targetUrl → target_url 매핑
+        targetUrl: notification.targetUrl, // 기존 필드도 유지
+        created_at: transformDate(notification.createdAt), // 배열을 Date로 변환
+        createdAt: notification.createdAt, // 원본도 유지
+        read: notification.read,
+        typeName: notification.typeName,
+        // 누락된 필드들 기본값 설정
+        benefit: null,
+        dday: null,
+        date: formatDateToString(notification.createdAt)
+      }));
+      
+      notifications.value = transformedData;
     } catch (err) {
       error.value = err.message;
       console.error('알림 조회 실패:', err);
@@ -73,7 +108,13 @@ export const useNotificationStore = defineStore('notification', () => {
   // 💪(상일) 구독 상태 조회
   const fetchSubscriptionStatus = async () => {
     try {
-      const response = await subscriptionAPI.getStatus();
+      const token = localStorage.getItem('fcm_token');
+      if (!token) {
+        console.error('구독 상태 조회 실패: FCM 토큰 없음');
+        return;
+      }
+      
+      const response = await subscriptionAPI.getStatus(token);
       
       if (response.data) {
         const data = response.data;
