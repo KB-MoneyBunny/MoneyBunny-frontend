@@ -1,12 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-import ShareModal from './ShareModal.vue';
-import PolicyApplyModal from '../component/PolicyApplyModal.vue';
-
-import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
-import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
-import shareIcon from '@/assets/images/icons/policy/share.png';
+import ShareModal from "./ShareModal.vue";
+import PolicyApplyModal from "../component/PolicyApplyModal.vue";
+import bookmarkBefore from "@/assets/images/icons/policy/bookmark_before.png";
+import bookmarkAfter from "@/assets/images/icons/policy/bookmark_after.png";
+import shareIcon from "@/assets/images/icons/policy/share.png";
 
 const props = defineProps({
   policy: {
@@ -72,7 +71,12 @@ function closeApplyModal() {
         공유하기
       </button>
     </div>
-    <ShareModal v-if="showModal" @close="showModal = false" />
+    <!-- 공유버튼에 policyId 넘겨주기 -->
+    <ShareModal
+      v-if="showModal"
+      :policyId="policy.policyId"
+      @close="showModal = false"
+    />
   </div>
 
   <PolicyApplyModal

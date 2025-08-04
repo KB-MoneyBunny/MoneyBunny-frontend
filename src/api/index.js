@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { useAuthStore } from '@/stores/auth';
-import router from '@/router';
+import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
+import router from "@/router";
 
 // Axios 인스턴스 생성
 const instance = axios.create({
@@ -8,30 +8,36 @@ const instance = axios.create({
 });
 
 // 💪(상일) 요청 인터셉터 - JWT 토큰 자동 추가 및 만료 확인
+// 🎵(유정) 정책 공유 시 접근 권한 완화
 instance.interceptors.request.use(
   (config) => {
     const authStore = useAuthStore();
     const { getToken, isTokenExpired, logout } = authStore;
     const token = getToken();
 
+    // 정책: 인증 없이 접근 허용
+    const allowAnonymous =
+      config.method === "get" && config.url?.includes("/policy/detail/");
+
+    if (!token && !allowAnonymous) {
+      router.push("/?error=auth_required");
+      return Promise.reject({ error: "로그인이 필요합니다." });
+    }
+
     if (token) {
-      // 토큰 만료 확인
       if (isTokenExpired()) {
-        console.warn('JWT 토큰이 만료되었습니다. 자동 로그아웃 처리');
+        console.warn("JWT 토큰이 만료되었습니다. 자동 로그아웃 처리");
         logout();
-        router.push('/?error=token_expired');
-        return Promise.reject({ error: '토큰이 만료되었습니다.' });
+        router.push("/?error=token_expired");
+        return Promise.reject({ error: "토큰이 만료되었습니다." });
       }
 
-      // Authorization 헤더에 Bearer 토큰 추가
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // 응답 인터셉터 - 에러 응답 자동 처리
@@ -43,7 +49,7 @@ instance.interceptors.response.use(
     }
 
     if (response.status === 404) {
-      return Promise.reject('404: 페이지 없음 ' + response.request);
+      return Promise.reject("404: 페이지 없음 " + response.request);
     }
 
     return response;
@@ -53,11 +59,11 @@ instance.interceptors.response.use(
     if (error.response?.status === 401) {
       const { logout } = useAuthStore();
       logout(); // 자동 로그아웃
-      router.push('/?error=login_required'); // 로그인 페이지로 이동 (루트 경로 = 로그인 페이지)
+      router.push("/?error=login_required"); // 로그인 페이지로 이동 (루트 경로 = 로그인 페이지)
 
       // 401 Unauthorized 에러 발생 시 자동으로 로그아웃하고 로그인 페이지로 이동
       return Promise.reject({
-        error: '로그인이 필요한 서비스입니다.',
+        error: "로그인이 필요한 서비스입니다.",
       });
     }
 
