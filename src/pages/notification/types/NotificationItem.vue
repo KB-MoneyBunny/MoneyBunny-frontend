@@ -13,8 +13,8 @@
 const props = defineProps({
   isRead: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 </script>
 
@@ -49,7 +49,7 @@ const props = defineProps({
 
 /* 💪(상일) 읽은 알림 전체 흐림 효과 */
 .notification-card.read {
-  opacity: 0.6;
+  opacity: 0.48;
 }
 
 /* ✅ slot 내부 스타일도 적용되게 ::v-deep 사용 */
@@ -64,6 +64,12 @@ const props = defineProps({
   font-size: 13.5px;
   color: var(--text-bluegray);
   margin: 0;
+  /* 💪(상일) 메시지 2줄 말줄임 처리 (북마크와 동일) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
 }
 
 ::v-deep(.date) {
