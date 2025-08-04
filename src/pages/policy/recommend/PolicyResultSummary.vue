@@ -1,52 +1,3 @@
-<script>
-import { useRouter } from 'vue-router';
-
-export default {
-  name: 'PolicyResultSummary',
-  setup() {
-    const router = useRouter();
-
-    const summary = {
-      학력: '대학 졸업',
-      '전공 요건': '공학계열',
-      '현재 상황': '취업 준비 중',
-      '필요한 지원': '전셋집 보증금 지원',
-    };
-
-    const previewPolicies = [
-      {
-        tag: '주택',
-        title: '청년 주택드림 청약통장',
-        description: '만 19~34세 청년층을 위한 주택 구입 지원 정책',
-        match: '95%',
-      },
-      {
-        tag: '취업',
-        title: '청년 내일채움공제',
-        description: '중소기업 취업 청년을 위한 장기재직 지원제도',
-        match: '88%',
-      },
-    ];
-
-    const redoQuiz = () => {
-      router.push({ name: 'policyIntroForm' });
-    };
-
-    const goToAllPolicies = () => {
-      router.push({ name: 'policyMain' });
-    };
-    const priorityOrder = ['조회수', '만료일', '금액'];
-    return {
-      summary,
-      previewPolicies,
-      redoQuiz,
-      goToAllPolicies,
-      priorityOrder,
-    };
-  },
-};
-</script>
-
 <template>
   <header class="introHeader">
     <div class="resultHeader">
@@ -85,13 +36,28 @@ export default {
       <h3 class="font-18 font-bold">추천 정책 미리보기</h3>
       <div
         class="policyCard"
-        v-for="policy in previewPolicies"
-        :key="policy.title"
+        v-for="policy in previewPolicies.slice(0, 2)"
+        :key="policy.policyId"
       >
-        <div class="tag">{{ policy.tag }}</div>
+        <!-- 🛠️ 제승 수정: 태그 하드코딩, 추후 API 값으로 대체 예정 -->
+        <div class="tag">주택</div>
         <p class="title font-bold">{{ policy.title }}</p>
+        <p class="desc">{{ policy.policyBenefitDescription }}</p>
+        <p class="match">
+          신청기간:
+          <template v-if="policy.startDate && policy.endDate">
+            {{ formatDate(policy.startDate) }} ~
+            {{ formatDate(policy.endDate) }}
+          </template>
+          <template v-else>
+            {{ formatDate(policy.endDate) }}
+          </template>
+        </p>
+        <!--
+        <div class="tag">{{ policy.tag }}</div>
         <p class="desc">{{ policy.description }}</p>
         <p class="match">매칭도: {{ policy.match }}</p>
+        -->
       </div>
     </section>
 
@@ -103,6 +69,107 @@ export default {
     </footer>
   </div>
 </template>
+
+<script>
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { usePolicyQuizStore } from '@/stores/policyQuizStore';
+import { usePolicyMatchingStore } from '@/stores/policyMatchingStore'; // 🛠️ 제승 수정: 정책 매칭 스토어 import
+import api from '@/api';
+
+export default {
+  name: 'PolicyResultSummary',
+  setup() {
+    const router = useRouter();
+    const policyQuizStore = usePolicyQuizStore();
+    const policyMatchingStore = usePolicyMatchingStore(); // 🛠️ 제승 수정: 스토어 사용
+
+    const summary = computed(() => ({
+      학력: policyQuizStore.educationLevels || '-',
+      '전공 요건': policyQuizStore.majors || '-',
+      '현재 상황': policyQuizStore.employmentStatuses || '-',
+      소득: policyQuizStore.income || '-',
+    }));
+
+    const priorityOrder = computed(() => {
+      const arr = [];
+      const { moneyRank, popularityRank, periodRank } = policyQuizStore;
+      if (moneyRank === 1) arr[0] = '금액';
+      if (moneyRank === 2) arr[1] = '금액';
+      if (moneyRank === 3) arr[2] = '금액';
+      if (popularityRank === 1) arr[0] = '조회수';
+      if (popularityRank === 2) arr[1] = '조회수';
+      if (popularityRank === 3) arr[2] = '조회수';
+      if (periodRank === 1) arr[0] = '만료일';
+      if (periodRank === 2) arr[1] = '만료일';
+      if (periodRank === 3) arr[2] = '만료일';
+      return arr;
+    });
+
+    // 🛠️ 제승 수정: 정책 미리보기 API 연동 및 policyMatchingStore 연동
+    const previewPolicies = ref([]);
+
+    onMounted(async () => {
+      if (policyMatchingStore.recommendedPolicies.length > 0) {
+        previewPolicies.value = policyMatchingStore.recommendedPolicies;
+        return;
+      }
+      try {
+        const res = await api.get('/api/userPolicy/search');
+        previewPolicies.value = res.data;
+        policyMatchingStore.setRecommendedPolicies(res.data);
+      } catch (e) {
+        previewPolicies.value = [];
+      }
+    });
+
+    // 🛠️ 제승 수정: 날짜 포맷 함수 개선 (YYYYMMDD → YYYY.MM.DD 또는 "YYYYMMDD ~ YYYYMMDD" 처리)
+    function formatDate(dateStr) {
+      if (typeof dateStr !== 'string') return dateStr;
+      // "YYYYMMDD ~ YYYYMMDD" 형식 처리
+      const parts = dateStr.split('~').map((s) => s.trim());
+      if (
+        parts.length === 2 &&
+        /^\d{8}$/.test(parts[0]) &&
+        /^\d{8}$/.test(parts[1])
+      ) {
+        return `${parts[0].slice(0, 4)}.${parts[0].slice(
+          4,
+          6
+        )}.${parts[0].slice(6, 8)} ~ ${parts[1].slice(0, 4)}.${parts[1].slice(
+          4,
+          6
+        )}.${parts[1].slice(6, 8)}`;
+      }
+      // 단일 날짜 "YYYYMMDD"
+      if (parts.length === 1 && /^\d{8}$/.test(parts[0])) {
+        return `${parts[0].slice(0, 4)}.${parts[0].slice(
+          4,
+          6
+        )}.${parts[0].slice(6, 8)}`;
+      }
+      return dateStr;
+    }
+
+    const redoQuiz = () => {
+      router.push({ name: 'policyIntroForm' });
+    };
+
+    const goToAllPolicies = () => {
+      router.push({ name: 'policyMain' });
+    };
+
+    return {
+      summary,
+      previewPolicies,
+      redoQuiz,
+      goToAllPolicies,
+      priorityOrder,
+      formatDate, // 🛠️ 제승 수정: 템플릿에서 사용
+    };
+  },
+};
+</script>
 
 <style scoped>
 .introHeader {
