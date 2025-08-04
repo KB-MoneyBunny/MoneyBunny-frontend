@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 
 import ShareModal from './ShareModal.vue';
+import PolicyApplyModal from '../component/PolicyApplyModal.vue';
+
 import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
 import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
 import shareIcon from '@/assets/images/icons/policy/share.png';
@@ -13,6 +15,10 @@ const props = defineProps({
   },
 });
 
+const showApplyModal = ref(false);
+
+const selectedPolicy = ref(null);
+
 const bookmark = ref(false);
 const showModal = ref(false);
 
@@ -23,6 +29,15 @@ const toggleBookmark = () => {
 const toggleShareModal = () => {
   showModal.value = true;
 };
+
+function openApplyModal(policy) {
+  selectedPolicy.value = policy;
+  showApplyModal.value = true;
+}
+
+function closeApplyModal() {
+  showApplyModal.value = false;
+}
 </script>
 
 <template>
@@ -49,7 +64,9 @@ const toggleShareModal = () => {
     </p>
 
     <div class="actions">
-      <button class="applyButton font-14">바로 신청하기</button>
+      <button class="applyButton font-14" @click="openApplyModal(policy)">
+        바로 신청하기
+      </button>
       <button class="shareButton font-14" @click="toggleShareModal">
         <img :src="shareIcon" alt="공유" class="shareIcon" />
         공유하기
@@ -57,6 +74,13 @@ const toggleShareModal = () => {
     </div>
     <ShareModal v-if="showModal" @close="showModal = false" />
   </div>
+
+  <PolicyApplyModal
+    v-if="showApplyModal"
+    :policyTitle="selectedPolicy?.title"
+    :applyUrl="selectedPolicy?.applyUrl"
+    @close="closeApplyModal"
+  />
 </template>
 
 <style scoped>
