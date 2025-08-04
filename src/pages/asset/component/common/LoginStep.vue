@@ -81,6 +81,8 @@ import { getBankLogo } from '@/assets/utils/bankLogoMap.js';
 import { getCardLogo } from '@/assets/utils/cardLogoMap.js';
 import cardCodeMap from '@/assets/utils/cardCodeMap.js';
 
+import { connectAccount, connectCard } from '@/api/assetApi.js';
+
 const props = defineProps({
   type: { type: String, required: true },
 });
@@ -118,21 +120,59 @@ const handleLogin = async () => {
   }
 
   isLoading.value = true;
-
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // 로딩 시뮬레이션
+    let result;
+    if (props.type === 'account') {
+      result = await connectAccount({
+        organization: formData.value.code,
+        loginId: formData.value.id,
+        password: formData.value.password,
+      });
+    } else {
+      result = await connectCard({
+        organization: formData.value.code,
+        loginId: formData.value.id,
+        password: formData.value.password,
+      });
+    }
 
+    console.log('✅ [LoginStep] result:', result);
+    console.log('✅ [LoginStep] result.data:', result.data);
+
+    // 성공 시 → 기관/아이디/목록 emit!
     emit('login-success', {
       institutionCode: formData.value.code,
       institutionName: getInstitutionName(formData.value.code),
       loginId: formData.value.id,
+      items: result.data || [],
+      password: formData.value.password,
     });
   } catch (error) {
-    alert('로그인에 실패했습니다.');
+    let message = '로그인 또는 정보 불러오기에 실패했습니다.';
+    if (error?.response?.data?.message) {
+      message = error.response.data.message;
+    }
+    console.error('[LoginStep] error:', error);
+    alert(message);
   } finally {
     isLoading.value = false;
   }
 };
+
+//   try {
+//     await new Promise((resolve) => setTimeout(resolve, 1000)); // 로딩 시뮬레이션
+
+//     emit('login-success', {
+//       institutionCode: formData.value.code,
+//       institutionName: getInstitutionName(formData.value.code),
+//       loginId: formData.value.id,
+//     });
+//   } catch (error) {
+//     alert('로그인에 실패했습니다.');
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
 </script>
 
 <style scoped>
