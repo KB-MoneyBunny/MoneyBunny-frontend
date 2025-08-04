@@ -62,27 +62,15 @@ onMounted(() => {
   if (policyQuizStore.birthMonth)
     birth.value.month = policyQuizStore.birthMonth;
   if (policyQuizStore.birthDay) birth.value.day = policyQuizStore.birthDay;
-  if (
+
+  const hasBirthInfo =
     policyQuizStore.birthYear &&
     policyQuizStore.birthMonth &&
-    policyQuizStore.birthDay
-  ) {
-    if (policyQuizStore.regions && policyQuizStore.regions !== '') {
-      address.value =
-        policyQuizStore.birthYear &&
-        policyQuizStore.birthMonth &&
-        policyQuizStore.birthDay
-          ? policyQuizStore.birthYear &&
-            policyQuizStore.birthMonth &&
-            policyQuizStore.birthDay
-            ? policyQuizStore.birthYear &&
-              policyQuizStore.birthMonth &&
-              policyQuizStore.birthDay
-              ? address.value
-              : ''
-            : ''
-          : '';
-    }
+    policyQuizStore.birthDay;
+  const hasRegion = policyQuizStore.regions && policyQuizStore.regions !== '';
+
+  if (hasBirthInfo && hasRegion) {
+    address.value = policyQuizStore.regionName;
   }
 });
 </script>
