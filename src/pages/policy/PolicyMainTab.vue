@@ -1,3 +1,58 @@
+<script setup>
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import BottomNav from '@/components/layouts/NavBar.vue';
+import PolicyApplyModal from './component/PolicyApplyModal.vue';
+import { ALL_POLICIES } from '@/data/policyData.js'; // 데이터파일에서 import (경로 주의!)
+
+const router = useRouter();
+
+const showApplyModal = ref(false);
+const selectedPolicy = ref(null);
+
+const goToDetail = (policyId) => {
+  router.push({ name: 'policyDetail', params: { policyId } });
+};
+
+const goToSearchPage = () => {
+  router.push({ name: 'policySearch' });
+};
+
+const formatPeriod = (periodStr) => {
+  if (!periodStr) return '상시';
+  const match = periodStr.match(/^(\d{8})\s*~\s*(\d{8})$/);
+  if (!match) return periodStr;
+  const [_, start, end] = match;
+  const s = `${start.slice(0, 4)}.${start.slice(4, 6)}.${start.slice(6, 8)}`;
+  const e = `${end.slice(0, 4)}.${end.slice(4, 6)}.${end.slice(6, 8)}`;
+  return `${s} ~ ${e}`;
+};
+
+// ---- 데이터 관련 코드 START ----
+const policiesToShow = ref(3); // 한 번에 보여줄 개수(처음 3개)
+const visiblePolicies = computed(() =>
+  ALL_POLICIES.slice(0, policiesToShow.value)
+);
+const showMoreBtn = computed(() => policiesToShow.value < ALL_POLICIES.length);
+
+const loadMore = () => {
+  policiesToShow.value = Math.min(
+    policiesToShow.value + 5,
+    ALL_POLICIES.length
+  );
+};
+
+function openApplyModal(policy) {
+  selectedPolicy.value = policy;
+  showApplyModal.value = true;
+}
+
+function closeApplyModal() {
+  showApplyModal.value = false;
+}
+// ---- 데이터 관련 코드 END ----
+</script>
+
 <template>
   <div class="policyWrapper">
     <!-- 정책 검색창 -->
@@ -77,6 +132,13 @@
     </button>
     <BottomNav />
   </div>
+
+  <PolicyApplyModal
+    v-if="showApplyModal"
+    :policyTitle="selectedPolicy?.title"
+    :applyUrl="selectedPolicy?.applyUrl"
+    @close="closeApplyModal"
+  />
 </template>
 
 <script setup>
@@ -376,7 +438,7 @@ const formatPeriod = (periodStr) => {
 
 <style scoped>
 .policyWrapper {
-  padding-bottom: 40px;
+  padding: 10px;
   background-color: var(--input-bg-2);
 }
 .searchBar {

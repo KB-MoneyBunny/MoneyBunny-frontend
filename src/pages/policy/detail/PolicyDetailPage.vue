@@ -66,6 +66,8 @@ const policyId = computed(() =>
 const policy = computed(() =>
   ALL_POLICIES.find((p) => p.policyId === policyId.value)
 );
+// 기간 문자열 추출 (endDate 필드)
+const period = computed(() => policy.value?.endDate || '');
 </script>
 
 <template>
@@ -76,14 +78,16 @@ const policy = computed(() =>
       <PolicyTab v-model:selectedTab="selectedTab" />
       <PolicyTabContent :policy="policy" :tab="selectedTab">
         <template #overview>
-          <PolicyTabContent :policy="policy" :tab="selectedTab" />
+          <PolicyTabContent
+            :policy="policy"
+            :period="policy.endDate"
+            :tab="selectedTab"
+          />
         </template>
         <template #condition>
           <PolicyConditionTab :policy="policy" />
         </template>
-        <template #apply>
-          <PolicyApplyTab :policy="policy" :period="policy.endDate" />
-        </template>
+        <template #apply> <PolicyApplyTab :policy="policy" /> </template>
       </PolicyTabContent>
     </div>
   </div>
