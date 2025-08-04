@@ -49,6 +49,10 @@
   --alert-light-2: #f9dada;
   --alert-light-3: #fef2f2;
 
+  --success-bg: #e8f9f1; /* 배경 */
+  --success-text: #218a5b; /* 텍스트 */
+  --success-border: #b6e5d2; /* 테두리 */
+
   --input-outline: #f1f5f9;
   --input-outline-2: #e5e7eb;
   --gray-medium: #cfd4db;
