@@ -105,10 +105,22 @@ const handleLogout = () => {
 };
 
 // 💪(상일) auth store를 통한 실제 로그아웃 처리
-const confirmLogout = () => {
+// 🎵(유정) router 변경
+const confirmLogout = async () => {
   showLogoutModal.value = false;
-  authStore.logout(); // auth store의 logout 메서드 사용
-  router.push("/"); // 로그인 페이지로 이동
+  await authStore.logout();
+
+  // Vue next tick 사용하여 상태 반영 이후 이동
+  await new Promise((resolve) => setTimeout(resolve)); // 상태 반영 기다림
+
+  // 로그 확인
+  console.log("[Logout] isLogin 상태:", authStore.isLogin); // false 나와야 정상
+
+  if (!authStore.isLogin) {
+    router.replace({ path: "/" }); // 로그인 페이지로 이동
+  } else {
+    console.warn("[Logout] 상태 반영이 아직 안 됨");
+  }
 };
 
 const goToChangePassword = () => {

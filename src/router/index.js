@@ -230,11 +230,11 @@ router.beforeEach(async (to, from, next) => {
   );
 
   // 👸🏻 은진
-  // if (authRequired && !authStore.isLogin) {
-  //   // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-  //   console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
-  //   return next({ path: '/', query: { error: 'auth_required' } });
-  // }
+  if (authRequired && !authStore.isLogin) {
+    // 로그인이 필요한 페이지인데 로그인하지 않은 경우
+    console.log("인증되지 않은 접근 - 로그인 페이지로 리다이렉트");
+    return next({ path: "/", query: { error: "auth_required" } });
+  }
 
   if (to.path === '/' && authStore.isLogin) {
     // 이미 로그인한 사용자가 로그인 페이지에 접근하는 경우 홈으로 리다이렉트
