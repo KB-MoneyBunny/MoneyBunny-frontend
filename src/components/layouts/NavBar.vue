@@ -6,6 +6,7 @@
       :to="item.path"
       class="nav-item"
       :class="{ active: isActive(item.path) }"
+      @click.prevent="handleNavClick(item)"
     >
       <img
         :src="isActive(item.path) ? item.iconActive : item.icon"
@@ -18,9 +19,11 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import api from '@/api'; // 🛠️ 제승 수정: api import
 
 const route = useRoute();
+const router = useRouter();
 
 const navItems = [
   {
