@@ -22,7 +22,7 @@ const handleSendCode = () => {
     showToast.value = false;
     // 실제 이동
     router.push({
-      name: 'findPasswordCode', // 라우터 네임에 맞게 수정
+      name: 'findPasswordCode',
       query: { loginId: loginId.value, email: email.value },
     });
   }, 1200); // 1.2초 후 이동
@@ -42,15 +42,15 @@ const handleSendCode = () => {
       </transition>
 
       <div class="card">
-        <div class="title font-26 font-extrabold">MoneyBunny</div>
-        <p class="subtitle font-14">이메일을 입력해주세요</p>
+        <div class="title font-24 font-extrabold">MoneyBunny</div>
+        <p class="subtitle font-13">이메일을 입력해주세요</p>
 
-        <div v-if="errorMessage" class="errorMessage font-12">
+        <div v-if="errorMessage" class="errorMessage font-11">
           {{ errorMessage }}
         </div>
 
         <div class="formGroup">
-          <label class="font-14 font-bold">아이디</label>
+          <label class="font-13 font-bold">아이디</label>
           <input
             type="text"
             v-model="loginId"
@@ -59,7 +59,7 @@ const handleSendCode = () => {
         </div>
 
         <div class="formGroup">
-          <label class="font-14 font-bold">이메일</label>
+          <label class="font-13 font-bold">이메일</label>
           <input
             type="email"
             v-model="email"
@@ -67,16 +67,20 @@ const handleSendCode = () => {
           />
         </div>
 
-        <button class="actionButton font-15" @click="handleSendCode">
+        <button
+          class="actionButton font-14"
+          @click="handleSendCode"
+          type="button"
+        >
           인증코드 발송
         </button>
 
-        <div class="loginLink font-12">
+        <div class="loginLink font-11">
           <a href="/findId">아이디 찾기</a>
           <span>|</span>
           <a href="/">로그인</a>
         </div>
-        <div class="signupLink font-12">
+        <div class="signupLink font-11">
           계정이 없으신가요? <a href="/signUpEmailVerify">회원가입</a>
         </div>
       </div>
@@ -110,8 +114,8 @@ const handleSendCode = () => {
 }
 .card {
   width: 100%;
-  max-width: 360px;
-  min-height: 460px;
+  max-width: 340px;
+  min-height: 440px;
   background-color: white;
   padding: 32px 24px;
   border-radius: 12px;
@@ -137,8 +141,8 @@ const handleSendCode = () => {
 }
 input {
   margin-top: 7px;
-  font-size: 13px;
-  padding: 12px 16px;
+  font-size: 12px;
+  padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
@@ -151,8 +155,8 @@ input:focus {
   width: 100%;
   background-color: var(--base-blue-dark);
   color: white;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
   margin-top: 10px;
   cursor: pointer;
@@ -176,7 +180,7 @@ input:focus {
   color: var(--base-lavender);
   text-decoration: none;
   margin-left: 6px;
-  font-size: 13px;
+  font-size: 12px;
 }
 .errorMessage {
   background-color: var(--alert-light-3);
@@ -198,7 +202,7 @@ input:focus {
   color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   min-width: 300px;
   max-width: 400px;
   pointer-events: none;

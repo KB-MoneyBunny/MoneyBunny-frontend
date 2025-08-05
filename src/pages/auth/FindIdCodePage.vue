@@ -142,7 +142,7 @@ const formattedTime = computed(() => {
               style="flex: 1"
             />
             <span
-              class="timer font-12"
+              class="timer font-11"
               :style="{
                 color:
                   timeLeft < 30
@@ -156,7 +156,7 @@ const formattedTime = computed(() => {
         </div>
 
         <button
-          class="submitButton font-15"
+          class="submitButton font-14"
           @click="verify"
           :disabled="isExpired"
           :class="{ expired: isExpired }"
@@ -164,13 +164,13 @@ const formattedTime = computed(() => {
           {{ isExpired ? '인증 만료' : '인증하기' }}
         </button>
 
-        <div class="loginLink font-12">
+        <div class="loginLink font-11">
           <a href="/findPassword">비밀번호 찾기</a>
           <span>|</span>
           <a href="/">로그인</a>
         </div>
 
-        <div class="signupLink font-12">
+        <div class="signupLink font-11">
           계정이 없으신가요? <a href="/signUpEmailVerify">회원가입</a>
         </div>
       </div>
@@ -207,8 +207,8 @@ const formattedTime = computed(() => {
 
 .card {
   width: 100%;
-  max-width: 360px;
-  min-height: 460px;
+  max-width: 340px;
+  min-height: 440px;
   background-color: white;
   padding: 32px 24px;
   border-radius: 12px;
@@ -241,7 +241,7 @@ const formattedTime = computed(() => {
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
-  font-size: 13px;
+  font-size: 12px;
   outline: none;
 }
 input:focus {
@@ -302,7 +302,7 @@ input:focus {
   color: var(--base-lavender);
   text-decoration: none;
   margin-left: 6px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .errorMessage {
@@ -325,7 +325,7 @@ input:focus {
   color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   min-width: 300px;
   max-width: 400px;
   pointer-events: none;

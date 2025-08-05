@@ -159,12 +159,12 @@ const handleSignUp = async () => {
         class="bunnyImage"
       />
       <div class="card">
-        <div class="title font-26 font-extrabold">MoneyBunny</div>
-        <p class="subtitle font-14">새로운 계정을 만들어보세요</p>
+        <div class="title font-24 font-extrabold">MoneyBunny</div>
+        <p class="subtitle font-12">새로운 계정을 만들어보세요</p>
 
         <!-- 프로필 이미지 선택 -->
         <div class="profileImageSection">
-          <div class="font-14 font-bold">프로필 사진 선택</div>
+          <div class="font-13 font-bold">프로필 사진 선택</div>
           <div class="profileImages">
             <img
               v-for="(img, idx) in profileImages"
@@ -175,14 +175,14 @@ const handleSignUp = async () => {
               @click="selectedImage = img"
             />
           </div>
-          <p class="profileGuide font-12 font-light">
+          <p class="profileGuide font-11 font-light">
             원하는 프로필 사진을 선택하세요
           </p>
         </div>
 
         <!-- 이름 -->
         <div class="formGroup">
-          <label class="font-14 font-bold">이름</label>
+          <label class="font-13 font-bold">이름</label>
           <input
             type="text"
             v-model="realName"
@@ -191,7 +191,7 @@ const handleSignUp = async () => {
         </div>
         <!-- 아이디 -->
         <div class="formGroup">
-          <label class="font-14 font-bold">아이디</label>
+          <label class="font-13 font-bold">아이디</label>
           <div class="inputRowHorizontal">
             <input
               type="text"
@@ -199,13 +199,13 @@ const handleSignUp = async () => {
               placeholder="아이디를 입력하세요"
               class="idInput"
             />
-            <button class="checkButton font-11" @click="checkUsername">
+            <button class="checkButton font-10" @click="checkUsername">
               중복확인
             </button>
           </div>
           <template v-if="usernameMsg">
             <p
-              class="font-11 idStatusMsg"
+              class="font-10 idStatusMsg"
               :class="{
                 error: idStatusType === 'error',
                 success: idStatusType === 'success',
@@ -215,14 +215,14 @@ const handleSignUp = async () => {
             </p>
           </template>
           <template v-else>
-            <p class="requireMsg font-11 font-light">
+            <p class="requireMsg font-10 font-light">
               영문, 숫자 조합 6자 이상
             </p>
           </template>
         </div>
         <!-- 이메일 -->
         <div class="formGroup">
-          <label class="font-14 font-bold">이메일</label>
+          <label class="font-13 font-bold">이메일</label>
           <input
             type="email"
             v-model="email"
@@ -231,7 +231,7 @@ const handleSignUp = async () => {
         </div>
         <!-- 비밀번호 -->
         <div class="formGroup">
-          <label class="font-14 font-bold">비밀번호</label>
+          <label class="font-13 font-bold">비밀번호</label>
           <div class="inputRow" style="position: relative">
             <input
               :type="showPassword ? 'text' : 'password'"
@@ -247,11 +247,11 @@ const handleSignUp = async () => {
               @click="showPassword = !showPassword"
             />
           </div>
-          <p class="font-11 font-light">8자 이상, 영문/숫자/특수문자 포함</p>
+          <p class="font-10 font-light">8자 이상, 영문/숫자/특수문자 포함</p>
         </div>
         <!-- 비밀번호 확인 -->
         <div class="formGroup">
-          <label class="font-14 font-bold">비밀번호 확인</label>
+          <label class="font-13 font-bold">비밀번호 확인</label>
           <div class="inputRow" style="position: relative">
             <input
               :type="showConfirmPassword ? 'text' : 'password'"
@@ -269,14 +269,14 @@ const handleSignUp = async () => {
           </div>
           <p
             v-if="passwordMsg"
-            class="font-11 pwStatusMsg"
+            class="font-10 pwStatusMsg"
             :class="{ error: confirmStatusType === 'error' }"
           >
             {{ passwordMsg }}
           </p>
         </div>
         <!-- 약관동의 -->
-        <div class="agreementGroup font-12">
+        <div class="agreementGroup font-11">
           <label class="checkboxRow">
             <input
               type="checkbox"
@@ -312,10 +312,10 @@ const handleSignUp = async () => {
         </div>
         <!-- 버튼 -->
         <div class="buttonGroup">
-          <button @click="goBack" class="backButton font-15">이전</button>
+          <button @click="goBack" class="backButton font-14">이전</button>
           <button
             @click="handleSignUp"
-            class="submitButton font-15"
+            class="submitButton font-14"
             :disabled="!canSignUp"
             :style="{
               backgroundColor: canSignUp
@@ -344,7 +344,7 @@ const handleSignUp = async () => {
 .cardBox {
   position: relative;
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -357,12 +357,12 @@ const handleSignUp = async () => {
 }
 .card {
   width: 100%;
-  max-width: 360px;
-  min-height: 460px;
+  max-width: 340px;
+  min-height: 440px;
   background: white;
   border-radius: 12px;
   border: none;
-  padding: 32px 24px 32px 24px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -380,7 +380,7 @@ const handleSignUp = async () => {
 }
 
 .profileImageSection {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-bluegray);
 }
 .profileImages {
@@ -392,15 +392,15 @@ const handleSignUp = async () => {
 }
 
 .profileImage {
-  width: 66px;
-  height: 66px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   cursor: pointer;
   box-sizing: border-box;
 }
 
 .profileImage.selected {
-  border: 1.75px solid var(--base-blue-dark);
+  border: 1.5px solid var(--base-blue-dark);
 }
 
 .profileGuide {
@@ -414,14 +414,14 @@ const handleSignUp = async () => {
   align-items: stretch;
 }
 .formGroup label {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-bluegray);
 }
 
 input {
   margin-top: 7px;
-  font-size: 13px;
-  padding: 12px 16px;
+  font-size: 12px;
+  padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
@@ -449,7 +449,7 @@ input:focus {
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
-  font-size: 13px;
+  font-size: 12px;
   outline: none;
   min-width: 0;
 }
@@ -464,10 +464,10 @@ input:focus {
   flex-shrink: 0;
   background-color: var(--base-blue-dark);
   color: white;
-  padding: 5px 10px;
-  border-radius: 8px;
+  padding: 2px 5px;
+  border-radius: 4px;
   border: none;
-  height: 40px;
+  height: 30px;
   margin-left: 3px;
 }
 
@@ -476,8 +476,8 @@ input:focus {
   right: 16px;
   top: 55%;
   transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   user-select: none;
 }
@@ -497,14 +497,14 @@ input:focus {
 }
 .checkboxRow input[type='checkbox'] {
   accent-color: var(--base-blue-dark);
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   margin: 0 8px 0 0;
   vertical-align: middle;
   display: inline-block;
 }
 .checkboxRow span {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-bluegray);
   line-height: 1;
   display: inline-block;
@@ -573,7 +573,7 @@ input:focus {
   color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   min-width: 300px;
   max-width: 400px;
   text-align: center;

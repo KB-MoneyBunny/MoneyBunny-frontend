@@ -68,19 +68,19 @@ const handleClick = () => {
       />
 
       <div class="card">
-        <div class="title font-26 font-extrabold">MoneyBunny</div>
-        <p class="subtitle font-14">이메일을 입력해주세요</p>
+        <div class="title font-24 font-extrabold">MoneyBunny</div>
+        <p class="subtitle font-13">이메일을 입력해주세요</p>
         <div
           v-if="errorMsg"
           :class="[
-            'errorMessage font-13',
+            'errorMessage font-12',
             errorMsg === '인증코드가 발송되었습니다.' ? 'successMessage' : '',
           ]"
         >
           {{ errorMsg }}
         </div>
         <div class="formGroup">
-          <label for="email" class="font-14">이메일</label>
+          <label for="email" class="font-13">이메일</label>
           <input
             type="email"
             id="email"
@@ -89,18 +89,18 @@ const handleClick = () => {
           />
         </div>
         <button
-          class="submitButton font-15"
+          class="submitButton font-14"
           @click="sendIdCode"
           :disabled="isCodeSent"
         >
           인증코드 발송
         </button>
-        <div class="loginLink font-12">
+        <div class="loginLink font-11">
           <router-link to="/findPassword">비밀번호 찾기</router-link>
           <span>|</span>
           <router-link to="/">로그인</router-link>
         </div>
-        <div class="signupLink font-12">
+        <div class="signupLink font-11">
           계정이 없으신가요?
           <router-link to="/signUpEmailVerify">회원가입</router-link>
         </div>
@@ -136,8 +136,8 @@ const handleClick = () => {
 }
 .card {
   width: 100%;
-  max-width: 360px;
-  min-height: 460px;
+  max-width: 340px;
+  min-height: 440px;
   background: white;
   border-radius: 12px;
   border: none;
@@ -165,7 +165,7 @@ const handleClick = () => {
 }
 input {
   margin-top: 7px;
-  font-size: 14px;
+  font-size: 13px;
   padding: 12px 16px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
@@ -185,7 +185,6 @@ input:focus {
   border: none;
   margin-bottom: 10px;
   cursor: pointer;
-  font-weight: bold;
   margin-top: 4px;
 }
 .loginLink {
@@ -207,7 +206,7 @@ input:focus {
   color: var(--base-lavender);
   text-decoration: none;
   margin-left: 6px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .errorMessage {
@@ -237,7 +236,7 @@ input:focus {
   color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   min-width: 300px;
   max-width: 400px;
   text-align: center;

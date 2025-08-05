@@ -90,7 +90,7 @@ const formattedTime = computed(() => {
         </div>
       </transition>
       <div class="card">
-        <div class="title font-26 font-extrabold">MoneyBunny</div>
+        <div class="title font-24 font-extrabold">MoneyBunny</div>
         <p class="subtitle font-14">인증코드를 입력해주세요</p>
 
         <!-- 에러 메시지 -->
