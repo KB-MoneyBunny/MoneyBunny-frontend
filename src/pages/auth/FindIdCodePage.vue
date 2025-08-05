@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
+
 // 🎵(유정) 이메일 인증 코드 전송 후 인증코드 입력 for 아이디 찾기 페이지
 // 이메일 전송 및 인증 관련 변수
 const route = useRoute();
@@ -10,6 +11,9 @@ const email = ref(route.query.email || '');
 const router = useRouter();
 const code = ref('');
 const errorMsg = ref('');
+
+// ✅ 토스트 관련 추가
+const showToast = ref(false);
 
 // 타이머 관련 변수
 const time = 180; // 180초 == 3분
@@ -49,10 +53,14 @@ const verify = async () => {
       code: code.value,
     });
 
-    // 인증 성공 → 아이디 조회
-    const res = await axios.post('/api/auth/find-id', { email: email.value });
-    const loginId = res.data;
-    router.push({ name: 'findIdResult', query: { loginId } });
+    // 인증 성공 → 토스트 띄우고 이동
+    showToast.value = true;
+    setTimeout(async () => {
+      showToast.value = false;
+      const res = await axios.post('/api/auth/find-id', { email: email.value });
+      const loginId = res.data;
+      router.push({ name: 'findIdResult', query: { loginId } });
+    }, 1000); // 1초 후 이동
   } catch (err) {
     errorMsg.value =
       '인증 실패: ' + (err.response?.data?.message || '코드를 확인해주세요');
@@ -90,6 +98,7 @@ const formattedTime = computed(() => {
   return `${minutes}:${seconds}`;
 });
 </script>
+
 <template>
   <div class="codeContainer">
     <div class="cardBox">
@@ -98,6 +107,9 @@ const formattedTime = computed(() => {
         alt="login-bunny"
         class="bunnyImage"
       />
+      <transition name="fade">
+        <div v-if="showToast" class="toastMsg">인증 성공!</div>
+      </transition>
       <div class="card">
         <div class="title font-26 font-extrabold">MoneyBunny</div>
         <p class="subtitle font-14">인증코드를 입력해주세요</p>
@@ -178,6 +190,7 @@ const formattedTime = computed(() => {
 }
 
 .cardBox {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -288,6 +301,8 @@ input:focus {
 .signupLink a {
   color: var(--base-lavender);
   text-decoration: none;
+  margin-left: 6px;
+  font-size: 13px;
 }
 
 .errorMessage {
@@ -298,5 +313,24 @@ input:focus {
   margin-bottom: 12px;
   text-align: center;
   border: 1px solid var(--alert-light-2);
+}
+
+.toastMsg {
+  position: absolute;
+  top: -54px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  background: var(--base-blue-dark);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  min-width: 300px;
+  max-width: 400px;
+  pointer-events: none;
+  text-align: center;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 </style>

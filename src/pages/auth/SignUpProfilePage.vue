@@ -1,8 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import axios from 'axios';
 
+// 프로필 이미지들
 const profileImages = [
   new URL(
     '@/assets/images/icons/profile/profile_edit_sprout.png',
@@ -22,7 +23,7 @@ const profileImages = [
   ).href,
 ];
 
-// 👁️ 비밀번호 아이콘
+// 👁️ 비밀번호 보기/숨기기 아이콘
 const eyeView = new URL(
   '@/assets/images/icons/signup/eye_view.png',
   import.meta.url
@@ -32,60 +33,29 @@ const eyeHide = new URL(
   import.meta.url
 ).href;
 
+// form 상태값
+const selectedImage = ref(profileImages[0]);
+const realName = ref('');
+const username = ref('');
+const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+
+// 안내/에러 메시지
+const usernameMsg = ref('');
+const idStatusType = ref(''); // 'error' | 'success'
+const passwordMsg = ref('');
+const confirmStatusType = ref(''); // 'error' | 'success'
+
+// 약관 체크
 const agreement = reactive({
   terms: false,
   privacy: false,
   marketing: false,
   all: false,
 });
-
-const showPassword = ref(false);
-const showConfirmPassword = ref(false);
-
-const selectedImage = ref(profileImages[0]);
-
-const router = useRouter();
-
-// 뒤로 가기
-const goBack = () => {
-  router.back();
-};
-
-// 회원 가입 후 로그인으로 이동
-const goLogin = () => {
-  router.push('/');
-};
-
-const username = ref('');
-
-const usernameMsg = ref('');
-const idStatusType = ref(''); // 'error' | 'success' | ''
-
-const checkUsername = async () => {
-  usernameMsg.value = '';
-  idStatusType.value = '';
-  // 1. 6자 미만 체크
-  if (!username.value || username.value.length < 6) {
-    usernameMsg.value = '아이디는 6자 이상 입력해야 합니다.';
-    idStatusType.value = 'error';
-    return;
-  }
-  // 2. 서버 중복확인
-  try {
-    const res = await axios.get(`/api/member/checkusername/${username.value}`);
-    if (res.data === true) {
-      usernameMsg.value = '이미 사용 중인 아이디입니다.';
-      idStatusType.value = 'error';
-    } else {
-      usernameMsg.value = '사용 가능한 아이디입니다!';
-      idStatusType.value = 'success';
-    }
-  } catch (err) {
-    usernameMsg.value = '아이디 확인 중 오류가 발생했습니다.';
-    idStatusType.value = 'error';
-  }
-};
-
 const handleIndividualCheck = () => {
   agreement.all = agreement.terms && agreement.privacy && agreement.marketing;
 };
@@ -96,20 +66,42 @@ const handleAllAgree = () => {
   agreement.marketing = checked;
 };
 
-const password = ref('');
-const confirmPassword = ref('');
-const passwordMsg = ref('');
-const confirmStatusType = ref(''); // 'error' | '' | 'success'
+// 정규식
+const pwRule =
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?]).{8,}$/;
+const emailRule = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-// 비밀번호/확인 실시간 검사
+// 아이디 중복확인
+const checkUsername = async () => {
+  usernameMsg.value = '';
+  idStatusType.value = '';
+  if (!username.value || username.value.length < 6) {
+    usernameMsg.value = '아이디는 6자 이상 입력해야 합니다.';
+    idStatusType.value = 'error';
+    return;
+  }
+  try {
+    const res = await axios.get(`/api/member/checkusername/${username.value}`);
+    if (res.data === true) {
+      usernameMsg.value = '이미 사용 중인 아이디입니다.';
+      idStatusType.value = 'error';
+    } else {
+      usernameMsg.value = '사용 가능한 아이디입니다!';
+      idStatusType.value = 'success';
+    }
+  } catch {
+    usernameMsg.value = '아이디 확인 중 오류가 발생했습니다.';
+    idStatusType.value = 'error';
+  }
+};
+
+// 비밀번호 일치 검사
 const validatePassword = () => {
-  // 입력 안 한 경우 문구 없앰
   if (!password.value || !confirmPassword.value) {
     passwordMsg.value = '';
     confirmStatusType.value = '';
     return;
   }
-  // 다르면 에러
   if (password.value !== confirmPassword.value) {
     passwordMsg.value = '비밀번호가 서로 일치하지 않습니다.';
     confirmStatusType.value = 'error';
@@ -118,156 +110,222 @@ const validatePassword = () => {
     confirmStatusType.value = 'success';
   }
 };
+
+// 가입 가능 여부 (모든 조건 만족해야 버튼 활성화)
+const canSignUp = computed(() => {
+  return (
+    selectedImage.value &&
+    realName.value.trim().length > 0 &&
+    username.value.length >= 6 &&
+    idStatusType.value === 'success' &&
+    email.value.trim().length > 0 &&
+    emailRule.test(email.value) &&
+    pwRule.test(password.value) &&
+    password.value === confirmPassword.value &&
+    agreement.terms &&
+    agreement.privacy
+  );
+});
+
+// 라우터
+const router = useRouter();
+const showToast = ref(false);
+
+const goBack = () => router.back();
+const goLogin = () => router.push('/');
+
+// 회원가입 처리 (API는 실제 적용시 추가)
+const handleSignUp = async () => {
+  if (!canSignUp.value) return;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+    goLogin();
+  }, 1200);
+};
 </script>
+
 <template>
   <div class="signUpContainer">
-    <div class="card">
-      <div class="title font-26 font-extrabold">MoneyBunny</div>
-      <p class="subtitle font-14">새로운 계정을 만들어보세요</p>
-
-      <!-- 프로필 이미지 선택 -->
-      <div class="profileImageSection">
-        <div class="font-14 font-bold">프로필 사진 선택</div>
-        <div class="profileImages">
-          <img
-            v-for="(img, idx) in profileImages"
-            :key="idx"
-            :src="img"
-            class="profileImage"
-            :class="{ selected: selectedImage === img }"
-            @click="selectedImage = img"
-          />
+    <div class="cardBox">
+      <transition name="fade">
+        <div v-if="showToast" class="toastMsg">
+          가입이 완료되었습니다! 로그인해 주세요
         </div>
-        <p class="profileGuide font-12 font-light">
-          원하는 프로필 사진을 선택하세요
-        </p>
-      </div>
+      </transition>
+      <img
+        src="@/assets/images/icons/signup/login_main.png"
+        alt="login-bunny"
+        class="bunnyImage"
+      />
+      <div class="card">
+        <div class="title font-26 font-extrabold">MoneyBunny</div>
+        <p class="subtitle font-14">새로운 계정을 만들어보세요</p>
 
-      <!-- 입력 폼 -->
-      <div class="formGroup">
-        <label class="font-14 font-bold">이름</label>
-        <input type="text" placeholder="이름을 입력하세요" />
-      </div>
-      <div class="formGroup">
-        <label class="font-14 font-bold">아이디</label>
-        <div class="inputRowHorizontal">
+        <!-- 프로필 이미지 선택 -->
+        <div class="profileImageSection">
+          <div class="font-14 font-bold">프로필 사진 선택</div>
+          <div class="profileImages">
+            <img
+              v-for="(img, idx) in profileImages"
+              :key="idx"
+              :src="img"
+              class="profileImage"
+              :class="{ selected: selectedImage === img }"
+              @click="selectedImage = img"
+            />
+          </div>
+          <p class="profileGuide font-12 font-light">
+            원하는 프로필 사진을 선택하세요
+          </p>
+        </div>
+
+        <!-- 이름 -->
+        <div class="formGroup">
+          <label class="font-14 font-bold">이름</label>
           <input
             type="text"
-            v-model="username"
-            placeholder="아이디를 입력하세요"
-            class="idInput"
+            v-model="realName"
+            placeholder="이름을 입력하세요"
           />
-          <button class="checkButton font-11" @click="checkUsername">
-            중복확인
-          </button>
         </div>
-        <!-- 안내문 or 상태 메시지 -->
-        <template v-if="usernameMsg">
+        <!-- 아이디 -->
+        <div class="formGroup">
+          <label class="font-14 font-bold">아이디</label>
+          <div class="inputRowHorizontal">
+            <input
+              type="text"
+              v-model="username"
+              placeholder="아이디를 입력하세요"
+              class="idInput"
+            />
+            <button class="checkButton font-11" @click="checkUsername">
+              중복확인
+            </button>
+          </div>
+          <template v-if="usernameMsg">
+            <p
+              class="font-11 idStatusMsg"
+              :class="{
+                error: idStatusType === 'error',
+                success: idStatusType === 'success',
+              }"
+            >
+              {{ usernameMsg }}
+            </p>
+          </template>
+          <template v-else>
+            <p class="requireMsg font-11 font-light">
+              영문, 숫자 조합 6자 이상
+            </p>
+          </template>
+        </div>
+        <!-- 이메일 -->
+        <div class="formGroup">
+          <label class="font-14 font-bold">이메일</label>
+          <input
+            type="email"
+            v-model="email"
+            placeholder="이메일을 입력하세요"
+          />
+        </div>
+        <!-- 비밀번호 -->
+        <div class="formGroup">
+          <label class="font-14 font-bold">비밀번호</label>
+          <div class="inputRow" style="position: relative">
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="비밀번호를 입력하세요"
+              class="passwordInput"
+              v-model="password"
+              @input="validatePassword"
+            />
+            <img
+              :src="showPassword ? eyeHide : eyeView"
+              class="icon"
+              alt="비밀번호 보기 토글"
+              @click="showPassword = !showPassword"
+            />
+          </div>
+          <p class="font-11 font-light">8자 이상, 영문/숫자/특수문자 포함</p>
+        </div>
+        <!-- 비밀번호 확인 -->
+        <div class="formGroup">
+          <label class="font-14 font-bold">비밀번호 확인</label>
+          <div class="inputRow" style="position: relative">
+            <input
+              :type="showConfirmPassword ? 'text' : 'password'"
+              placeholder="비밀번호를 다시 입력하세요"
+              class="passwordInput"
+              v-model="confirmPassword"
+              @input="validatePassword"
+            />
+            <img
+              :src="showConfirmPassword ? eyeHide : eyeView"
+              class="icon"
+              alt="비밀번호 보기 토글"
+              @click="showConfirmPassword = !showConfirmPassword"
+            />
+          </div>
           <p
-            class="font-11 idStatusMsg"
-            :class="{
-              error: idStatusType === 'error',
-              success: idStatusType === 'success',
+            v-if="passwordMsg"
+            class="font-11 pwStatusMsg"
+            :class="{ error: confirmStatusType === 'error' }"
+          >
+            {{ passwordMsg }}
+          </p>
+        </div>
+        <!-- 약관동의 -->
+        <div class="agreementGroup font-12">
+          <label class="checkboxRow">
+            <input
+              type="checkbox"
+              v-model="agreement.terms"
+              @change="handleIndividualCheck"
+            />
+            <span>[필수] 서비스 이용약관에 동의합니다</span>
+          </label>
+          <label class="checkboxRow">
+            <input
+              type="checkbox"
+              v-model="agreement.privacy"
+              @change="handleIndividualCheck"
+            />
+            <span>[필수] 개인정보 수집 및 이용에 동의합니다</span>
+          </label>
+          <label class="checkboxRow">
+            <input
+              type="checkbox"
+              v-model="agreement.marketing"
+              @change="handleIndividualCheck"
+            />
+            <span>[선택] 마케팅 정보 수신에 동의합니다</span>
+          </label>
+          <label class="checkboxRow">
+            <input
+              type="checkbox"
+              v-model="agreement.all"
+              @change="handleAllAgree"
+            />
+            <span>전체 동의</span>
+          </label>
+        </div>
+        <!-- 버튼 -->
+        <div class="buttonGroup">
+          <button @click="goBack" class="backButton font-15">이전</button>
+          <button
+            @click="handleSignUp"
+            class="submitButton font-15"
+            :disabled="!canSignUp"
+            :style="{
+              backgroundColor: canSignUp
+                ? 'var(--base-blue-dark)'
+                : 'var(--input-disabled-2)',
             }"
           >
-            {{ usernameMsg }}
-          </p>
-        </template>
-        <template v-else>
-          <p class="requireMsg font-11 font-light">영문, 숫자 조합 6자 이상</p>
-        </template>
-      </div>
-
-      <div class="formGroup">
-        <label class="font-14 font-bold">이메일</label>
-        <input type="email" placeholder="이메일을 입력하세요" />
-      </div>
-
-      <div class="formGroup">
-        <label class="font-14 font-bold">비밀번호</label>
-        <div class="inputRow" style="position: relative">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            placeholder="비밀번호를 입력하세요"
-            class="passwordInput"
-            v-model="password"
-            @input="validatePassword"
-          />
-          <img
-            :src="showPassword ? eyeHide : eyeView"
-            class="icon"
-            alt="비밀번호 보기 토글"
-            @click="showPassword = !showPassword"
-          />
+            회원가입
+          </button>
         </div>
-        <p class="font-11 font-light">8자 이상, 영문/숫자/특수문자 포함</p>
-      </div>
-      <div class="formGroup">
-        <label class="font-14 font-bold">비밀번호 확인</label>
-        <div class="inputRow" style="position: relative">
-          <input
-            :type="showConfirmPassword ? 'text' : 'password'"
-            placeholder="비밀번호를 다시 입력하세요"
-            class="passwordInput"
-            v-model="confirmPassword"
-            @input="validatePassword"
-          />
-          <img
-            :src="showConfirmPassword ? eyeHide : eyeView"
-            class="icon"
-            alt="비밀번호 보기 토글"
-            @click="showConfirmPassword = !showConfirmPassword"
-          />
-        </div>
-        <!-- 문구 뜨는 곳! -->
-        <p
-          v-if="passwordMsg"
-          class="font-11 pwStatusMsg"
-          :class="{ error: confirmStatusType === 'error' }"
-        >
-          {{ passwordMsg }}
-        </p>
-      </div>
-
-      <!-- 템플릿 부분 약관동의만 발췌 -->
-      <div class="agreementGroup font-12">
-        <label class="checkboxRow">
-          <input
-            type="checkbox"
-            v-model="agreement.terms"
-            @change="handleIndividualCheck"
-          />
-          <span>[필수] 서비스 이용약관에 동의합니다</span>
-        </label>
-        <label class="checkboxRow">
-          <input
-            type="checkbox"
-            v-model="agreement.privacy"
-            @change="handleIndividualCheck"
-          />
-          <span>[필수] 개인정보 수집 및 이용에 동의합니다</span>
-        </label>
-        <label class="checkboxRow">
-          <input
-            type="checkbox"
-            v-model="agreement.marketing"
-            @change="handleIndividualCheck"
-          />
-          <span>[선택] 마케팅 정보 수신에 동의합니다</span>
-        </label>
-        <label class="checkboxRow">
-          <input
-            type="checkbox"
-            v-model="agreement.all"
-            @change="handleAllAgree"
-          />
-          <span>전체 동의</span>
-        </label>
-      </div>
-      <!-- 버튼 -->
-      <div class="buttonGroup">
-        <button @click="goBack" class="backButton font-15">이전</button>
-        <button @click="goLogin" class="submitButton font-15">회원가입</button>
       </div>
     </div>
   </div>
@@ -281,15 +339,33 @@ const validatePassword = () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
-
+.cardBox {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bunnyImage {
+  width: 90px;
+  height: 90px;
+  margin-bottom: -30px;
+  z-index: 2;
+}
 .card {
   width: 100%;
-  max-width: 350px;
+  max-width: 360px;
+  min-height: 460px;
   background: white;
-  border-radius: 10px;
-  padding: 24px;
+  border-radius: 12px;
   border: none;
+  padding: 32px 24px 32px 24px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .title {
@@ -415,7 +491,6 @@ input:focus {
 .checkboxRow {
   display: flex;
   align-items: center;
-  /* gap: 2px; */
   margin-bottom: 0;
   cursor: pointer;
   user-select: none;
@@ -467,25 +542,43 @@ input:focus {
 }
 
 .requireMsg {
-  margin-top: 6px;
-  margin-left: 3px;
+  margin-top: 5px;
+  margin-left: 5px;
   margin-bottom: 0;
   color: var(--text-bluegray);
 }
 .idStatusMsg {
-  margin-top: 6px;
-  margin-left: 3px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 .idStatusMsg.error {
   color: var(--alert-strong);
 }
 .idStatusMsg.success {
-  color: var(--base-blue-dark);
+  color: var(--success-text);
 }
 .pwStatusMsg {
-  margin-top: 6px;
-  margin-left: 3px;
-  color: var(--alert-strong); /* 기존에 에러컬러 지정 */
-  font-weight: 500;
+  margin-top: 5px;
+  margin-left: 5px;
+  color: var(--alert-strong);
+}
+
+.toastMsg {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  background: var(--base-blue-dark);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  min-width: 300px;
+  max-width: 400px;
+  text-align: center;
+  pointer-events: none;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 </style>

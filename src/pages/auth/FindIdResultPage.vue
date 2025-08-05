@@ -55,9 +55,8 @@ const goLogin = () => {
           </transition>
         </div>
 
-        <!-- 여기서부터 버튼만! -->
         <button class="goLoginButton font-15" @click="goLogin">
-          로그인하러 가기
+          로그인하러가기
         </button>
 
         <div class="signupLink font-12">
@@ -117,9 +116,10 @@ const goLogin = () => {
 .resultBox {
   background-color: var(--input-bg-2);
   border-radius: 8px;
-  margin-bottom: 16px;
+  margin-top: 8px;
+  margin-bottom: px;
   width: 100%;
-  min-height: 160px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -182,6 +182,7 @@ const goLogin = () => {
 .signupLink a {
   color: var(--base-lavender);
   text-decoration: none;
-  margin-left: 10px;
+  margin-left: 6px;
+  font-size: 13px;
 }
 </style>

@@ -9,13 +9,14 @@ import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 import LoginPage from '@/pages/auth/LoginPage.vue';
 import FindIdPage from '@/pages/auth/FindIdPage.vue';
 import FindPasswordPage from '@/pages/auth/FindPasswordPage.vue';
-import SignUpEmailVerifyPage from '@/pages/auth/SignUpEmailVerifyPage.vue';
+import SignUpEmailVerifyPage from '@/pages/auth/SignUpEmailRequestPage.vue';
 import SignUpProfilePage from '@/pages/auth/SignUpProfilePage.vue';
 import FindIdResultPage from '@/pages/auth/FindIdResultPage.vue';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage.vue';
 import AttendanceCheckModal from '@/pages/auth/AttendanceCheckModal.vue';
 import FindIdCodePage from '@/pages/auth/FindIdCodePage.vue';
 import FindPasswordCodePage from '@/pages/auth/FindPasswordCodePage.vue';
+import SignUpEmailCodePage from '@/pages/auth/SignUpEmailCodePage.vue';
 
 //
 // ─── 마이페이지 관련 ──────────────────────────────────
@@ -81,6 +82,16 @@ const routes = [
     path: '/findPasswordCode',
     name: 'findPasswordCode',
     component: FindPasswordCodePage,
+  },
+  {
+    path: '/resetPassword',
+    name: 'resetPassword',
+    component: ResetPasswordPage,
+  },
+  {
+    path: '/signUpEmailCode',
+    name: 'signUpEmailCode',
+    component: SignUpEmailCodePage,
   },
   //
   // ─── 마이페이지 ─────────────────────────────────────

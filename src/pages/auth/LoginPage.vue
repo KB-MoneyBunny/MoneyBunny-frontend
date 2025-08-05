@@ -4,6 +4,8 @@ import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import AttendanceCheckModal from './AttendanceCheckModal.vue';
 
+const showToast = ref(false);
+
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
@@ -37,9 +39,15 @@ const handleLogin = async () => {
       password: password.value,
     });
 
-    console.log('로그인 성공, 출석체크 모달 표시');
     // 로그인 성공 시 출석체크 모달 표시
-    showModal.value = true;
+    // showModal.value = true;
+
+    // 로그인 성공!
+    showToast.value = true;
+    setTimeout(() => {
+      showToast.value = false;
+      router.push('/home');
+    }, 1200); // 1.2초 보여주고 홈으로
   } catch (error) {
     console.error('로그인 에러:', error);
 
@@ -109,13 +117,15 @@ watch(errorMessage, () => {
 
 <template>
   <div class="loginContainer">
-    <div class="loginCardBox">
+    <div class="cardBox">
       <img
         src="@/assets/images/icons/signup/login_main.png"
         alt="login-bunny"
         class="bunnyImage"
       />
-
+      <transition name="fade">
+        <div v-if="showToast" class="toastMsg">로그인 되었습니다!</div>
+      </transition>
       <div class="loginCard">
         <div class="loginTitle font-26 font-extrabold">MoneyBunny</div>
         <p class="loginSubtitle font-14">아이디와 비밀번호를 입력해주세요</p>
@@ -186,7 +196,8 @@ watch(errorMessage, () => {
   align-items: center;
   justify-content: center;
 }
-.loginCardBox {
+.cardBox {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -276,7 +287,8 @@ input:focus {
 .signupLink a {
   color: var(--base-lavender);
   text-decoration: none;
-  margin-left: 10px;
+  margin-left: 6px;
+  font-size: 13px;
 }
 
 /* 💪(상일) 에러 메시지 및 로딩 상태 스타일 추가 */
@@ -299,5 +311,24 @@ input:focus {
 input:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
+}
+
+.toastMsg {
+  position: absolute;
+  top: -54px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  background: var(--base-blue-dark);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  min-width: 300px;
+  max-width: 400px;
+  pointer-events: none;
+  text-align: center;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 </style>
