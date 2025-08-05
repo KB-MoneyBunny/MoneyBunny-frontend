@@ -34,7 +34,7 @@
     />
 
     <!-- 월별 지출 추이 차트 -->
-    <CategoryChart :spending-data="monthlyTrendChartData" />
+    <CategoryChart :monthly-trend-data="monthlyTrendData" />
 
     <!-- 카테고리 상세보기 모달 -->
     <DetailModal :visible="showCategoryDetail" @close="closeCategoryDetail">
@@ -83,18 +83,6 @@ const comparisonText = computed(() => {
   const percentage = Math.abs(rate);
 
   return `${sign}${difference.toLocaleString()}원(${sign}${percentage}%)`;
-});
-
-// 월별 추이 차트용 데이터 변환 (CategoryChart 컴포넌트에 맞게)
-const monthlyTrendChartData = computed(() => {
-  const { months, amounts } = monthlyTrendData.value;
-
-  return months.map((month, index) => ({
-    date: month.replace('월', '.1'), // "8월" -> "8.1" 형식으로 변환
-    price: amounts[index],
-    category: '지출',
-    memo: '월별 지출',
-  }));
 });
 
 // 월별 네비게이션 업데이트 핸들러
