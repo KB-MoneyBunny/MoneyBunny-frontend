@@ -1,13 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
+import { useRoute } from "vue-router";
 
-const props = defineProps({
-  policyId: {
-    type: Number,
-    required: true,
-  },
-});
+const route = useRoute();
+const policyId = computed(() =>
+  Number(route.params.policyId || route.params.id)
+);
 
 const emit = defineEmits(["close"]);
 
@@ -22,6 +21,8 @@ const shareInfo = ref({
   url: "",
 });
 
+// 정책 불러오기
+
 const fetchPolicy = async () => {
   try {
     const savedAuth = localStorage.getItem("auth"); // "auth" 전체 객체 꺼냄
@@ -32,7 +33,7 @@ const fetchPolicy = async () => {
 
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-    const response = await axios.get(`/api/policy/detail/${props.policyId}`, {
+    const response = await axios.get(`/api/policy/detail/${policyId.value}`, {
       headers,
     });
 
@@ -52,6 +53,10 @@ const fetchPolicy = async () => {
         data.applyUrl.startsWith("http") &&
         !data.applyUrl.includes("localhost")
           ? data.applyUrl
+          : typeof data.refUrl1 === "string" &&
+            data.refUrl1.startsWith("http") &&
+            !data.refUrl1.includes("localhost")
+          ? data.refUrl1
           : `https://money-bunny-frontend.vercel.app/policy/${String(
               props.policyId
             )}`,
@@ -84,6 +89,8 @@ onMounted(() => {
   }
 });
 
+// 카카오 공유하기 전송
+
 const sendKakao = () => {
   const info = shareInfo.value;
   console.log("✅ 공유할 정보:", info);
@@ -112,9 +119,21 @@ const sendKakao = () => {
       title: info.title,
       description: info.description,
       amount: info.amount,
-      policy_id: props.policyId,
+      policy_id: policyId.value,
     },
   });
+};
+
+// 클립보드 복사(링크 공유)
+
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("링크가 복사되었습니다!");
+  } catch (err) {
+    console.error("클립보드 복사 실패:", err);
+    alert("복사에 실패했습니다. 브라우저 권한을 확인해주세요.");
+  }
 };
 </script>
 
@@ -136,7 +155,7 @@ const sendKakao = () => {
         </div>
       </div>
 
-      <div class="shareItem">
+      <div class="shareItem" @click="copyToClipboard(shareInfo.url)">
         <img src="@/assets/images/icons/policy/link.png" />
         <div class="text">
           <div class="font-15 font-bold">링크 복사</div>
