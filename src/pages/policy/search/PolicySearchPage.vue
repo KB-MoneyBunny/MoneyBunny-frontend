@@ -1,10 +1,25 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import api from '@/api';
 
 const router = useRouter();
 const searchQuery = ref('');
-const popularKeywords = ['청년', '주거', '창업', '취업', '대출', '지원금'];
+const popularKeywords = ref([]);
+const recentKeywords = ref([]);
+
+// 기본 필터(사용자 조건) 저장
+const filterInitial = ref({
+  marital: [],
+  region: [],
+  age: '',
+  income: '',
+  education: [],
+  major: [],
+  jobStatus: [],
+  specialty: [],
+});
+const filterData = ref({});
 
 const goBack = () => {
   router.back();
@@ -13,6 +28,62 @@ const goBack = () => {
 const search = () => {
   console.log(`검색어: ${searchQuery.value}`);
 };
+
+const fetchPopularKeywords = async () => {
+  try {
+    const res = await api.get('/api/userPolicy/popular-keywords');
+    popularKeywords.value = Array.isArray(res.data) ? res.data : [];
+  } catch (e) {
+    console.error('인기 검색어 조회 실패', e);
+  }
+};
+
+const fetchRecentKeywords = async () => {
+  try {
+    const res = await api.get('/api/userPolicy/recent-keywords');
+    recentKeywords.value = Array.isArray(res.data) ? res.data : [];
+  } catch (e) {
+    console.error('최근 검색어 조회 실패', e);
+  }
+};
+
+// 사용자 기본 필터 조건 불러오기
+const fetchUserPolicyFilter = async () => {
+  try {
+    const res = await api.get('/api/userPolicy');
+    const d = res.data || {};
+    Object.assign(filterInitial.value, {
+      marital: d.marriage ? [d.marriage] : [],
+      region: d.regions || [],
+      age: d.age || '',
+      income: d.income || '',
+      education: d.educationLevels || [],
+      major: d.majors || [],
+      jobStatus: d.employmentStatuses || [],
+      specialty: d.specialConditions || [],
+    });
+    Object.assign(filterData.value, filterInitial.value);
+  } catch (e) {
+    // 에러 무시
+  }
+};
+
+// 검색어 클릭 시 기본 필터 + 해당 검색어로 검색 결과 페이지 이동
+function searchWithKeyword(keyword) {
+  router.push({
+    name: 'policySearchResult',
+    query: {
+      q: keyword,
+      filter: encodeURIComponent(JSON.stringify(filterData.value)),
+    },
+  });
+}
+
+onMounted(() => {
+  fetchPopularKeywords();
+  fetchRecentKeywords();
+  fetchUserPolicyFilter();
+});
 </script>
 
 <template>
@@ -20,9 +91,14 @@ const search = () => {
     <section class="section">
       <div class="title">최근 검색어</div>
       <div class="chipList">
-        <span class="chip">청년 내일채움공제</span>
-        <span class="chip">전세자금 대출</span>
-        <span class="chip">창업지원금</span>
+        <span
+          class="chip"
+          v-for="(item, idx) in recentKeywords"
+          :key="idx"
+          @click="searchWithKeyword(item)"
+          style="cursor: pointer"
+          >{{ item }}</span
+        >
       </div>
     </section>
 
@@ -34,6 +110,8 @@ const search = () => {
           class="popularItem"
           v-for="(item, index) in popularKeywords"
           :key="index"
+          @click="searchWithKeyword(item)"
+          style="cursor: pointer"
         >
           <span class="number">{{ index + 1 }}</span>
           <span class="text">{{ item }}</span>

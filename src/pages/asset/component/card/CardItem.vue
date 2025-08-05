@@ -14,7 +14,7 @@
         <span v-if="isRepresentative" class="main-badge">대표</span>
       </div>
       <p class="card-number">{{ card.cardMaskedNumber }}</p>
-      <p class="card-amount">{{ formatWon(card.amount) }}</p>
+      <p class="card-amount">{{ formatWon(card.thisMonthUsed) }}</p>
     </div>
 
     <!-- 카드 컨트롤 영역 -->

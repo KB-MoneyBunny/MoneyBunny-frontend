@@ -1,58 +1,3 @@
-<script setup>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import BottomNav from '@/components/layouts/NavBar.vue';
-import PolicyApplyModal from './component/PolicyApplyModal.vue';
-import { ALL_POLICIES } from '@/data/policyData.js'; // 데이터파일에서 import (경로 주의!)
-
-const router = useRouter();
-
-const showApplyModal = ref(false);
-const selectedPolicy = ref(null);
-
-const goToDetail = (policyId) => {
-  router.push({ name: 'policyDetail', params: { policyId } });
-};
-
-const goToSearchPage = () => {
-  router.push({ name: 'policySearch' });
-};
-
-const formatPeriod = (periodStr) => {
-  if (!periodStr) return '상시';
-  const match = periodStr.match(/^(\d{8})\s*~\s*(\d{8})$/);
-  if (!match) return periodStr;
-  const [_, start, end] = match;
-  const s = `${start.slice(0, 4)}.${start.slice(4, 6)}.${start.slice(6, 8)}`;
-  const e = `${end.slice(0, 4)}.${end.slice(4, 6)}.${end.slice(6, 8)}`;
-  return `${s} ~ ${e}`;
-};
-
-// ---- 데이터 관련 코드 START ----
-const policiesToShow = ref(3); // 한 번에 보여줄 개수(처음 3개)
-const visiblePolicies = computed(() =>
-  ALL_POLICIES.slice(0, policiesToShow.value)
-);
-const showMoreBtn = computed(() => policiesToShow.value < ALL_POLICIES.length);
-
-const loadMore = () => {
-  policiesToShow.value = Math.min(
-    policiesToShow.value + 5,
-    ALL_POLICIES.length
-  );
-};
-
-function openApplyModal(policy) {
-  selectedPolicy.value = policy;
-  showApplyModal.value = true;
-}
-
-function closeApplyModal() {
-  showApplyModal.value = false;
-}
-// ---- 데이터 관련 코드 END ----
-</script>
-
 <template>
   <div class="policyWrapper">
     <!-- 정책 검색창 -->
@@ -73,41 +18,59 @@ function closeApplyModal() {
     </div>
 
     <!-- 정책 카드 리스트 -->
-    <div
-      v-for="(policy, index) in visiblePolicies"
-      :key="policy.policyId"
-      class="policyCard"
-    >
-      <div class="cardHeader">
-        <span v-if="index < 3" class="topRank" :class="`rank${index + 1}`">
-          TOP {{ index + 1 }}
-        </span>
-        <div class="titleTagRow">
-          <span class="cardTitle font-bold font-15">{{ policy.title }}</span>
-          <span class="cardTag font-12">{{ policy.tag }}</span>
+    <template v-if="visiblePolicies.length > 0">
+      <div
+        v-for="(policy, index) in visiblePolicies"
+        :key="policy.policyId"
+        class="policyCard"
+      >
+        <div class="cardHeader">
+          <span v-if="index < 3" class="topRank" :class="`rank${index + 1}`">
+            TOP {{ index + 1 }}
+          </span>
+          <div class="titleTagRow">
+            <span class="cardTitle font-bold font-15">{{ policy.title }}</span>
+            <!-- 대분류 태그 중복 제거 후 표시 -->
+            <template v-if="getUniqueLargeCategories(policy).length">
+              <span
+                v-for="tag in getUniqueLargeCategories(policy)"
+                :key="tag"
+                class="cardTag font-12"
+                >{{ tag }}</span
+              >
+            </template>
+          </div>
+        </div>
+        <p class="cardDesc font-14">{{ policy.policyBenefitDescription }}</p>
+        <p class="cardDeadline font-12">
+          <span class="label font-regular">신청기간 : </span>
+          <span class="date font-bold">
+            {{ policy.endDate ? formatPeriod(policy.endDate) : '상시' }}
+          </span>
+        </p>
+        <div class="cardActions">
+          <button
+            class="buttonSecondary font-14"
+            @click="goToDetail(policy.policyId)"
+          >
+            자세히 보기
+          </button>
+          <button
+            class="buttonPrimary font-14"
+            @click="goToApplyPage(policy.applyUrl)"
+          >
+            신청하기
+          </button>
         </div>
       </div>
-
-      <p class="cardDesc font-14">{{ policy.policyBenefitDescription }}</p>
-      <p class="cardDeadline font-12">
-        <span class="label font-regular">신청기간 : </span>
-        <span class="date font-bold">
-          {{ policy.endDate ? formatPeriod(policy.endDate) : '상시' }}
-        </span>
-      </p>
-
-      <div class="cardActions">
-        <button
-          class="buttonSecondary font-14"
-          @click="goToDetail(policy.policyId)"
-        >
-          자세히 보기
-        </button>
-        <button class="buttonPrimary font-14" @click="openApplyModal(policy)">
-          신청하기
-        </button>
+    </template>
+    <template v-else>
+      <div
+        style="text-align: center; color: var(--text-bluegray); margin: 40px 0"
+      >
+        조건에 맞는 정책 목록이 없습니다.
       </div>
-    </div>
+    </template>
 
     <!-- 더 많은 정책 보기 버튼 -->
     <button
@@ -127,6 +90,99 @@ function closeApplyModal() {
     @close="closeApplyModal"
   />
 </template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import BottomNav from '@/components/layouts/NavBar.vue';
+import PolicyApplyModal from './component/PolicyApplyModal.vue';
+import { usePolicyMatchingStore } from '@/stores/policyMatchingStore';
+import api from '@/api';
+
+const router = useRouter();
+const policyMatchingStore = usePolicyMatchingStore();
+
+const showApplyModal = ref(false);
+const selectedPolicy = ref(null);
+
+const goToDetail = (policyId) => {
+  router.push({ name: 'policyDetail', params: { policyId } });
+};
+
+const goToSearchPage = () => {
+  router.push({ name: 'policySearch' });
+};
+
+const goToApplyPage = (url) => {
+  if (url) {
+    window.open(url, '_blank');
+  }
+};
+
+const formatPeriod = (periodStr) => {
+  if (!periodStr) return '상시';
+  const match = periodStr.match(/^(\d{8})\s*~\s*(\d{8})$/);
+  if (!match) return periodStr;
+  const [_, start, end] = match;
+  const s = `${start.slice(0, 4)}.${start.slice(4, 6)}.${start.slice(6, 8)}`;
+  const e = `${end.slice(0, 4)}.${end.slice(4, 6)}.${end.slice(6, 8)}`;
+  return `${s} ~ ${e}`;
+};
+
+// 정책 데이터 관리 (스토어/동적 API)
+const ALL_POLICIES = ref([]);
+
+onMounted(async () => {
+  if (policyMatchingStore.recommendedPolicies.length > 0) {
+    ALL_POLICIES.value = policyMatchingStore.recommendedPolicies;
+  } else {
+    try {
+      const res = await api.get('/api/userPolicy/search');
+      policyMatchingStore.setRecommendedPolicies(res.data);
+      ALL_POLICIES.value = res.data;
+    } catch (e) {
+      ALL_POLICIES.value = [];
+    }
+  }
+});
+
+const policiesToShow = ref(3);
+const visiblePolicies = computed(() =>
+  ALL_POLICIES.value.slice(0, policiesToShow.value)
+);
+const showMoreBtn = computed(
+  () => policiesToShow.value < ALL_POLICIES.value.length
+);
+
+const loadMore = () => {
+  policiesToShow.value = Math.min(
+    policiesToShow.value + 5,
+    ALL_POLICIES.value.length
+  );
+};
+
+// 대분류 중복 제거 함수
+function getUniqueLargeCategories(policy) {
+  // largeCategory가 배열이든, 문자열이든, 중복 없이 문자열 배열로 반환
+  if (!policy.largeCategory) return [];
+  if (Array.isArray(policy.largeCategory)) {
+    // 배열 내 중복/공백 제거
+    return Array.from(
+      new Set(policy.largeCategory.filter((v) => !!v && v !== ''))
+    );
+  }
+  // 문자열(콤마로 구분된 경우 포함) 처리
+  if (typeof policy.largeCategory === 'string') {
+    // 콤마로 구분된 문자열이면 분리
+    const arr = policy.largeCategory
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+    return Array.from(new Set(arr));
+  }
+  return [];
+}
+</script>
 
 <style scoped>
 .policyWrapper {

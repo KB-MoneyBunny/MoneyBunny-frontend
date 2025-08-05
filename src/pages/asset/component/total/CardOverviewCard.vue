@@ -16,19 +16,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+// import { ref } from 'vue';
+// import CardOverviewList from '../card/CardOverviewList.vue';
+// import cardsData from '@/assets/data/cards.json'; // json 파일 불러오기
+
+// const emit = defineEmits(['switchTab']);
+
+// // 내부 탭 전환
+// const goToCardTab = () => {
+//   emit('switchTab', '카드');
+// };
+
+// // 더미 카드 데이터 (JSON 파일에서 로드)
+// const cards = ref(cardsData);
 import CardOverviewList from '../card/CardOverviewList.vue';
-import cardsData from '@/assets/data/cards.json'; // json 파일 불러오기
-
+const props = defineProps({
+  cards: { type: Array, required: true },
+});
 const emit = defineEmits(['switchTab']);
-
-// 내부 탭 전환
-const goToCardTab = () => {
-  emit('switchTab', '카드');
-};
-
-// 더미 카드 데이터 (JSON 파일에서 로드)
-const cards = ref(cardsData);
+const goToCardTab = () => emit('switchTab', '카드');
 </script>
 
 <style scoped>
