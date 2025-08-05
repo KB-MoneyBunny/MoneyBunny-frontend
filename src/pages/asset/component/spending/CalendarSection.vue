@@ -54,7 +54,7 @@ const previousMonth = () => {
   newDate.setMonth(newDate.getMonth() - 1);
   currentDate.value = newDate;
   emit('update:selectedDate', newDate);
-  emit('month-change', newDate.getMonth() + 1); // ✅ 추가
+  emit('month-change', newDate.getMonth() + 1);
 };
 
 // 다음 달 이동

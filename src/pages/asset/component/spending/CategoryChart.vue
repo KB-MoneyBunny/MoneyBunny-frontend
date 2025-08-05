@@ -20,7 +20,7 @@
           class="chart-bar"
           :style="{
             height: `${getBarHeight(value)}%`,
-            backgroundColor: getBarColor(parseInt(chartData.months[index])), // ✅ 월 값 사용
+            backgroundColor: getBarColor(parseInt(chartData.months[index])), // 월 값 사용
           }"
         ></div>
       </div>
@@ -48,7 +48,6 @@ const props = defineProps({
     default: () => ({ months: [], amounts: [] }),
   },
   selectedMonth: {
-    // ✅ 추가
     type: Number,
     required: true,
   },
@@ -71,7 +70,7 @@ const getBarHeight = (value) => {
   return Math.max((value / maxValue.value) * 100, 2);
 };
 
-// ✅ 실제 월과 selectedMonth 비교
+// 실제 월과 selectedMonth 비교
 const getBarColor = (month) => {
   return month === props.selectedMonth
     ? 'var(--base-blue-dark)'

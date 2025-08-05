@@ -45,6 +45,7 @@
       <CategoryDetailView
         v-if="selectedCategoryData"
         :category-data="selectedCategoryData"
+        :selected-date="currentDate"
         @back="closeCategoryDetail"
       />
     </DetailModal>
@@ -70,9 +71,6 @@ const {
   categoryList,
   chartData,
   monthlyTrendData,
-  previousMonth,
-  nextMonth,
-  getCategoryDetail,
 } = useSpendingData();
 
 // 로컬 상태
@@ -80,11 +78,8 @@ const showAllCategories = ref(false);
 const showCategoryDetail = ref(false);
 const selectedCategoryData = ref(null);
 
-// 추가: 월 상태와 핸들러
+// 현재 선택된 월 상태 (초기값: 현재 월)
 const selectedMonth = ref(currentDate.value.getMonth() + 1);
-const handleMonthChange = (month) => {
-  selectedMonth.value = month;
-};
 
 // 전월 대비 텍스트 계산
 const comparisonText = computed(() => {
@@ -95,10 +90,15 @@ const comparisonText = computed(() => {
   return `${sign}${difference.toLocaleString()}원(${sign}${percentage}%)`;
 });
 
-// 월별 네비게이션 업데이트 핸들러
+// CalendarSection에서 월 변경 시 처리
+const handleMonthChange = (month) => {
+  selectedMonth.value = month;
+};
+
+// CalendarSection에서 날짜 업데이트 시 처리
 const updateSelectedDate = (newDate) => {
-  // useSpendingData의 currentDate 직접 업데이트
   currentDate.value = newDate;
+  selectedMonth.value = newDate.getMonth() + 1;
 };
 
 // 더보기/접기 토글
@@ -106,17 +106,14 @@ const toggleShowAll = () => {
   showAllCategories.value = !showAllCategories.value;
 };
 
-// 카테고리 리스트 아이템 클릭 핸들러
-const handleCategoryDetailClick = (category) => {
-  console.log('카테고리 상세 클릭:', category.name);
-  openCategoryDetail(category);
-};
-
-// 카테고리 상세보기 열기
-const openCategoryDetail = (category) => {
+// 카테고리 클릭 핸들러 (도넛 차트 & 리스트 공통)
+const handleCategoryClick = (category) => {
   selectedCategoryData.value = category;
   showCategoryDetail.value = true;
 };
+
+// 리스트에서 카테고리 클릭 (handleCategoryClick과 동일하므로 통합)
+const handleCategoryDetailClick = handleCategoryClick;
 
 // 카테고리 상세보기 닫기
 const closeCategoryDetail = () => {
