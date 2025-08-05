@@ -36,7 +36,7 @@ const fetchPolicy = async () => {
       headers,
     });
 
-    console.log("✅ API 응답 데이터:", response.data);
+    console.log("API 응답 데이터:", response.data);
     const data = response.data;
 
     shareInfo.value = {
@@ -57,8 +57,8 @@ const fetchPolicy = async () => {
             )}`,
     };
 
-    console.log("📦 applyUrl from API:", data.applyUrl);
-    console.log("✅ 공유할 정보:", shareInfo);
+    console.log("applyUrl from API:", data.applyUrl);
+    console.log("공유할 정보:", shareInfo);
   } catch (error) {
     console.error("정책 정보 조회 실패:", error);
   }
@@ -69,7 +69,8 @@ onMounted(() => {
 
   const initKakao = () => {
     if (!window.Kakao.isInitialized()) {
-      window.Kakao.init("0c226f7ea07bd313970742ed31d007dd"); // 환경변수로 이동 권장
+      const KAKAO_KEY = import.meta.env.VITE_KAKAO_API_KEY;
+      window.Kakao.init(KAKAO_KEY);
     }
   };
 
@@ -111,7 +112,7 @@ const sendKakao = () => {
       title: info.title,
       description: info.description,
       amount: info.amount,
-      link: info.url,
+      policy_id: props.policyId,
     },
   });
 };

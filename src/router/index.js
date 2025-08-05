@@ -194,6 +194,14 @@ const router = createRouter({
 
 // 인증 가드
 router.beforeEach(async (to, from, next) => {
+  // const isPolicyDetailPage = /^\/policy\/\d+$/.test(to.path);
+  const isPolicyDetailPage = to.name === "policyDetail";
+
+  // ✅ 상세 페이지는 무조건 접근 허용
+  if (isPolicyDetailPage) {
+    return next(); // 🔥 여기가 핵심
+  }
+
   // 🛠️ 제승 추가: 정책 메인 접근 전 조건 체크 네비게이션 가드
   if (to.path === "/policy" || to.path === "/policy/main") {
     try {
@@ -231,7 +239,7 @@ router.beforeEach(async (to, from, next) => {
     "/findIdResult",
     "/findIdCode",
     "/policyDetail",
-  ]; // 정책 공유 관련 페이지 오픈
+  ];
 
   const authRequired = !publicPages.includes(to.path);
 
