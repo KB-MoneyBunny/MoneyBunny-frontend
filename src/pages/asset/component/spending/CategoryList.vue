@@ -72,7 +72,6 @@ const handleCategoryClick = (category) => {
   border-radius: 12px;
   padding: 20px;
   margin-top: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .show-more-section {

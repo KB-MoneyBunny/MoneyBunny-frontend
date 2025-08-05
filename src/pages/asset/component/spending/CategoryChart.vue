@@ -8,7 +8,7 @@
 
     <!-- 데이터가 없을 때 -->
     <div v-if="isEmpty" class="no-data">
-      <p class="no-data-text">지출 데이터가 없습니다</p>
+      <p class="no-data-text">지출 내역이 없습니다</p>
     </div>
 
     <!-- 차트 컨테이너 -->
@@ -83,7 +83,7 @@ const getBarColor = (month) => {
   background: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
   margin-top: 1.5rem;
 }
 

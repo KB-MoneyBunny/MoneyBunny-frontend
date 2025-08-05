@@ -77,8 +77,7 @@ onMounted(() => {
 .calendar-section {
   background: white;
   border-radius: 0.75rem;
-  padding: 1rem 1.5rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 1rem;
 }
 
 .calendar-header {
@@ -90,12 +89,12 @@ onMounted(() => {
 .calendar-nav-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--base-blue-dark);
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  padding: 0.375rem;
+  border-radius: 0.25rem;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,11 +106,11 @@ onMounted(() => {
 
 .calendar-nav-btn:active {
   background-color: var(--input-bg-1);
-  transform: scale(0.95);
+  transform: scale(0.9);
 }
 
 .calendar-title {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-login);
   margin: 0;
