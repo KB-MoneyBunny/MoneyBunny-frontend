@@ -10,12 +10,14 @@ import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 import LoginPage from '@/pages/auth/LoginPage.vue';
 import FindIdPage from '@/pages/auth/FindIdPage.vue';
 import FindPasswordPage from '@/pages/auth/FindPasswordPage.vue';
-import SignUpEmailVerifyPage from '@/pages/auth/SignUpEmailVerifyPage.vue';
+import SignUpEmailRequestPage from '@/pages/auth/SignUpEmailRequestPage.vue';
 import SignUpProfilePage from '@/pages/auth/SignUpProfilePage.vue';
 import FindIdResultPage from '@/pages/auth/FindIdResultPage.vue';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage.vue';
 import AttendanceCheckModal from '@/pages/auth/AttendanceCheckModal.vue';
 import FindIdCodePage from '@/pages/auth/FindIdCodePage.vue';
+import FindPasswordCodePage from '@/pages/auth/FindPasswordCodePage.vue';
+import SignUpEmailCodePage from '@/pages/auth/SignUpEmailCodePage.vue';
 
 //
 // ─── 마이페이지 관련 ──────────────────────────────────
@@ -23,6 +25,8 @@ import MypageMain from '@/pages/mypage/MypageMain.vue';
 import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
 import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
 import PolicyRetestPage from '@/pages/mypage/settings/PolicyRetestPage.vue';
+// 💪(상일) 알림 설정 페이지 import
+import NotificationSettings from '@/pages/mypage/settings/NotificationSettings.vue';
 
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
@@ -52,9 +56,9 @@ const routes = [
   { path: '/findId', name: 'findId', component: FindIdPage },
   { path: '/findPassword', name: 'findPassword', component: FindPasswordPage },
   {
-    path: '/signUpEmailVerify',
-    name: 'signUpEmailVerify',
-    component: SignUpEmailVerifyPage,
+    path: '/signUpEmailRequest',
+    name: 'signUpEmailRequest',
+    component: SignUpEmailRequestPage,
   },
   {
     path: '/signUpProfile',
@@ -76,6 +80,21 @@ const routes = [
     path: '/findIdCode',
     name: 'findIdCode',
     component: FindIdCodePage,
+  },
+  {
+    path: '/findPasswordCode',
+    name: 'findPasswordCode',
+    component: FindPasswordCodePage,
+  },
+  {
+    path: '/resetPassword',
+    name: 'resetPassword',
+    component: ResetPasswordPage,
+  },
+  {
+    path: '/signUpEmailCode',
+    name: 'signUpEmailCode',
+    component: SignUpEmailCodePage,
   },
   //
   // ─── 마이페이지 ─────────────────────────────────────
@@ -119,6 +138,14 @@ const routes = [
         path: 'mypage/settings/policy',
         name: 'myPageSettingsPolicy',
         component: PolicyRetestPage,
+      },
+      // 💪(상일) 알림 설정 라우트 추가
+      {
+        path: 'notification',
+        name: 'notification',
+        path: 'mypage/settings/notification',
+        name: 'notificationSettings',
+        component: NotificationSettings,
       },
       {
         path: 'notification',
@@ -232,8 +259,8 @@ router.beforeEach(async (to, from, next) => {
   // 👸🏻 은진
   if (authRequired && !authStore.isLogin) {
     // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-    console.log("인증되지 않은 접근 - 로그인 페이지로 리다이렉트");
-    return next({ path: "/", query: { error: "auth_required" } });
+    console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
+    return next({ path: '/', query: { error: 'auth_required' } });
   }
 
   if (to.path === '/' && authStore.isLogin) {
