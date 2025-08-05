@@ -20,7 +20,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 
@@ -31,7 +30,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:selectedDate']);
+const emit = defineEmits(['update:selectedDate', 'month-change']); // month-change 이벤트 추가
 
 const currentDate = ref(new Date()); // 현재 날짜로 자동 초기화
 
@@ -49,23 +48,28 @@ const formatDate = (date) => {
   return `${month}월 ${year}년`;
 };
 
+// 이전 달 이동
 const previousMonth = () => {
   const newDate = new Date(currentDate.value);
   newDate.setMonth(newDate.getMonth() - 1);
   currentDate.value = newDate;
   emit('update:selectedDate', newDate);
+  emit('month-change', newDate.getMonth() + 1); // ✅ 추가
 };
 
+// 다음 달 이동
 const nextMonth = () => {
   const newDate = new Date(currentDate.value);
   newDate.setMonth(newDate.getMonth() + 1);
   currentDate.value = newDate;
   emit('update:selectedDate', newDate);
+  emit('month-change', newDate.getMonth() + 1);
 };
 
 // 컴포넌트 마운트시 부모에게 초기 날짜 전달
 onMounted(() => {
   emit('update:selectedDate', currentDate.value);
+  emit('month-change', currentDate.value.getMonth() + 1);
 });
 </script>
 

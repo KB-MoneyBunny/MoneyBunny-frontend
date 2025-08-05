@@ -20,7 +20,7 @@
           class="chart-bar"
           :style="{
             height: `${getBarHeight(value)}%`,
-            backgroundColor: getBarColor(index),
+            backgroundColor: getBarColor(parseInt(chartData.months[index])), // ✅ 월 값 사용
           }"
         ></div>
       </div>
@@ -47,31 +47,33 @@ const props = defineProps({
     required: true,
     default: () => ({ months: [], amounts: [] }),
   },
+  selectedMonth: {
+    // ✅ 추가
+    type: Number,
+    required: true,
+  },
 });
 
-// 차트 데이터 (간단화)
 const chartData = computed(() => props.monthlyTrendData);
 
-// 데이터가 비어있는지 확인
-const isEmpty = computed(() =>
-  chartData.value.amounts.every((val) => val === 0)
-);
+const isEmpty = computed(() => {
+  const amounts = chartData.value.amounts || [];
+  return amounts.length === 0 || amounts.every((val) => val === 0);
+});
 
-// 최대값 계산
-const maxValue = computed(() => Math.max(...chartData.value.amounts, 1));
+const maxValue = computed(() => {
+  const amounts = chartData.value.amounts || [];
+  return Math.max(...amounts, 1);
+});
 
-// 바 높이 계산
 const getBarHeight = (value) => {
-  if (value === 0) return 2; // 최소 높이
+  if (!value || value === 0) return 2;
   return Math.max((value / maxValue.value) * 100, 2);
 };
 
-// 바 색상 계산 (현재 월 강조)
-const getBarColor = (index) => {
-  const currentMonth = new Date().getMonth() + 1;
-  const barMonth = parseInt(chartData.value.months[index].replace('월', ''));
-
-  return barMonth === currentMonth
+// ✅ 실제 월과 selectedMonth 비교
+const getBarColor = (month) => {
+  return month === props.selectedMonth
     ? 'var(--base-blue-dark)'
     : 'var(--base-blue-light)';
 };
@@ -82,7 +84,7 @@ const getBarColor = (index) => {
   background: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
-
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   margin-top: 1.5rem;
 }
 

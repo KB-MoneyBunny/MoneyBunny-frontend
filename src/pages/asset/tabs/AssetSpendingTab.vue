@@ -16,6 +16,7 @@
     <CalendarSection
       :selected-date="currentDate"
       @update:selectedDate="updateSelectedDate"
+      @month-change="handleMonthChange"
     />
 
     <!-- 도넛 차트 -->
@@ -34,7 +35,10 @@
     />
 
     <!-- 월별 지출 추이 차트 -->
-    <CategoryChart :monthly-trend-data="monthlyTrendData" />
+    <CategoryChart
+      :monthly-trend-data="monthlyTrendData"
+      :selected-month="selectedMonth"
+    />
 
     <!-- 카테고리 상세보기 모달 -->
     <DetailModal :visible="showCategoryDetail" @close="closeCategoryDetail">
@@ -76,6 +80,12 @@ const showAllCategories = ref(false);
 const showCategoryDetail = ref(false);
 const selectedCategoryData = ref(null);
 
+// 추가: 월 상태와 핸들러
+const selectedMonth = ref(currentDate.value.getMonth() + 1);
+const handleMonthChange = (month) => {
+  selectedMonth.value = month;
+};
+
 // 전월 대비 텍스트 계산
 const comparisonText = computed(() => {
   const { difference, rate, isIncrease } = monthComparison.value;
@@ -94,15 +104,6 @@ const updateSelectedDate = (newDate) => {
 // 더보기/접기 토글
 const toggleShowAll = () => {
   showAllCategories.value = !showAllCategories.value;
-};
-
-// 도넛 차트 카테고리 클릭 핸들러
-const handleCategoryClick = (categoryIndex) => {
-  const category = categoryList.value[categoryIndex];
-  if (category) {
-    console.log('도넛 차트 카테고리 클릭:', category.name);
-    openCategoryDetail(category);
-  }
 };
 
 // 카테고리 리스트 아이템 클릭 핸들러
