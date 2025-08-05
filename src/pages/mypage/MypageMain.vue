@@ -32,7 +32,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useBookmarkStore } from '@/stores/bookmark';
 
 // 컴포넌트 import
 import MypageProfileCard from './common/MypageProfileCard.vue';
@@ -59,7 +61,10 @@ const userInfo = ref({
   profileImage: imgBeard,
 });
 
-const bookmarks = ref([]);
+// 💪(상일) 북마크 스토어 연동
+const bookmarkStore = useBookmarkStore();
+const { bookmarks, loading: bookmarkLoading, error: bookmarkError } = storeToRefs(bookmarkStore);
+const { fetchBookmarks } = bookmarkStore;
 
 const openModal = () => {
   isModalOpen.value = true;
@@ -67,11 +72,21 @@ const openModal = () => {
 
 const changeTab = (tab) => {
   currentTab.value = tab;
+  
+  // 💪(상일) 북마크 탭으로 전환 시 데이터 로드
+  if (tab === 'bookmark' && bookmarks.value.length === 0) {
+    fetchBookmarks();
+  }
 };
 
 const handleUpdate = (data) => {
   userInfo.value = { ...userInfo.value, ...data };
 };
+
+// 💪(상일) 컴포넌트 마운트 시 북마크 데이터 미리 로드
+onMounted(async () => {
+  await fetchBookmarks();
+});
 </script>
 
 <style scoped>

@@ -23,6 +23,8 @@ import MypageMain from "@/pages/mypage/MypageMain.vue";
 import SettingMain from "@/pages/mypage/settings/SettingMain.vue";
 import ChangePassword from "@/pages/mypage/settings/ChangePassword.vue";
 import PolicyRetestPage from "@/pages/mypage/settings/PolicyRetestPage.vue";
+// 💪(상일) 알림 설정 페이지 import
+import NotificationSettings from "@/pages/mypage/settings/NotificationSettings.vue";
 
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
@@ -119,6 +121,12 @@ const routes = [
         path: "mypage/settings/policy",
         name: "myPageSettingsPolicy",
         component: PolicyRetestPage,
+      },
+      // 💪(상일) 알림 설정 라우트 추가
+      {
+        path: "mypage/settings/notification",
+        name: "notificationSettings",
+        component: NotificationSettings,
       },
       {
         path: "notification",

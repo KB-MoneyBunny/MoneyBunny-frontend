@@ -22,9 +22,8 @@
       <p>불러오는 중...</p>
     </div>
 
-    <!-- 목록 -->
+    <!-- 계좌/카드 목록 -->
     <div v-else class="items">
-      <!-- 목록 헤더 -->
       <div class="items-header">
         <p class="items-title">
           {{ type === 'account' ? '계좌를 선택하세요' : '카드를 선택하세요' }}
@@ -38,7 +37,6 @@
         </button>
       </div>
 
-      <!-- 아이템 목록 -->
       <div
         v-for="item in items"
         :key="item.id"
@@ -49,7 +47,9 @@
         <div class="info">
           <div class="item-name">{{ item.name }}</div>
           <div class="item-number">{{ item.number }}</div>
-          <div class="item-balance">{{ formatMoney(item.balance) }}</div>
+          <div class="item-balance" v-if="type === 'account'">
+            {{ formatMoney(item.balance) }}
+          </div>
         </div>
         <div
           class="checkbox"
@@ -59,7 +59,6 @@
         </div>
       </div>
 
-      <!-- 선택 정보 -->
       <div v-if="selectedItems.length > 0" class="selection-info">
         <span>{{ selectedItems.length }}개 선택됨</span>
       </div>
@@ -81,14 +80,20 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import {
+  connectAccount,
+  registerAccounts,
+  connectCard,
+  registerCards,
+} from '@/api/assetApi';
 import { getBankLogo } from '@/assets/utils/bankLogoMap.js';
 import { getCardLogo } from '@/assets/utils/cardLogoMap.js';
 
 const props = defineProps({
   type: String,
   institutionInfo: Object,
+  preloadedItems: { type: Array, default: () => [] }, // 1단계에서 받아온 목록
 });
-
 const emit = defineEmits(['back', 'close', 'items-selected']);
 
 const items = ref([]);
@@ -100,86 +105,109 @@ const isAllSelected = computed(
     items.value.length > 0 && selectedItems.value.length === items.value.length
 );
 
-const getLogo = () => {
-  return props.type === 'account'
+const getLogo = () =>
+  props.type === 'account'
     ? getBankLogo(props.institutionInfo.institutionName)
     : getCardLogo(props.institutionInfo.institutionName);
-};
 
-const formatMoney = (amount) => {
-  return new Intl.NumberFormat('ko-KR').format(amount) + '원';
-};
+const formatMoney = (amount) =>
+  new Intl.NumberFormat('ko-KR').format(amount) + '원';
 
 const toggleSelection = (itemId) => {
-  const index = selectedItems.value.indexOf(itemId);
-  if (index > -1) {
-    selectedItems.value.splice(index, 1);
-  } else {
-    selectedItems.value.push(itemId);
-  }
+  const idx = selectedItems.value.indexOf(itemId);
+  if (idx > -1) selectedItems.value.splice(idx, 1);
+  else selectedItems.value.push(itemId);
 };
 
 const toggleSelectAll = () => {
-  if (isAllSelected.value) {
+  if (isAllSelected.value) selectedItems.value = [];
+  else selectedItems.value = items.value.map((item) => item.id);
+};
+
+// 1. onMounted에서 preloadedItems 우선 사용, 없으면 loadItems 실행
+onMounted(() => {
+  if (props.preloadedItems && props.preloadedItems.length > 0) {
+    // 이미 데이터 있음: 바로 사용!
+    items.value = props.preloadedItems.map((item, i) => ({
+      ...item,
+      id: item.accountNumber || item.cardMaskedNumber || item.id || `item-${i}`,
+      name: item.accountName || item.cardName,
+      number: item.accountNumber || item.cardMaskedNumber,
+      balance: item.balance || 0,
+      raw: item,
+    }));
+    console.log('🔥 [SelectItemsStep] items:', items.value);
+    isLoading.value = false;
+  } else {
+    // 실수로 preloadedItems 없거나, 새로고침 등 예외 → API로 재호출
+    loadItems();
+  }
+});
+
+// 2. 만약 다시 API로 직접 목록 불러야 할 때 (예외/테스트용)
+async function loadItems() {
+  isLoading.value = true;
+  try {
+    let res;
+    if (props.type === 'account') {
+      res = await connectAccount({
+        organization: props.institutionInfo.institutionCode,
+        loginId: props.institutionInfo.loginId,
+        password: props.institutionInfo.password,
+      });
+      items.value = res.data.map((item, i) => ({
+        ...item,
+        id: item.accountNumber || item.id || `acc-${i}`,
+        name: item.accountName,
+        number: item.accountNumber,
+        balance: item.balance,
+        raw: item,
+      }));
+    } else {
+      res = await connectCard({
+        organization: props.institutionInfo.institutionCode,
+        loginId: props.institutionInfo.loginId,
+        password: props.institutionInfo.password,
+      });
+      items.value = res.data.map((item, i) => ({
+        ...item,
+        id: item.cardMaskedNumber || item.id || `card-${i}`,
+        name: item.cardName,
+        number: item.cardMaskedNumber,
+        balance: 0,
+        raw: item,
+      }));
+    }
+  } catch (e) {
+    alert('목록을 불러오는 데 실패했습니다.');
+    items.value = [];
+  } finally {
+    isLoading.value = false;
     selectedItems.value = [];
-  } else {
-    selectedItems.value = items.value.map((item) => item.id);
   }
-};
+}
 
-const loadItems = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  if (props.type === 'account') {
-    items.value = [
-      {
-        id: 'acc1',
-        name: '주거래 통장',
-        number: '110-123-456789',
-        balance: 15420000,
-      },
-      {
-        id: 'acc2',
-        name: '적금 통장',
-        number: '110-987-654321',
-        balance: 8500000,
-      },
-    ];
-  } else {
-    items.value = [
-      {
-        id: 'card1',
-        name: '신용카드',
-        number: '5211****1002',
-        balance: 210000,
-      },
-      {
-        id: 'card2',
-        name: '체크카드',
-        number: '5211****2003',
-        balance: 150000,
-      },
-    ];
-  }
-
-  isLoading.value = false;
-};
-
-const submit = () => {
+// 3. 선택 후 등록/추가 (등록 API 호출)
+const submit = async () => {
   if (selectedItems.value.length === 0) return;
-
   const selectedData = items.value.filter((item) =>
     selectedItems.value.includes(item.id)
   );
-
-  emit('items-selected', {
-    institutionInfo: props.institutionInfo,
-    selectedItems: selectedData,
-    type: props.type,
-  });
+  try {
+    if (props.type === 'account') {
+      await registerAccounts(selectedData.map((item) => item.raw));
+    } else {
+      await registerCards(selectedData.map((item) => item.raw));
+    }
+    emit('items-selected', {
+      institutionInfo: props.institutionInfo,
+      selectedItems: selectedData,
+      type: props.type,
+    });
+  } catch (e) {
+    alert('등록 중 오류! 다시 시도해 주세요.');
+  }
 };
-
-onMounted(loadItems);
 </script>
 
 <style scoped>

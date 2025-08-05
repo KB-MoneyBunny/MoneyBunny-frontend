@@ -43,11 +43,16 @@ const displayNumber = computed(() =>
   props.type === 'card' ? props.data.cardMaskedNumber : props.data.accountNumber
 );
 
-const formattedBalance = computed(() =>
-  props.data.amount
-    ? props.data.amount.toLocaleString()
-    : props.data.balance.toLocaleString()
-);
+const formattedBalance = computed(() => {
+  // 카드면 thisMonthUsed → 없으면 amount → 없으면 0
+  if (props.type === 'card') {
+    const used = props.data.thisMonthUsed ?? props.data.amount ?? 0;
+    return used.toLocaleString();
+  }
+  // 계좌면 balance → 없으면 amount → 없으면 0
+  const bal = props.data.balance ?? props.data.amount ?? 0;
+  return bal.toLocaleString();
+});
 </script>
 
 <style scoped>

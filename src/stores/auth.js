@@ -73,9 +73,40 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   // 로그아웃 액션
-  const logout = () => {
-    localStorage.clear(); // localStorage 완전 삭제
-    state.value = { ...initState }; // 상태를 초기값으로 리셋
+  // 🎵(유정)
+  const logout = async () => {
+    console.log('[Logout] 로그아웃 시작');
+
+    load(); // 상태 복원 시도
+    console.log('[Logout] 로컬 상태 복원 완료:', state.value);
+
+    try {
+      const token = state.value.token;
+      if (token) {
+        console.log('[Logout] 백엔드 로그아웃 요청 전송...');
+        await axios.post(
+          '/api/auth/logout',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log('[Logout] 백엔드 로그아웃 완료');
+      } else {
+        console.warn('[Logout] 토큰이 없어 백엔드 로그아웃 생략');
+      }
+    } catch (err) {
+      console.warn(
+        '[Logout] 백엔드 로그아웃 실패:',
+        err.response?.data || err.message
+      );
+    } finally {
+      localStorage.clear();
+      state.value = { ...initState };
+      console.log('[Logout] 로컬 상태 및 localStorage 초기화 완료');
+    }
   };
 
   // 토큰 얻어오기 액션
