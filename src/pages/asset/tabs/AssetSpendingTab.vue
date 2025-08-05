@@ -1,121 +1,153 @@
+<!-- src/pages/asset/tabs/AssetSpendingTab.vue -->
 <template>
-  <div class="spending-tab">
-    <!-- 월 선택 -->
-    <MonthSelector v-model="selectedMonth" />
+  <div class="asset-spending-tab">
+    <!-- 일반 지출 탭 화면 -->
+    <!-- 상단 지출 요약 카드 -->
+    <SummaryCard
+      title="이번 달 총 지출액"
+      :main-amount="totalSpending"
+      right-label="지난달 대비"
+      :right-value="comparisonText"
+      right-unit=""
+      variant="spending"
+    />
 
-    <!-- 총 지출 카드 (상위 카드 포함) -->
-    <SpendingSummary :total="totalSpending" :top-cards="cardSpendings" />
+    <!-- 월별 네비게이션 -->
+    <CalendarSection
+      :selected-date="currentDate"
+      @update:selectedDate="updateSelectedDate"
+    />
 
-    <!-- 지출 내역 -->
-    <div class="section-header">
-      <h3 class="section-title">지출 내역</h3>
-      <button class="view-all-btn">전체보기</button>
-    </div>
+    <!-- 도넛 차트 -->
+    <CategoryDonutChart
+      :total-spending="totalSpending"
+      :chart-data="chartData"
+      @category-click="handleCategoryClick"
+    />
 
-    <!-- 거래 내역이 있을 때 -->
-    <div v-if="recentTransactions.length > 0">
-      <SpendingTransactionList :transactions="recentTransactions" />
-    </div>
+    <!-- 카테고리 리스트 -->
+    <CategoryList
+      :categories="categoryList"
+      :show-all="showAllCategories"
+      @toggle-show-all="toggleShowAll"
+      @category-click="handleCategoryDetailClick"
+    />
 
-    <!-- 거래 내역이 없을 때 -->
-    <div v-else>
-      <SpendingNodata />
-    </div>
+    <!-- 월별 지출 추이 차트 -->
+    <CategoryChart :spending-data="monthlyTrendChartData" />
+
+    <!-- 카테고리 상세보기 모달 -->
+    <DetailModal :visible="showCategoryDetail" @close="closeCategoryDetail">
+      <CategoryDetailView
+        v-if="selectedCategoryData"
+        :category-data="selectedCategoryData"
+        @back="closeCategoryDetail"
+      />
+    </DetailModal>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import MonthSelector from '@/pages/asset/component/spending/MonthSelector.vue';
-import SpendingSummary from '@/pages/asset/component/spending/SpendingSummary.vue';
-import SpendingTransactionList from '@/pages/asset/component/spending/SpendingTransactionList.vue';
-import SpendingNodata from '@/pages/asset/component/spending/SpendingNodata.vue';
-import cardCodeMap from '@/assets/utils/cardCodeMap.js';
-import cardsData from '@/assets/data/cards.json';
+import { ref, computed } from 'vue';
+import { useSpendingData } from '@/assets/utils/useSpendingData';
+import SummaryCard from '../component/common/SummaryCard.vue';
+import CalendarSection from '../component/spending/CalendarSection.vue';
+import CategoryDonutChart from '../component/spending/CategoryDonutChart.vue';
+import CategoryList from '../component/spending/CategoryList.vue';
+import CategoryChart from '../component/spending/CategoryChart.vue';
+import CategoryDetailView from '../component/spending/CategoryDetailView.vue';
+import DetailModal from '../component/common/DetailModal.vue';
 
-const selectedMonth = ref('2025-08');
-const cards = ref([]);
+// 지출 데이터 composable 사용
+const {
+  currentDate,
+  totalSpending,
+  monthComparison,
+  categoryList,
+  chartData,
+  monthlyTrendData,
+  previousMonth,
+  nextMonth,
+  getCategoryDetail,
+} = useSpendingData();
 
-// 초기 카드 데이터 로드
-onMounted(() => {
-  cards.value = cardsData;
+// 로컬 상태
+const showAllCategories = ref(false);
+const showCategoryDetail = ref(false);
+const selectedCategoryData = ref(null);
+
+// 전월 대비 텍스트 계산
+const comparisonText = computed(() => {
+  const { difference, rate, isIncrease } = monthComparison.value;
+  const sign = isIncrease ? '+' : '';
+  const percentage = Math.abs(rate);
+
+  return `${sign}${difference.toLocaleString()}원(${sign}${percentage}%)`;
 });
 
-// 총 지출 계산 (실제 거래 내역 기준)
-const totalSpending = computed(() => {
-  return cards.value.reduce((sum, card) => {
-    const cardTransactionSum =
-      card.cardTransactions?.reduce(
-        (cardSum, transaction) => cardSum + transaction.amount,
-        0
-      ) || 0;
-    return sum + cardTransactionSum;
-  }, 0);
+// 월별 추이 차트용 데이터 변환 (CategoryChart 컴포넌트에 맞게)
+const monthlyTrendChartData = computed(() => {
+  const { months, amounts } = monthlyTrendData.value;
+
+  return months.map((month, index) => ({
+    date: month.replace('월', '.1'), // "8월" -> "8.1" 형식으로 변환
+    price: amounts[index],
+    category: '지출',
+    memo: '월별 지출',
+  }));
 });
 
-// 카드별 지출 데이터 (거래 내역 기준으로 정렬)
-const cardSpendings = computed(() => {
-  return cards.value
-    .map((card) => {
-      const cardSpending =
-        card.cardTransactions?.reduce(
-          (sum, transaction) => sum + transaction.amount,
-          0
-        ) || 0;
-      return {
-        cardName: cardCodeMap[card.issuerCode] || card.cardName,
-        cardNumber: card.cardMaskedNumber.slice(-4),
-        amount: cardSpending,
-        cardImage: card.cardImage,
-      };
-    })
-    .filter((card) => card.amount > 0)
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 3);
-});
+// 월별 네비게이션 업데이트 핸들러
+const updateSelectedDate = (newDate) => {
+  // useSpendingData의 currentDate 직접 업데이트
+  currentDate.value = newDate;
+};
 
-// 최근 거래 내역
-const recentTransactions = computed(() => {
-  const allTransactions = [];
-  cards.value.forEach((card) => {
-    if (card.cardTransactions && card.cardTransactions.length > 0) {
-      card.cardTransactions.forEach((transaction) => {
-        allTransactions.push({
-          ...transaction,
-          cardName: card.cardName,
-          cardImage: card.cardImage,
-        });
-      });
-    }
-  });
+// 더보기/접기 토글
+const toggleShowAll = () => {
+  showAllCategories.value = !showAllCategories.value;
+};
 
-  return allTransactions
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5);
-});
+// 도넛 차트 카테고리 클릭 핸들러
+const handleCategoryClick = (categoryIndex) => {
+  const category = categoryList.value[categoryIndex];
+  if (category) {
+    console.log('도넛 차트 카테고리 클릭:', category.name);
+    openCategoryDetail(category);
+  }
+};
+
+// 카테고리 리스트 아이템 클릭 핸들러
+const handleCategoryDetailClick = (category) => {
+  console.log('카테고리 상세 클릭:', category.name);
+  openCategoryDetail(category);
+};
+
+// 카테고리 상세보기 열기
+const openCategoryDetail = (category) => {
+  selectedCategoryData.value = category;
+  showCategoryDetail.value = true;
+};
+
+// 카테고리 상세보기 닫기
+const closeCategoryDetail = () => {
+  showCategoryDetail.value = false;
+  selectedCategoryData.value = null;
+};
 </script>
 
 <style scoped>
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-login);
+.asset-spending-tab {
+  padding: 0;
   margin: 0;
 }
 
-.view-all-btn {
-  background: none;
-  border: none;
-  color: var(--text-bluegray);
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: 400;
+/* 각 섹션 간 간격 */
+.asset-spending-tab > * {
+  margin-bottom: 1rem;
+}
+
+.asset-spending-tab > *:last-child {
+  margin-bottom: 0;
 }
 </style>
