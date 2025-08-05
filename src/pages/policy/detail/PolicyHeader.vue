@@ -1,13 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import api from '@/api';
+import { ref, onMounted } from "vue";
+import api from "@/api";
 
-import ShareModal from './ShareModal.vue';
-import PolicyApplyModal from '../component/PolicyApplyModal.vue';
-
-import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
-import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
-import shareIcon from '@/assets/images/icons/policy/share.png';
+import ShareModal from "./ShareModal.vue";
+import PolicyApplyModal from "../component/PolicyApplyModal.vue";
+import bookmarkBefore from "@/assets/images/icons/policy/bookmark_before.png";
+import bookmarkAfter from "@/assets/images/icons/policy/bookmark_after.png";
+import shareIcon from "@/assets/images/icons/policy/share.png";
 
 const props = defineProps({
   policy: {
@@ -36,7 +35,7 @@ const policyId = props.policy?.id || props.policy?.policyId;
 // 북마크 상태 조회
 async function fetchBookmarkStatus() {
   try {
-    const res = await api.get('/api/policy-interaction/bookmark/list');
+    const res = await api.get("/api/policy-interaction/bookmark/list");
     const list = res.data || [];
     bookmark.value = list.some(
       (item) => item.id === policyId || item.policyId === policyId
@@ -113,7 +112,12 @@ function closeApplyModal() {
         공유하기
       </button>
     </div>
-    <ShareModal v-if="showModal" @close="showModal = false" />
+    <!-- 공유버튼에 policyId 넘겨주기 -->
+    <ShareModal
+      v-if="showModal"
+      :policyId="policy.policyId"
+      @close="showModal = false"
+    />
   </div>
 
   <PolicyApplyModal
