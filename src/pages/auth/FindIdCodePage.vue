@@ -92,66 +92,75 @@ const formattedTime = computed(() => {
 </script>
 <template>
   <div class="codeContainer">
-    <div class="card">
-      <div class="title font-26 font-extrabold">MoneyBunny</div>
-      <p class="subtitle font-14">인증코드를 입력해주세요</p>
+    <div class="cardBox">
+      <img
+        src="@/assets/images/icons/signup/login_main.png"
+        alt="login-bunny"
+        class="bunnyImage"
+      />
+      <div class="card">
+        <div class="title font-26 font-extrabold">MoneyBunny</div>
+        <p class="subtitle font-14">인증코드를 입력해주세요</p>
 
-      <!-- 에러 메시지 표시 -->
-      <div v-if="errorMsg" class="errorMessage font-13">
-        {{ errorMsg }}
-      </div>
-
-      <div class="formGroup">
-        <label class="font-14 font-bold" for="email">이메일</label>
-        <input
-          id="email"
-          type="email"
-          placeholder="이메일을 입력하세요"
-          class="input"
-          v-model="email"
-        />
-      </div>
-
-      <div class="formGroup">
-        <label class="font-14 font-bold" for="code">인증코드</label>
-        <div class="inputRow">
-          <input
-            id="code"
-            type="text"
-            placeholder="인증코드를 입력하세요"
-            class="input"
-            v-model="code"
-            style="flex: 1"
-          />
-          <span
-            class="timer font-12"
-            :style="{
-              color:
-                timeLeft < 30 ? 'var(--alert-strong)' : 'var(--base-blue-dark)',
-            }"
-          >
-            {{ formattedTime }}
-          </span>
+        <!-- 에러 메시지 표시 -->
+        <div v-if="errorMsg" class="errorMessage font-13">
+          {{ errorMsg }}
         </div>
-      </div>
 
-      <button
-        class="submitButton font-15"
-        @click="verify"
-        :disabled="isExpired"
-        :class="{ expired: isExpired }"
-      >
-        {{ isExpired ? '인증 만료' : '인증하기' }}
-      </button>
+        <div class="formGroup">
+          <label class="font-14 font-bold" for="email">이메일</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="이메일을 입력하세요"
+            class="input"
+            v-model="email"
+          />
+        </div>
 
-      <div class="loginLink font-12">
-        <a href="/findPassword">비밀번호 찾기</a>
-        <span>|</span>
-        <a href="/">로그인</a>
-      </div>
+        <div class="formGroup">
+          <label class="font-14 font-bold" for="code">인증코드</label>
+          <div class="inputRow">
+            <input
+              id="code"
+              type="text"
+              placeholder="인증코드를 입력하세요"
+              class="input"
+              v-model="code"
+              style="flex: 1"
+            />
+            <span
+              class="timer font-12"
+              :style="{
+                color:
+                  timeLeft < 30
+                    ? 'var(--alert-strong)'
+                    : 'var(--base-blue-dark)',
+              }"
+            >
+              {{ formattedTime }}
+            </span>
+          </div>
+        </div>
 
-      <div class="signupLink font-12">
-        계정이 없으신가요? <a href="/signUpEmailVerify">회원가입</a>
+        <button
+          class="submitButton font-15"
+          @click="verify"
+          :disabled="isExpired"
+          :class="{ expired: isExpired }"
+        >
+          {{ isExpired ? '인증 만료' : '인증하기' }}
+        </button>
+
+        <div class="loginLink font-12">
+          <a href="/findPassword">비밀번호 찾기</a>
+          <span>|</span>
+          <a href="/">로그인</a>
+        </div>
+
+        <div class="signupLink font-12">
+          계정이 없으신가요? <a href="/signUpEmailVerify">회원가입</a>
+        </div>
       </div>
     </div>
   </div>
@@ -163,16 +172,36 @@ const formattedTime = computed(() => {
   min-height: 100vh;
   background-color: var(--input-bg-2);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+}
+
+.cardBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+}
+
+.bunnyImage {
+  width: 90px;
+  height: 90px;
+  margin-bottom: -30px;
+  z-index: 2;
 }
 
 .card {
   width: 100%;
-  max-width: 350px;
+  max-width: 360px;
+  min-height: 460px;
   background-color: white;
-  padding: 24px;
-  border-radius: 10px;
+  padding: 32px 24px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
   border: none;
 }
 

@@ -109,7 +109,7 @@ watch(errorMessage, () => {
 
 <template>
   <div class="loginContainer">
-    <div class="loginWrapper">
+    <div class="loginCardBox">
       <img
         src="@/assets/images/icons/signup/login_main.png"
         alt="login-bunny"
@@ -182,18 +182,34 @@ watch(errorMessage, () => {
   min-height: 100vh;
   background-color: var(--input-bg-2);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  /* padding: 24px; */
-  box-sizing: border-box;
+  justify-content: center;
+}
+.loginCardBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+}
+.bunnyImage {
+  width: 90px;
+  height: 90px;
+  margin-bottom: -30px;
+  z-index: 2;
 }
 
 .loginCard {
   width: 100%;
-  max-width: 350px;
+  max-width: 360px;
+  min-height: 460px;
   background-color: white;
-  padding: 24px;
-  border-radius: 10px;
+  padding: 32px 24px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .loginTitle {
@@ -262,41 +278,16 @@ input:focus {
   text-decoration: none;
   margin-left: 10px;
 }
-.loginWrapper {
-  position: relative;
-  width: 100%;
-  max-width: 350px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.bunnyImage {
-  width: 100px;
-  height: auto;
-  position: absolute;
-  top: -35px;
-  z-index: 2;
-}
-
-.loginCard {
-  background-color: white;
-  padding: 24px;
-  border-radius: 16px;
-  margin-top: 40px;
-  width: 100%;
-  box-sizing: border-box;
-}
 
 /* 💪(상일) 에러 메시지 및 로딩 상태 스타일 추가 */
 .errorMessage {
-  background-color: #fee;
-  color: #c33;
+  background-color: var(--alert-light-3);
+  color: var(--alert-red);
   padding: 8px 12px;
   border-radius: 4px;
   margin-bottom: 16px;
   text-align: center;
-  border: 1px solid #fcc;
+  border: 1px solid var(--alert-light-2);
 }
 
 .loginButton:disabled {
