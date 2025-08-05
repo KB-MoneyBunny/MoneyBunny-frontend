@@ -4,7 +4,8 @@
     <DetailInfoCard type="card" :data="cardData" />
     <TransactionList
       type="card"
-      :transactions="cardData.cardTransactions || []"
+      :cardId="cardData.id"
+      @transaction-click="goToDetail"
     />
   </div>
 </template>

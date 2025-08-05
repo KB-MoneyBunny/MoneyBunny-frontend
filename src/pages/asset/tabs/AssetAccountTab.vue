@@ -1,6 +1,6 @@
 <template>
   <div class="account-tab">
-    <!--상단 요약 카드 -->
+    <!-- 상단 요약 카드 -->
     <SummaryCard
       title="총 계좌 잔액"
       :mainAmount="totalBalance"
@@ -8,17 +8,15 @@
       :rightValue="accounts.length"
       rightUnit="개"
     />
-    <!--계좌 데이터 있는 경우-->
+    <div class="account-tab-header"></div>
     <div v-if="accounts.length > 0">
-      <AccountControllerBar @add-account="onAddAccount" />
-      <!-- 계좌 리스트: 정렬 및 대표 설정은 AccountList 내부에서 처리 -->
+      <!-- <AccountControllerBar @add-account="onAddAccount" /> -->
       <AccountList
         :accounts="accounts"
         @delete-account="deleteAccount"
-        @update-accounts="accounts = $event"
+        @update-accounts="onUpdateAccounts"
       />
     </div>
-    <!--데이터가 없는 경우-->
     <div v-else>
       <NoDataCard type="account" @add="onAddAccount" />
     </div>
@@ -26,36 +24,35 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import SummaryCard from '../component/common/SummaryCard.vue';
 import AccountList from '../component/account/AccountList.vue';
 import NoDataCard from '../component/common/NoDataCard.vue';
-import accountsData from '@/assets/data/accounts.json';
 
-const accounts = ref([]); // 계좌 데이터 배열
-const monthlyChange = ref(0); // 이번 달 순입출금 (기본값 0)
-
-// 컴포넌트가 마운트될 때 계좌 데이터 로드
-onMounted(() => {
-  accounts.value = accountsData; // JSON 데이터 로드 후 accounts에 저장
+const props = defineProps({
+  accounts: { type: Array, required: true },
 });
 
-// 총 계좌 잔액 계산 (모든 계좌 balance 합산)
+const emit = defineEmits(['delete-account', 'update-accounts']);
+
+// 총 계좌 잔액 계산
 const totalBalance = computed(() =>
-  accounts.value.reduce((sum, acc) => sum + acc.balance, 0)
+  props.accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0)
 );
 
-// 계좌 삭제 함수
-const deleteAccount = (accountToDelete) => {
-  // 선택된 계좌를 제외하고 배열 갱신
-  accounts.value = accounts.value.filter(
-    (acc) => acc.id !== accountToDelete.id
-  );
+// 계좌 삭제: 부모로 이벤트 전달
+const deleteAccount = (account) => {
+  emit('delete-account', account);
 };
 
-// 계좌 추가 버튼 클릭 시 실행 (추후 모달 연결 예정)
+// 계좌 배열 변경(정렬/대표변경 등): 부모로 이벤트 전달
+const onUpdateAccounts = (accounts) => {
+  emit('update-accounts', accounts);
+};
+
 const onAddAccount = () => {
-  console.log('계좌 추가 모달 열기');
+  // 실제로는 모달/폼 열기 등
+  alert('계좌 추가 기능(모달)!');
 };
 </script>
 

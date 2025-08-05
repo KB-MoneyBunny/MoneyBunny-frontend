@@ -19,10 +19,13 @@ import FindIdCodePage from '@/pages/auth/FindIdCodePage.vue';
 
 //
 // ─── 마이페이지 관련 ──────────────────────────────────
-import MypageMain from '@/pages/mypage/MypageMain.vue';
-import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
-import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
-import PolicyRetestPage from '@/pages/mypage/settings/PolicyRetestPage.vue';
+import MypageMain from "@/pages/mypage/MypageMain.vue";
+import SettingMain from "@/pages/mypage/settings/SettingMain.vue";
+import ChangePassword from "@/pages/mypage/settings/ChangePassword.vue";
+import PolicyRetestPage from "@/pages/mypage/settings/PolicyRetestPage.vue";
+// 💪(상일) 알림 설정 페이지 import
+import NotificationSettings from "@/pages/mypage/settings/NotificationSettings.vue";
+
 
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
@@ -52,24 +55,24 @@ const routes = [
   { path: '/findId', name: 'findId', component: FindIdPage },
   { path: '/findPassword', name: 'findPassword', component: FindPasswordPage },
   {
-    path: '/signUpEmailVerify',
-    name: 'signUpEmailVerify',
+    path: "/signUpEmailVerify",
+    name: "signUpEmailVerify",
     component: SignUpEmailVerifyPage,
   },
   {
-    path: '/signUpProfile',
-    name: 'signUpProfile',
+    path: "/signUpProfile",
+    name: "signUpProfile",
     component: SignUpProfilePage,
   },
   {
-    path: '/resetPassword',
-    name: 'resetPassword',
+    path: "/resetPassword",
+    name: "resetPassword",
     component: ResetPasswordPage,
   },
-  { path: '/findIdResult', name: 'findIdResult', component: FindIdResultPage },
+  { path: "/findIdResult", name: "findIdResult", component: FindIdResultPage },
   {
-    path: '/attendanceCheck',
-    name: 'attendanceCheck',
+    path: "/attendanceCheck",
+    name: "attendanceCheck",
     component: AttendanceCheckModal,
   },
   {
@@ -81,14 +84,14 @@ const routes = [
   // ─── 마이페이지 ─────────────────────────────────────
   { path: '/mypage/settings', name: 'myPageSettings', component: SettingMain },
   {
-    path: '/mypage/settings/changePassword',
-    name: 'changePassword',
+    path: "/mypage/settings/changePassword",
+    name: "changePassword",
     component: ChangePassword,
   },
 
   // ─── 기본 레이아웃 하위 라우트 ─────────
   {
-    path: '/',
+    path: "/",
     component: DefaultLayout,
     children: [
       { path: '', redirect: '/home' },
@@ -119,6 +122,12 @@ const routes = [
         path: 'mypage/settings/policy',
         name: 'myPageSettingsPolicy',
         component: PolicyRetestPage,
+      },
+      // 💪(상일) 알림 설정 라우트 추가
+      {
+        path: "mypage/settings/notification",
+        name: "notificationSettings",
+        component: NotificationSettings,
       },
       {
         path: 'notification',
@@ -230,11 +239,11 @@ router.beforeEach(async (to, from, next) => {
   );
 
   // 👸🏻 은진
-  // if (authRequired && !authStore.isLogin) {
-  //   // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-  //   console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
-  //   return next({ path: '/', query: { error: 'auth_required' } });
-  // }
+  if (authRequired && !authStore.isLogin) {
+    // 로그인이 필요한 페이지인데 로그인하지 않은 경우
+    console.log("인증되지 않은 접근 - 로그인 페이지로 리다이렉트");
+    return next({ path: "/", query: { error: "auth_required" } });
+  }
 
   if (to.path === '/' && authStore.isLogin) {
     // 이미 로그인한 사용자가 로그인 페이지에 접근하는 경우 홈으로 리다이렉트
