@@ -74,7 +74,6 @@ const handleDelete = (event) => {
   isDeleteModalOpen.value = false;
 };
 </script>
-
-<style scoped>
+<style>
 @import '@/assets/styles/item-styles.css';
 </style>
