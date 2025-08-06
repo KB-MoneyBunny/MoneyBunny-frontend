@@ -120,11 +120,11 @@ function parseAccountTransactions(rawList = []) {
   });
 }
 
-// 거래 상세 클릭 핸들러
+// 🥕거래 상세 클릭 핸들러 (수정됨)
 function handleItemClick(item) {
+  console.log('🥕TransactionList에서 클릭 받음:', item); // 디버깅 로그
   emit('transaction-click', item);
 }
-
 // 공통 API 로딩 함수
 async function loadMore() {
   if (loading.value || !hasMore.value) return;
@@ -217,7 +217,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0; /* 간격 대신 border로 구분 */
-  max-height: 420px; /* 적당히! 모바일이면 60~80vh로도 가능 */
+  max-height: 460px; /* 적당히! 모바일이면 60~80vh로도 가능 */
   overflow-y: auto;
   scrollbar-width: none; /* 파이어폭스 */
 }
