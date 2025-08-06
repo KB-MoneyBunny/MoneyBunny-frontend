@@ -80,7 +80,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
-import api from '@/api';
+import { policyAPI } from '@/api/policy';
 
 import EditEducationModal from '../modals/EditEducationModal.vue';
 import EditMajorModal from '../modals/EditMajorModal.vue';
@@ -120,7 +120,7 @@ const priorityOptions = ['금액', '만료일', '조회수'];
 // 서버에서 초기값 받아오기
 onMounted(async () => {
   try {
-    const { data } = await api.get('/api/userPolicy');
+    const { data } = await policyAPI.getUserPolicy();
     originalData.value = data; // 전체 데이터 저장
     summary.value = {
       학력: codeToLabel(educationLevelCodeMap, data.educationLevels?.[0] || ''),
@@ -188,16 +188,15 @@ const save = async () => {
     ],
     ...rankObj,
   };
-  await api.put('/api/userPolicy', payload);
+  await policyAPI.saveUserPolicy(payload);
   router.push({ name: 'mypage' });
 };
 
 const redoQuiz = async () => {
   try {
-    await api.delete('/api/userPolicy');
+    await policyAPI.deleteUserPolicy();
     router.push({ path: '/policy' });
   } catch (e) {
-    // 실패 시 기존 동작(폼 이동) 유지
     router.push({ path: '/policy' });
   }
 };
