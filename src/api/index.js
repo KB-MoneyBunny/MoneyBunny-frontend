@@ -4,7 +4,7 @@ import router from "@/router";
 
 // 기본 인스턴스(1초)
 const instance = axios.create({
-  timeout: 1000,
+  timeout: 5000,
 });
 
 // CODEF 전용 인스턴스 (2분)
