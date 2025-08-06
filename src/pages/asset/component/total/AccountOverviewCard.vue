@@ -18,21 +18,28 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+// import { ref, onMounted } from 'vue';
+// import AccountList from '../account/AccountOverviewList.vue';
+// import rawAccounts from '@/assets/data/accounts.json';
+
+// const emit = defineEmits(['switchTab']);
+// const accounts = ref([]);
+
+// // 내부 탭 전환: 계좌탭 이동
+// const goToAccountTab = () => {
+//   emit('switchTab', '계좌');
+// };
+
+// onMounted(() => {
+//   accounts.value = rawAccounts;
+// });
+
 import AccountList from '../account/AccountOverviewList.vue';
-import rawAccounts from '@/assets/data/accounts.json';
-
-const emit = defineEmits(['switchTab']);
-const accounts = ref([]);
-
-// 내부 탭 전환: 계좌탭 이동
-const goToAccountTab = () => {
-  emit('switchTab', '계좌');
-};
-
-onMounted(() => {
-  accounts.value = rawAccounts;
+const props = defineProps({
+  accounts: { type: Array, required: true },
 });
+const emit = defineEmits(['switchTab']);
+const goToAccountTab = () => emit('switchTab', '계좌');
 </script>
 
 <style scoped>

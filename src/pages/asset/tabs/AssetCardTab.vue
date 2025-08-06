@@ -14,8 +14,9 @@
       <CardList
         :cards="cards"
         @delete-card="deleteCard"
-        @update-cards="cards = $event"
+        @update-cards="onUpdateCards"
       />
+      <!-- @update-cards="cards = $event" -->
     </div>
 
     <!-- 카드가 없을 때 -->
@@ -26,30 +27,34 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+//
+
+import { computed } from 'vue';
 import SummaryCard from '../component/common/SummaryCard.vue';
 import CardList from '../component/card/CardList.vue';
 import NoDataCard from '../component/common/NoDataCard.vue';
-import cardsData from '@/assets/data/cards.json';
 
-const cards = ref([]);
-
-// 초기 카드 데이터 로드
-onMounted(() => {
-  cards.value = cardsData;
+const props = defineProps({
+  cards: { type: Array, required: true },
 });
 
-// 총 사용액 계산
+const emit = defineEmits(['update:cards']);
+
 const totalUsage = computed(() =>
-  cards.value.reduce((sum, card) => sum + (card.amount || 0), 0)
+  props.cards.reduce((sum, card) => sum + (card.thisMonthUsed || 0), 0)
 );
 
-// 카드 삭제
 const deleteCard = (cardToDelete) => {
-  cards.value = cards.value.filter((card) => card.id !== cardToDelete.id);
+  emit(
+    'update:cards',
+    props.cards.filter((card) => card.id !== cardToDelete.id)
+  );
 };
 
-// 카드 추가 (모달 등 연결 예정)
+const onUpdateCards = (newCards) => {
+  emit('update:cards', newCards);
+};
+
 const onAddCard = () => {
   console.log('카드 추가 모달 열기');
 };

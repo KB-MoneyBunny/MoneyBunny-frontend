@@ -14,7 +14,7 @@
     </div>
 
     <div class="balance">
-      <p class="amount">{{ formatWon(card.amount) }}</p>
+      <p class="amount">{{ formatWon(card.thisMonthUsed) }}</p>
       <p class="type">카드</p>
     </div>
   </div>
@@ -24,8 +24,7 @@
 import cardCodeMap from '@/assets/utils/cardCodeMap.js';
 
 const props = defineProps({
-  card: Object,
-  isRepresentative: Boolean,
+  card: { type: Object, required: true },
 });
 
 const getCardIssuerName = (issuerCode) => {
@@ -33,6 +32,7 @@ const getCardIssuerName = (issuerCode) => {
 };
 
 const formatWon = (value) => {
+  if (value == null) return '-';
   return `${value.toLocaleString()}원`;
 };
 </script>

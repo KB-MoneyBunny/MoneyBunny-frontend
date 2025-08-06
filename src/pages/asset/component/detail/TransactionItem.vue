@@ -2,11 +2,13 @@
   <div class="transaction-item">
     <div class="transaction-left">
       <p class="transaction-title">
-        {{ type === 'card' ? data.merchant : data.description }}
+        {{ data.description }}
       </p>
       <p class="transaction-sub">
         {{ data.date }} · {{ data.time }}
-        <span v-if="type === 'card'"> · {{ data.category }}</span>
+        <span v-if="type === 'card' && data.category">
+          · {{ data.category }}</span
+        >
         <span v-else> · {{ data.type }}</span>
       </p>
     </div>
@@ -31,13 +33,18 @@ const props = defineProps({
 
 const formattedAmount = computed(() => props.data.amount.toLocaleString());
 
+// 카드면 환불이면 입금, 아니면 지출
 const amountClass = computed(() => {
-  if (props.type === 'card') return 'negative';
+  if (props.type === 'card') {
+    return props.data.isCancel ? 'positive' : 'negative';
+  }
   return props.data.type === '입금' ? 'positive' : 'negative';
 });
 
 const amountSign = computed(() => {
-  if (props.type === 'card') return '-';
+  if (props.type === 'card') {
+    return props.data.isCancel ? '+' : '-';
+  }
   return props.data.type === '입금' ? '+' : '-';
 });
 </script>

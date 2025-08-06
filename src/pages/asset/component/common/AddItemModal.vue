@@ -51,16 +51,14 @@ const availableItems = ref([]);
 
 // 메서드
 const handleLoginSuccess = async (loginData) => {
+  console.log('🚀 [AddItemModal] handleLoginSuccess loginData:', loginData);
   console.log('로그인 성공:', loginData);
 
   // 기관 정보 저장
   institutionInfo.value = loginData;
 
   try {
-    // 실제로는 여기서 API를 호출해서 계좌/카드 목록을 가져와야 합니다
-    // 현재는 SelectItemsStep 내부에서 시뮬레이션 중
-    availableItems.value = [];
-
+    availableItems.value = loginData.items || [];
     // 2단계로 이동
     currentStep.value = 'select';
   } catch (error) {
