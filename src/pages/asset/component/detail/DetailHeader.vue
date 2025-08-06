@@ -9,16 +9,7 @@
     </button>
     <h2 class="detail-title">{{ title }}</h2>
 
-    <!-- 월 선택 드롭다운 -->
-    <select
-      v-model="selectedMonth"
-      class="month-dropdown"
-      @change="onMonthChange"
-    >
-      <option v-for="month in months" :key="month.value" :value="month.value">
-        {{ month.label }}
-      </option>
-    </select>
+    <!-- 월 선택 드롭다운 제거 - TransactionFilter로 이동 -->
   </header>
 </template>
 
@@ -26,37 +17,10 @@
 export default {
   props: {
     title: String,
-    currentMonth: {
-      type: String,
-      default: () => new Date().toISOString().slice(0, 7), // YYYY-MM
-    },
+    // currentMonth, generateMonths, onMonthChange 관련 로직 제거
+    // TransactionFilter로 이동할 예정
   },
-  data() {
-    return {
-      selectedMonth: this.currentMonth,
-      months: this.generateMonths(),
-    };
-  },
-  methods: {
-    generateMonths() {
-      const months = [];
-      const now = new Date();
-      for (let i = 0; i < 12; i++) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const value = `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, '0')}`;
-        months.push({
-          label: `${date.getFullYear()}년 ${date.getMonth() + 1}월`,
-          value,
-        });
-      }
-      return months;
-    },
-    onMonthChange() {
-      this.$emit('month-change', this.selectedMonth);
-    },
-  },
+  // data, methods 에서 월 선택 관련 로직 제거
 };
 </script>
 
@@ -90,14 +54,5 @@ export default {
   margin: 0;
 }
 
-/*드롭다운*/
-.month-dropdown {
-  padding: 0.5rem;
-  border: 1px solid var(--base-lavender);
-  border-radius: 0.5rem;
-  background-color: var(--input-bg-2);
-  color: var(--text-darkgray);
-  font-size: 0.875rem;
-  margin-left: auto;
-}
+/* 드롭다운 스타일 제거 - TransactionFilter로 이동 */
 </style>

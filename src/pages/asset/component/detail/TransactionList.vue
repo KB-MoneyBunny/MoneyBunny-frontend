@@ -1,13 +1,13 @@
 <template>
   <div class="transaction-list" ref="listRef">
     <TransactionItem
-      v-for="item in transactions"
+      v-for="item in filteredTransactions"
       :key="item.transactionId"
       :data="item"
       :type="type"
       @click="handleItemClick(item)"
     />
-    <p v-if="!loading && transactions.length === 0" class="no-data">
+    <p v-if="!loading && filteredTransactions.length === 0" class="no-data">
       거래 내역이 없습니다.
     </p>
     <div ref="observerTarget" style="height: 1px"></div>
@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, watch, onUnmounted, nextTick, computed } from 'vue';
 import TransactionItem from './TransactionItem.vue';
 import {
   fetchAccountTransactions,
@@ -24,8 +24,8 @@ import {
 } from '@/api/assetApi';
 
 const props = defineProps({
-  type: { type: String, required: true }, // 'account'
-  accountId: { type: Number, required: true },
+  type: { type: String, required: true }, // 'account' | 'card'
+  accountId: { type: Number, required: false },
   cardId: { type: Number, required: false },
   filter: { type: String, default: '전체' },
 });
@@ -39,7 +39,33 @@ const loading = ref(false);
 const listRef = ref(null);
 const observerTarget = ref(null);
 
-// 카드 거래내역용 파서 (응답 구조 맞춰서!)
+// 필터링된 거래내역 computed 추가
+const filteredTransactions = computed(() => {
+  if (props.filter === '전체') {
+    return transactions.value;
+  }
+
+  if (props.type === 'card') {
+    // 카드 필터링
+    if (props.filter === '환불') {
+      return transactions.value.filter((tx) => tx.isCancel === true);
+    } else if (props.filter === '지출') {
+      return transactions.value.filter((tx) => tx.isCancel === false);
+    }
+  } else if (props.type === 'account') {
+    // 계좌 필터링 (서버에서 이미 필터링되어 오므로 클라이언트에서는 추가 필터링 불필요)
+    // 하지만 만약 클라이언트 필터링을 원한다면:
+    if (props.filter === '입금') {
+      return transactions.value.filter((tx) => tx.type === '입금');
+    } else if (props.filter === '출금') {
+      return transactions.value.filter((tx) => tx.type === '출금');
+    }
+  }
+
+  return transactions.value;
+});
+
+// 카드 거래내역용 파서 (수정)
 function parseCardTransactions(rawList = []) {
   return rawList.map((tx) => {
     // 날짜 가공
@@ -50,8 +76,8 @@ function parseCardTransactions(rawList = []) {
     const date = `${y}-${m}-${d}`;
     const time = dateObj.toTimeString().slice(0, 5);
 
-    // 환불 여부 체크!
-    const isCancel = tx.cancelStatus === 'normal';
+    // 환불 여부 체크 수정! (실제 API 응답에 맞게)
+    const isCancel = tx.cancelStatus === 'normal'; // 'normal'이면 환불
 
     return {
       transactionId: tx.id,
@@ -61,7 +87,8 @@ function parseCardTransactions(rawList = []) {
       cancelAmount: tx.cancelAmount, // (UI에서 필요하면 표시)
       date,
       time,
-      isCancel,
+      isCancel, // 필터링용
+      category: tx.category || '', // 카테고리 추가
     };
   });
 }
@@ -93,19 +120,19 @@ function parseAccountTransactions(rawList = []) {
   });
 }
 
-// 거래 상세 클릭 핸들러(원하는 곳에 사용!)
+// 거래 상세 클릭 핸들러
 function handleItemClick(item) {
   emit('transaction-click', item);
 }
 
-// 공통 API 로딩 함수(계좌/카드 구분)
+// 공통 API 로딩 함수
 async function loadMore() {
   if (loading.value || !hasMore.value) return;
   loading.value = true;
   try {
     let items = [];
     if (props.type === 'account') {
-      // filter값 → API 파라미터로!
+      // 계좌는 서버에서 필터링
       const typeParam =
         props.filter === '전체'
           ? null
@@ -123,7 +150,7 @@ async function loadMore() {
       items = parseAccountTransactions(res.data.content || []);
       hasMore.value = !(res.data.last || items.length === 0);
     } else if (props.type === 'card') {
-      // 카드 거래내역(필터 X)
+      // 카드는 모든 데이터를 가져와서 클라이언트에서 필터링
       const res = await fetchCardTransactions(props.cardId, page.value, 20);
       items = parseCardTransactions(res.data.content || []);
       hasMore.value = !(res.data.last || items.length === 0);
@@ -135,20 +162,28 @@ async function loadMore() {
     }
     page.value += 1;
   } catch (e) {
+    console.error('거래내역 로딩 실패:', e);
     hasMore.value = false;
   } finally {
     loading.value = false;
   }
 }
 
-// 필터/계좌/카드 변경 시 초기화!
+// 필터 변경 시 초기화
 watch(
   () => [props.filter, props.accountId, props.cardId, props.type],
   async () => {
+    // 카드의 경우 필터 변경시 데이터 다시 로딩하지 않고 클라이언트에서만 필터링
+    if (props.type === 'card' && page.value > 0) {
+      // 이미 데이터가 있으면 새로 로딩하지 않음 (클라이언트 필터링)
+      return;
+    }
+    // 계좌이거나 처음 로딩인 경우 데이터 다시 로딩
     page.value = 0;
     hasMore.value = true;
     await loadMore();
-  }
+  },
+  { deep: true }
 );
 
 // 무한스크롤 IntersectionObserver
