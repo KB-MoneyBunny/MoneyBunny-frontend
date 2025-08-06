@@ -35,14 +35,14 @@
           @click="toggleNotification('bookmark')"
           :disabled="!hasNotificationPermission || loading"
         >
-          {{ subscriptionStatus.isActiveBookmark ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveBookmark ? 'ON' : 'OFF' }}
         </button>
       </div>
 
       <div class="setting-item">
         <div class="setting-info">
-          <h3 class="setting-title font-16 font-bold">TOP3 추천 알림</h3>
-          <p class="setting-desc font-13">
+          <h3 class="setting-title font-15 font-bold">TOP3 추천 알림</h3>
+          <p class="setting-desc font-14">
             머니버니가 추천하는 맞춤 정책 TOP3를 알려드려요
           </p>
         </div>
@@ -55,7 +55,7 @@
           @click="toggleNotification('top3')"
           :disabled="!hasNotificationPermission || loading"
         >
-          {{ subscriptionStatus.isActiveTop3 ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveTop3 ? 'ON' : 'OFF' }}
         </button>
       </div>
 
@@ -75,7 +75,7 @@
           @click="toggleNotification('newPolicy')"
           :disabled="!hasNotificationPermission || loading"
         >
-          {{ subscriptionStatus.isActiveNewPolicy ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveNewPolicy ? 'ON' : 'OFF' }}
         </button>
       </div>
 
@@ -95,7 +95,7 @@
           @click="toggleNotification('feedback')"
           :disabled="!hasNotificationPermission || loading"
         >
-          {{ subscriptionStatus.isActiveFeedback ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveFeedback ? 'ON' : 'OFF' }}
         </button>
       </div>
     </div>
@@ -103,11 +103,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import { useRouter } from "vue-router";
-import { storeToRefs } from "pinia";
-import { useNotificationStore } from "@/stores/notification";
-import { subscribeToPush } from "@/firebase/notificationPermission";
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useNotificationStore } from '@/stores/notification';
+import { subscribeToPush } from '@/firebase/notificationPermission';
 
 const router = useRouter();
 
@@ -124,7 +124,7 @@ const {
 
 const hasNotificationPermission = ref(false);
 const showPermissionNotice = ref(false);
-const permissionMessage = ref("");
+const permissionMessage = ref('');
 
 // 💪(상일) 뒤로가기
 const goBack = () => {
@@ -133,33 +133,33 @@ const goBack = () => {
 
 // 💪(상일) 알림 권한 확인
 const checkNotificationPermission = async () => {
-  if (!("Notification" in window)) {
+  if (!('Notification' in window)) {
     showPermissionNotice.value = true;
-    permissionMessage.value = "이 브라우저는 알림을 지원하지 않습니다.";
+    permissionMessage.value = '이 브라우저는 알림을 지원하지 않습니다.';
     return;
   }
 
   const permission = Notification.permission;
-  hasNotificationPermission.value = permission === "granted";
+  hasNotificationPermission.value = permission === 'granted';
 
-  if (permission === "default") {
+  if (permission === 'default') {
     // 권한 요청 전인 경우 - 안내 문구 표시하지 않음
     showPermissionNotice.value = false;
-  } else if (permission === "denied") {
+  } else if (permission === 'denied') {
     // 권한이 거부된 경우
     showPermissionNotice.value = true;
-    permissionMessage.value = "브라우저 설정에서 알림 권한을 허용해주세요.";
+    permissionMessage.value = '브라우저 설정에서 알림 권한을 허용해주세요.';
   } else {
     // 권한이 있는 경우
     showPermissionNotice.value = false;
     // 💪(상일) 권한이 있지만 FCM 토큰이 없는 경우 발급 및 초기 구독
-    const token = localStorage.getItem("fcm_token");
+    const token = localStorage.getItem('fcm_token');
     if (!token) {
       try {
         await subscribeToPush();
         await createInitialSubscription();
       } catch (error) {
-        console.error("FCM 토큰 발급 실패:", error);
+        console.error('FCM 토큰 발급 실패:', error);
       }
     }
   }
@@ -173,9 +173,9 @@ const requestPermission = async () => {
     hasNotificationPermission.value = true;
     showPermissionNotice.value = false;
 
-    const token = localStorage.getItem("fcm_token");
+    const token = localStorage.getItem('fcm_token');
     if (!token) {
-      throw new Error("FCM 토큰 발급 실패");
+      throw new Error('FCM 토큰 발급 실패');
     }
 
     // 2. 초기 구독 설정 (모든 알림 false로 시작)
@@ -192,7 +192,7 @@ const requestPermission = async () => {
     // 3. 구독 상태 재조회
     await fetchSubscriptionStatus();
   } catch (error) {
-    console.error("알림 권한 요청 실패:", error);
+    console.error('알림 권한 요청 실패:', error);
 
     // 권한 상태 재확인
     await checkNotificationPermission();
@@ -202,7 +202,7 @@ const requestPermission = async () => {
 // 💪(상일) 알림 타입별 토글
 const toggleNotification = async (type) => {
   if (!hasNotificationPermission.value) {
-    alert("먼저 알림 권한을 허용해주세요.");
+    alert('먼저 알림 권한을 허용해주세요.');
     return;
   }
 
@@ -210,24 +210,24 @@ const toggleNotification = async (type) => {
     // 💪(상일) reactive 객체는 .value 없이 접근
     let currentStatus = false;
     switch (type) {
-      case "bookmark":
+      case 'bookmark':
         currentStatus = subscriptionStatus.isActiveBookmark;
         break;
-      case "top3":
+      case 'top3':
         currentStatus = subscriptionStatus.isActiveTop3;
         break;
-      case "newPolicy":
+      case 'newPolicy':
         currentStatus = subscriptionStatus.isActiveNewPolicy;
         break;
-      case "feedback":
+      case 'feedback':
         currentStatus = subscriptionStatus.isActiveFeedback;
         break;
     }
 
     await toggleNotificationType(type, !currentStatus);
   } catch (error) {
-    console.error("알림 설정 변경 실패:", error);
-    alert("알림 설정 변경에 실패했습니다. 다시 시도해주세요.");
+    console.error('알림 설정 변경 실패:', error);
+    alert('알림 설정 변경에 실패했습니다. 다시 시도해주세요.');
   }
 };
 
@@ -236,12 +236,12 @@ onMounted(async () => {
   await checkNotificationPermission();
 
   // 💪(상일) 권한이 default 상태면 자동으로 권한 요청
-  if (Notification.permission === "default") {
-    console.log("🔔 설정 페이지 진입 - 자동 알림 권한 요청");
+  if (Notification.permission === 'default') {
+    console.log('🔔 설정 페이지 진입 - 자동 알림 권한 요청');
     try {
       await requestPermission();
     } catch (error) {
-      console.log("⚠️ 자동 권한 요청 실패 또는 사용자 거부:", error.message);
+      console.log('⚠️ 자동 권한 요청 실패 또는 사용자 거부:', error.message);
       // 실패해도 페이지는 정상 로드
     }
   }

@@ -106,20 +106,19 @@ onMounted(async () => {
   width: 100%;
   min-height: 100vh;
   background-color: var(--input-bg-2);
-  padding: 32px 20px;
   box-sizing: border-box;
 }
 
 .infoCard {
   background-color: white;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 20px;
 }
 
 .userCard {
   background-color: white;
-  border-radius: 20px;
-  padding: 24px;
+  border-radius: 10px;
+  padding: 20px;
   margin-bottom: 24px;
 }
 
@@ -130,12 +129,12 @@ onMounted(async () => {
 }
 
 .profileImage {
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-color: var(--input-bg-3);
   object-fit: cover;
-  margin-right: 16px;
+  margin-right: 12px;
 }
 
 .userText {
@@ -154,14 +153,14 @@ onMounted(async () => {
 }
 
 .editIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
 }
 
 .infoCard {
   background-color: white;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 20px;
 }
 

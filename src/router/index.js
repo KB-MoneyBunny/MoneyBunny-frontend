@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import api from "@/api"; // 🛠️ 제승 추가: api import
+import { policyAPI } from "@/api/policy";
+// 🛠️ 제승 추가: api import
 
 // ─── 레이아웃 ──────────────────────────────
 import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
@@ -224,7 +225,7 @@ router.beforeEach(async (to, from, next) => {
   // 🛠️ 제승 추가: 정책 메인 접근 전 조건 체크 네비게이션 가드
   if (to.path === "/policy" || to.path === "/policy/main") {
     try {
-      const res = await api.get("/api/userPolicy");
+      const res = await policyAPI.getUserPolicy();
       if (res.data && Object.keys(res.data).length > 0) {
         // 조건이 있으면 /policy/main 으로만 진입 허용
         if (to.path !== "/policy/main") {
@@ -261,8 +262,6 @@ router.beforeEach(async (to, from, next) => {
     "/resetPassword",
 
     // 회원 가입
-    "/signUpEmailRequest",
-    "/signUpEmailCode",
     "/signUpEmailVerify",
     "/signUpProfile",
 
