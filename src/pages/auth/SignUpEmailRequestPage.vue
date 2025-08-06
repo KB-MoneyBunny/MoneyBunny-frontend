@@ -3,59 +3,56 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
-// 🎵(유정) 이메일 인증(이메일 입력) for 아이디 찾기 페이지
+// 🎵 회원가입 - 이메일 인증 시작 페이지
 const router = useRouter();
-const email = ref('');
-const isCodeSent = ref(false);
+const signUpEmail = ref('');
+const isRequesting = ref(false);
 const errorMsg = ref('');
 const showToast = ref(false);
 
 // 인증코드 전송
-const sendIdCode = async () => {
+const requestSignUpCode = async () => {
   errorMsg.value = '';
 
   // 이메일 입력 확인
-  if (!email.value.trim()) {
+  if (!signUpEmail.value.trim()) {
     errorMsg.value = '이메일을 입력해주세요.';
     return;
   }
 
   // 이메일 형식 확인
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!emailRegex.test(email.value)) {
+  if (!emailRegex.test(signUpEmail.value)) {
     errorMsg.value = '올바른 이메일 형식을 입력해주세요.';
     return;
   }
 
   try {
-    // 인증 코드 요청
-    await axios.post('/api/auth/send-find-id-code', { email: email.value });
-    isCodeSent.value = true;
-    // 토스트 보여주기
+    isRequesting.value = true;
+    await axios.post('/api/auth/signup-request-email', {
+      email: signUpEmail.value,
+    });
     showToast.value = true;
-
     setTimeout(() => {
       showToast.value = false;
-      router.push({ name: 'findIdCode', query: { email: email.value } });
+      // 회원가입 인증코드 입력 페이지로 이동 (route 네임은 프로젝트에 맞게!)
+      router.push({
+        name: 'signUpEmailCode',
+        query: { email: signUpEmail.value },
+      });
     }, 1200);
   } catch (err) {
-    // 가입되지 않은 이메일 등 에러 처리
     errorMsg.value =
-      err.response?.data?.message || '가입되지 않은 이메일입니다.';
+      err.response?.data?.message ||
+      '이미 가입된 이메일이거나 오류가 발생했습니다.';
+  } finally {
+    isRequesting.value = false;
   }
-};
-
-// 버튼 핸들러는 단순 호출만
-const handleClick = () => {
-  if (!email.value) {
-    alert('이메일을 입력해주세요.');
-    return;
-  }
-  sendIdCode();
 };
 </script>
+
 <template>
-  <div class="authContainer">
+  <div class="signUpAuthContainer">
     <div class="cardBox">
       <transition name="fade">
         <div v-if="showToast" class="toastMsg">인증코드가 발송되었습니다.</div>
@@ -69,40 +66,29 @@ const handleClick = () => {
 
       <div class="card">
         <div class="title font-24 font-extrabold">MoneyBunny</div>
-        <p class="subtitle font-13">이메일을 입력해주세요</p>
-        <div
-          v-if="errorMsg"
-          :class="[
-            'errorMessage font-12',
-            errorMsg === '인증코드가 발송되었습니다.' ? 'successMessage' : '',
-          ]"
-        >
+        <p class="subtitle font-13">이메일로 회원가입을 진행합니다</p>
+        <div v-if="errorMsg" class="errorMessage font-12">
           {{ errorMsg }}
         </div>
         <div class="formGroup">
-          <label for="email" class="font-13">이메일</label>
+          <label for="signUpEmail" class="font-13">이메일</label>
           <input
             type="email"
-            id="email"
-            v-model="email"
+            id="signUpEmail"
+            v-model="signUpEmail"
             placeholder="이메일을 입력하세요"
+            autocomplete="email"
           />
         </div>
         <button
           class="submitButton font-14"
-          @click="sendIdCode"
-          :disabled="isCodeSent"
+          @click="requestSignUpCode"
+          :disabled="isRequesting"
         >
           인증코드 발송
         </button>
         <div class="loginLink font-11">
-          <router-link to="/findPassword">비밀번호 찾기</router-link>
-          <span>|</span>
-          <router-link to="/">로그인</router-link>
-        </div>
-        <div class="signupLink font-11">
-          계정이 없으신가요?
-          <router-link to="/signUpEmailVerify">회원가입</router-link>
+          이미 계정이 있으신가요? <a href="/">로그인</a>
         </div>
       </div>
     </div>
@@ -110,7 +96,7 @@ const handleClick = () => {
 </template>
 
 <style scoped>
-.authContainer {
+.signUpAuthContainer {
   width: 100%;
   min-height: 100vh;
   background-color: var(--input-bg-2);
@@ -119,7 +105,6 @@ const handleClick = () => {
   align-items: center;
   justify-content: center;
 }
-
 .cardBox {
   position: relative;
   width: 100%;
@@ -138,15 +123,14 @@ const handleClick = () => {
   width: 100%;
   max-width: 320px;
   min-height: 420px;
-  background-color: white;
-  padding: 28px 20px;
+  background: white;
   border-radius: 12px;
+  border: none;
+  padding: 28px 20px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  border: none;
 }
-
 .title {
   text-align: center;
   color: var(--text-login);
@@ -161,17 +145,17 @@ const handleClick = () => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
 }
 input {
   margin-top: 7px;
-  font-size: 13px;
+  font-size: 12px;
   padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
   outline: none;
-  /* width: 100%; */
+  width: 100%;
 }
 input:focus {
   border: 1.5px solid var(--input-outline-2);
@@ -184,24 +168,14 @@ input:focus {
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .loginLink {
+  text-align: center;
   margin-top: 12px;
-  text-align: center;
-  color: var(--text-bluegray);
-}
-.loginLink a {
-  color: var(--text-bluegray);
-  text-decoration: none;
-  margin: 0 6px;
-}
-.signupLink {
-  text-align: center;
-  margin-top: 14px;
   color: var(--text-lightgray);
 }
-.signupLink a {
+.loginLink a {
   color: var(--base-lavender);
   text-decoration: none;
   margin-left: 6px;
@@ -218,13 +192,6 @@ input:focus {
   text-align: center;
   border: 1px solid var(--alert-light-2);
 }
-
-.successMessage {
-  background-color: var(--success-bg);
-  color: var(--success-text);
-  border: 1px solid var(--success-border);
-}
-
 .toastMsg {
   position: absolute;
   top: -54px;
@@ -236,7 +203,7 @@ input:focus {
   padding: 10px 20px;
   border-radius: 8px;
   font-size: 14px;
-  min-width: 300px;
+  min-width: 260px;
   max-width: 400px;
   text-align: center;
   pointer-events: none;

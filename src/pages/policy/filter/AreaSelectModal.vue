@@ -398,11 +398,12 @@ const canApply = computed(() => selectedRegions.value.length > 0);
   border-radius: 8px;
   cursor: pointer;
 }
-/* .applyBtn:disabled {
-  background-color: var(--input-bg-2);
+
+.applyBtn:disabled {
+  background-color: rgba(160, 160, 180, 0.2);
   color: var(--text-bluegray);
   cursor: not-allowed;
-} */
+}
 
 .scrollArea {
   max-height: 360px;
