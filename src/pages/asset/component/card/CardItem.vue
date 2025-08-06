@@ -50,7 +50,7 @@
 <script setup>
 import { ref } from 'vue';
 import DeleteConfirmModal from '@/pages/asset/component/common/DeleteConfirmModal.vue';
-import DetailModal from '../common/DetailModal.vue'; // 공통 전체화면 모달
+import DetailModal from '../detail/DetailModal.vue'; // 공통 전체화면 모달
 import CardDetail from './CardDetail.vue';
 
 const props = defineProps({

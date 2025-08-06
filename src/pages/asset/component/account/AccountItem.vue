@@ -62,8 +62,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import DeleteConfirmModal from '@/pages/asset/component/common/DeleteConfirmModal.vue';
-import DetailModal from '../common/DetailModal.vue';
+import DetailModal from '../detail/DetailModal.vue';
 import AccountDetail from './AccountDetail.vue';
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
