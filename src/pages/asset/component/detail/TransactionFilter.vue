@@ -1,7 +1,7 @@
 <template>
   <div class="transaction-filter">
-    <!-- 기존 필터 버튼들 (좌측) -->
-    <div class="filter-buttons">
+    <!-- 기존 필터 버튼들 (좌측) - 카테고리에서는 숨김 -->
+    <div v-if="type !== 'category'" class="filter-buttons">
       <button
         v-for="option in filterOptions"
         :key="option"
@@ -11,6 +11,9 @@
         {{ option }}
       </button>
     </div>
+
+    <!-- 카테고리용 빈 공간 -->
+    <div v-else class="filter-spacer"></div>
 
     <!-- 월 선택 드롭다운 (우측) -->
     <select
@@ -36,7 +39,7 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: 'account', // 'account' | 'card' - 계좌/카드 구분
+    default: 'account', // 'account' | 'card' | 'category' - 구분
   },
 });
 
@@ -46,6 +49,8 @@ const emit = defineEmits(['update:modelValue', 'month-change']);
 const filterOptions = computed(() => {
   if (props.type === 'card') {
     return ['전체', '지출', '환불']; // 카드용 필터
+  } else if (props.type === 'category') {
+    return []; // 카테고리용 - 필터 없음
   }
   return ['전체', '입금', '출금']; // 계좌용 필터 (기본값)
 });
@@ -98,6 +103,10 @@ watch(
 .filter-buttons {
   display: flex;
   gap: 0.5rem;
+}
+
+.filter-spacer {
+  flex: 1; /* 카테고리용 빈 공간 */
 }
 
 .filter-btn {

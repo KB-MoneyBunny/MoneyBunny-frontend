@@ -40,7 +40,8 @@
     </div>
 
     <!-- 삭제 확인 모달 -->
-    <DeleteConfirmModal
+
+    <!-- <DeleteConfirmModal
       :visible="isDeleteModalOpen"
       title="계좌 삭제"
       message="계좌를 삭제하시겠습니까?"
@@ -50,7 +51,7 @@
       warning="삭제된 계좌는 복구할 수 없습니다."
       @close="isDeleteModalOpen = false"
       @confirm="handleDelete"
-    />
+    /> -->
 
     <!-- 계좌 상세 모달 -->
     <DetailModal :visible="showDetail" @close="showDetail = false">

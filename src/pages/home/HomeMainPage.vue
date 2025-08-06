@@ -15,13 +15,6 @@ import DailyMessageCard from '@/pages/home/main/DailyMessageCard.vue';
 </script>
 
 <style scoped>
-.home-container {
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 /* 한마디 카드는 아래 간격만 살짝 줄여주기 */
 .tight-top-margin {
   margin-top: 0.5rem;
