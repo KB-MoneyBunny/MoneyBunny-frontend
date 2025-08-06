@@ -4,7 +4,7 @@
       <!-- ✅ 헤더 공통 -->
       <DetailHeader :title="'거래 상세'" @back="closeModal" />
 
-      <!-- 🎨 개선된 거래 정보 카드 -->
+      <!-- 거래 정보 카드 -->
       <div class="info-card">
         <div class="info-top">
           <div class="info-left">
@@ -21,7 +21,7 @@
           </div>
         </div>
 
-        <!-- 🎨 개선된 상세 리스트 -->
+        <!--상세 리스트 -->
         <div class="detail-grid">
           <div class="detail-item">
             <span class="detail-label">거래시각</span>
@@ -37,10 +37,35 @@
             </span>
           </div>
 
+          <!-- 카드 전용: 카테고리 표시 -->
+          <div
+            class="detail-item"
+            v-if="type === 'card' && transaction.category"
+          >
+            <span class="detail-label">카테고리</span>
+            <span class="detail-value">{{ transaction.category }}</span>
+          </div>
+
+          <!-- 계좌 전용: 거래후 잔액 -->
           <div class="detail-item" v-if="type === 'account'">
             <span class="detail-label">거래후 잔액</span>
             <span class="detail-value balance"
               >{{ formatAmount(transaction.balanceAfter) }}원</span
+            >
+          </div>
+
+          <!-- 카드 전용: 환불 정보 (환불인 경우만) -->
+          <div
+            class="detail-item"
+            v-if="
+              type === 'card' &&
+              transaction.isCancel &&
+              transaction.cancelAmount
+            "
+          >
+            <span class="detail-label">환불금액</span>
+            <span class="detail-value positive"
+              >+{{ formatAmount(transaction.cancelAmount) }}원</span
             >
           </div>
         </div>
@@ -157,7 +182,6 @@ watch(
   box-sizing: border-box;
 }
 
-/* 🎨 개선된 정보 카드 */
 .info-card {
   background: white;
   border-radius: 1rem;
@@ -166,7 +190,6 @@ watch(
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* 🎨 개선된 상단 영역 */
 .info-top {
   display: flex;
   justify-content: space-between;
@@ -242,7 +265,6 @@ watch(
   font-weight: 500;
 }
 
-/* 🎨 그리드 형태로 개선된 상세 정보 */
 .detail-grid {
   display: flex;
   flex-direction: column;
