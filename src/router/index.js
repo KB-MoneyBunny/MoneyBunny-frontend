@@ -244,11 +244,13 @@ router.beforeEach(async (to, from, next) => {
     '/',
     '/findId',
     '/findPassword',
-    '/signUpEmailVerify',
+    '/signUpEmailRequest',
+    '/signUpEmailCode',
     '/signUpProfile',
     '/resetPassword',
     '/findIdResult',
     '/findIdCode',
+    '/findPasswordCode',
   ];
   const authRequired = !publicPages.includes(to.path);
 

@@ -115,7 +115,7 @@ const goToLogin = () => {
             placeholder="새 비밀번호를 입력하세요"
             autocomplete="new-password"
           />
-          <div :class="[passwordHintClass, 'font-11']">
+          <div :class="[passwordHintClass, 'font-10']">
             {{ passwordHintMsg }}
           </div>
         </div>
@@ -172,7 +172,7 @@ const goToLogin = () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 360px;
+  max-width: 320px;
 }
 
 .bunnyImage {
@@ -183,10 +183,10 @@ const goToLogin = () => {
 }
 .card {
   width: 100%;
-  max-width: 340px;
-  min-height: 440px;
+  max-width: 320px;
+  min-height: 420px;
   background-color: white;
-  padding: 32px 24px;
+  padding: 28px 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -203,18 +203,18 @@ const goToLogin = () => {
 .subtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  margin-bottom: 22px; /* 간격 넉넉하게 */
+  margin-bottom: 14px; /* 간격 넉넉하게 */
 }
 
 .formGroup label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   color: var(--text-bluegray);
   margin-bottom: 7px;
@@ -223,8 +223,9 @@ const goToLogin = () => {
 }
 
 input {
-  font-size: 13px;
-  padding: 13px 16px;
+  font-size: 12px;
+
+  padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
@@ -242,6 +243,7 @@ input:focus {
   border-radius: 8px;
   border: none;
   cursor: pointer;
+  margin-top: 6px;
 }
 
 .resetButton:disabled {
@@ -263,7 +265,7 @@ input:focus {
 
 .signupLink {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 14px;
   color: var(--text-lightgray);
 }
 
@@ -304,22 +306,21 @@ input:focus {
 
 .inputHint {
   color: var(--text-hint);
-  font-size: 11px;
-  margin-top: 4px;
+  font-size: 10px;
+  margin-top: 3px;
   margin-left: 4px;
   letter-spacing: -0.01em;
 }
 .inputSuccess {
   color: var(--success-text);
-  font-size: 11px;
-  margin-top: 4px;
+  font-size: 10px;
+  margin-top: 3px;
   margin-left: 4px;
   letter-spacing: -0.01em;
 }
 .inputError {
   color: var(--alert-red);
-  font-size: 11px;
-  margin-top: 4px;
+  font-size: 10px;
   margin-left: 4px;
 }
 </style>

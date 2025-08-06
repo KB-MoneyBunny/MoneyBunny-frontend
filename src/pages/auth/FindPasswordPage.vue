@@ -22,7 +22,7 @@ const handleSendCode = () => {
     showToast.value = false;
     // 실제 이동
     router.push({
-      name: 'findPasswordCode',
+      path: '/findPasswordCode',
       query: { loginId: loginId.value, email: email.value },
     });
   }, 1200); // 1.2초 후 이동
@@ -104,7 +104,7 @@ const handleSendCode = () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 360px;
+  max-width: 320px;
 }
 .bunnyImage {
   width: 90px;
@@ -114,10 +114,10 @@ const handleSendCode = () => {
 }
 .card {
   width: 100%;
-  max-width: 340px;
-  min-height: 440px;
+  max-width: 320px;
+  min-height: 420px;
   background-color: white;
-  padding: 32px 24px;
+  padding: 28px 20px;
   border-radius: 12px;
   border: none;
   display: flex;
@@ -132,7 +132,7 @@ const handleSendCode = () => {
 .subtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 .formGroup {
   display: flex;
@@ -158,7 +158,7 @@ input:focus {
   padding: 12px;
   border-radius: 8px;
   border: none;
-  margin-top: 10px;
+  margin-top: 6px;
   cursor: pointer;
 }
 .loginLink {
@@ -173,7 +173,7 @@ input:focus {
 }
 .signupLink {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 14px;
   color: var(--text-lightgray);
 }
 .signupLink a {

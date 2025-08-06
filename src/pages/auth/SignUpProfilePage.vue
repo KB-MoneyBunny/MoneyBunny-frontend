@@ -160,7 +160,7 @@ const handleSignUp = async () => {
       />
       <div class="card">
         <div class="title font-24 font-extrabold">MoneyBunny</div>
-        <p class="subtitle font-12">새로운 계정을 만들어보세요</p>
+        <p class="subtitle font-13">새로운 계정을 만들어보세요</p>
 
         <!-- 프로필 이미지 선택 -->
         <div class="profileImageSection">
@@ -269,8 +269,11 @@ const handleSignUp = async () => {
           </div>
           <p
             v-if="passwordMsg"
-            class="font-10 pwStatusMsg"
-            :class="{ error: confirmStatusType === 'error' }"
+            class="pwStatusMsg font-10"
+            :class="{
+              error: confirmStatusType === 'error',
+              success: confirmStatusType === 'success',
+            }"
           >
             {{ passwordMsg }}
           </p>
@@ -344,7 +347,7 @@ const handleSignUp = async () => {
 .cardBox {
   position: relative;
   width: 100%;
-  max-width: 340px;
+  max-width: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -357,12 +360,12 @@ const handleSignUp = async () => {
 }
 .card {
   width: 100%;
-  max-width: 340px;
-  min-height: 440px;
+  max-width: 320px;
+  min-height: 420px;
   background: white;
   border-radius: 12px;
   border: none;
-  padding: 32px 24px;
+  padding: 28px 20px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -371,12 +374,13 @@ const handleSignUp = async () => {
 .title {
   text-align: center;
   color: var(--text-login);
+  margin-bottom: 8px;
 }
 
 .subtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin: 8px 0 32px;
+  margin-bottom: 32px;
 }
 
 .profileImageSection {
@@ -386,8 +390,8 @@ const handleSignUp = async () => {
 .profileImages {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
-  margin-bottom: 12px;
+  margin-top: 12px;
+  margin-bottom: 14px;
   justify-content: center;
 }
 
@@ -445,7 +449,7 @@ input:focus {
 
 .idInput {
   flex: 1;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
@@ -458,6 +462,7 @@ input:focus {
 }
 .passwordInput {
   width: 100%;
+  margin-bottom: 3px;
 }
 
 .checkButton {
@@ -542,13 +547,13 @@ input:focus {
 }
 
 .requireMsg {
-  margin-top: 5px;
+  margin-top: 3px;
   margin-left: 5px;
   margin-bottom: 0;
   color: var(--text-bluegray);
 }
 .idStatusMsg {
-  margin-top: 5px;
+  margin-top: 3px;
   margin-left: 5px;
 }
 .idStatusMsg.error {
@@ -558,9 +563,16 @@ input:focus {
   color: var(--success-text);
 }
 .pwStatusMsg {
-  margin-top: 5px;
+  margin-top: 3px;
   margin-left: 5px;
   color: var(--alert-strong);
+}
+
+.pwStatusMsg.error {
+  color: var(--alert-strong);
+}
+.pwStatusMsg.success {
+  color: var(--success-text);
 }
 
 .toastMsg {

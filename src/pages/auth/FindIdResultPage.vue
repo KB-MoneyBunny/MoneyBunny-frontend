@@ -87,7 +87,7 @@ const goLogin = () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 360px;
+  max-width: 320px;
 }
 
 .bunnyImage {
@@ -99,10 +99,10 @@ const goLogin = () => {
 
 .card {
   width: 100%;
-  max-width: 340px;
-  min-height: 440px;
+  max-width: 320px;
+  min-height: 420px;
   background-color: white;
-  padding: 32px 24px;
+  padding: 28px 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -118,16 +118,15 @@ const goLogin = () => {
 .subtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .resultBox {
   background-color: var(--input-bg-2);
   border-radius: 8px;
-  margin-top: 8px;
   margin-bottom: 15px;
   width: 100%;
-  min-height: 130px;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -136,8 +135,8 @@ const goLogin = () => {
 }
 
 .resultLabel {
-  font-size: 17px;
-  margin-bottom: 7px;
+  font-size: 16px;
+  margin-bottom: 5px;
 }
 
 .foundIdRow {
@@ -148,7 +147,7 @@ const goLogin = () => {
 }
 
 .foundId {
-  font-size: 18px;
+  font-size: 17px;
   color: var(--base-blue-dark);
   font-weight: bold;
   letter-spacing: 1px;
@@ -165,8 +164,8 @@ const goLogin = () => {
 }
 
 .copyMsg {
-  margin-top: 12px;
-  font-size: 12px;
+  margin-top: 8px;
+  font-size: 11px;
   color: var(--base-blue-dark);
 }
 
@@ -177,13 +176,13 @@ const goLogin = () => {
   padding: 12px;
   border-radius: 8px;
   border: none;
-  margin: 12px 0;
   cursor: pointer;
+  margin-top: 6px;
 }
 
 .signupLink {
   text-align: center;
-  margin-top: 7px;
+  margin-top: 12px;
   color: var(--text-lightgray);
 }
 

@@ -202,7 +202,7 @@ watch(errorMessage, () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 360px;
+  max-width: 320px;
 }
 .bunnyImage {
   width: 90px;
@@ -213,10 +213,10 @@ watch(errorMessage, () => {
 
 .loginCard {
   width: 100%;
-  max-width: 340px;
-  min-height: 440px;
+  max-width: 320px;
+  min-height: 420px;
   background-color: white;
-  padding: 32px 24px;
+  padding: 28px 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -232,7 +232,7 @@ watch(errorMessage, () => {
 .loginSubtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .formGroup {
@@ -244,7 +244,7 @@ input {
   margin-top: 7px;
   margin-bottom: 13px;
   font-size: 12px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;

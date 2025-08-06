@@ -156,7 +156,7 @@ const formattedTime = computed(() => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 340px;
+  max-width: 320px;
 }
 .bunnyImage {
   width: 90px;
@@ -166,10 +166,10 @@ const formattedTime = computed(() => {
 }
 .card {
   width: 100%;
-  max-width: 340px;
-  min-height: 440px;
+  max-width: 320px;
+  min-height: 420px;
   background-color: white;
-  padding: 32px 24px;
+  padding: 28px 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -184,7 +184,7 @@ const formattedTime = computed(() => {
 .subtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 .formGroup {
   margin-bottom: 14px;
@@ -192,7 +192,7 @@ const formattedTime = computed(() => {
 .input {
   margin-top: 7px;
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
@@ -222,9 +222,9 @@ input:focus {
   background-color: var(--base-blue-dark);
   color: white;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
-  margin-top: 12px;
+  margin-top: 6px;
   cursor: pointer;
 }
 .submitButton.expired {
@@ -232,7 +232,7 @@ input:focus {
   cursor: not-allowed;
 }
 .loginLink {
-  margin-top: 16px;
+  margin-top: 12px;
   text-align: center;
   color: var(--text-bluegray);
 }
@@ -243,7 +243,7 @@ input:focus {
 }
 .signupLink {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 14px;
   color: var(--text-lightgray);
 }
 .signupLink a {
