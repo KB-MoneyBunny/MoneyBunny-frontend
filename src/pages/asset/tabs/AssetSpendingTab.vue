@@ -99,9 +99,9 @@ const updateSelectedDate = (newDate) => {
   selectedMonth.value = newDate.getMonth() + 1;
 };
 
-// 더보기/접기 토글
+// 더보기 토글 (한번 누르면 모든 카테고리 표시, 접기 없음)
 const toggleShowAll = () => {
-  showAllCategories.value = !showAllCategories.value;
+  showAllCategories.value = true;
 };
 
 // 카테고리 클릭 핸들러 (도넛 차트용)
