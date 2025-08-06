@@ -23,26 +23,27 @@
         v-for="(policy, index) in visiblePolicies"
         :key="policy.policyId"
         class="policyCard"
+        @click="goToDetail(policy.policyId)"
       >
         <div class="cardHeader">
           <span v-if="index < 3" class="topRank" :class="`rank${index + 1}`">
             TOP {{ index + 1 }}
           </span>
           <div class="titleTagRow">
-            <span class="cardTitle font-bold font-15">{{ policy.title }}</span>
+            <span class="cardTitle font-bold font-14">{{ policy.title }}</span>
             <!-- 대분류 태그 중복 제거 후 표시 -->
             <template v-if="getUniqueLargeCategories(policy).length">
               <span
                 v-for="tag in getUniqueLargeCategories(policy)"
                 :key="tag"
-                class="cardTag font-12"
+                class="cardTag font-11"
                 >{{ tag }}</span
               >
             </template>
           </div>
         </div>
-        <p class="cardDesc font-14">{{ policy.policyBenefitDescription }}</p>
-        <p class="cardDeadline font-12">
+        <p class="cardDesc font-13">{{ policy.policyBenefitDescription }}</p>
+        <p class="cardDeadline font-11">
           <span class="label font-regular">신청기간 : </span>
           <span class="date font-bold">
             {{ policy.endDate ? formatPeriod(policy.endDate) : '상시' }}
@@ -50,13 +51,13 @@
         </p>
         <div class="cardActions">
           <button
-            class="buttonSecondary font-14"
+            class="buttonSecondary font-13"
             @click="goToDetail(policy.policyId)"
           >
             자세히 보기
           </button>
           <button
-            class="buttonPrimary font-14"
+            class="buttonPrimary font-13"
             @click="goToApplyPage(policy.applyUrl)"
           >
             신청하기
@@ -75,7 +76,7 @@
     <!-- 더 많은 정책 보기 버튼 -->
     <button
       v-if="showMoreBtn"
-      class="moreButton font-bold font-16"
+      class="moreButton font-bold font-15"
       @click="loadMore"
     >
       더 많은 정책 보기
@@ -188,7 +189,6 @@ function getUniqueLargeCategories(policy) {
 
 <style scoped>
 .policyWrapper {
-  padding: 10px;
   background-color: var(--input-bg-2);
 }
 .searchBar {
@@ -197,16 +197,15 @@ function getUniqueLargeCategories(policy) {
   background-color: white;
   border: 1px solid var(--input-outline-2);
   border-radius: 8px;
-  padding: 9px 16px;
-  margin-top: 12px;
-  margin-bottom: 20px;
+  padding: 7px 14px;
+  margin-bottom: 15px;
   gap: 8px;
 }
 .searchBar input {
   border: none;
   outline: none;
   flex: 1;
-  font-size: 15px;
+  font-size: 14px;
   background-color: transparent;
 }
 .searchIconImage {
@@ -218,7 +217,7 @@ function getUniqueLargeCategories(policy) {
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 16px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
 }
 .cardHeader {
   display: flex;
@@ -240,7 +239,7 @@ function getUniqueLargeCategories(policy) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   border-radius: 999px;
   width: 50px;
@@ -261,7 +260,7 @@ function getUniqueLargeCategories(policy) {
 }
 .cardTitle {
   color: var(--text-login);
-  font-size: 16px;
+  font-size: 15px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -276,7 +275,7 @@ function getUniqueLargeCategories(policy) {
   padding: 2px 6px;
   border-radius: 4px;
   margin-left: 2px;
-  font-size: 13px;
+  font-size: 12px;
   vertical-align: middle;
   white-space: nowrap;
   flex-shrink: 0;
@@ -304,19 +303,19 @@ function getUniqueLargeCategories(policy) {
   flex: 1;
 }
 .buttonSecondary {
-  width: 185px;
+  width: 170px;
   background-color: var(--input-bg-2);
   border: none;
-  padding: 10px;
+  padding: 8px;
   border-radius: 8px;
   color: var(--text-bluegray);
 }
 .buttonPrimary {
-  width: 185px;
+  width: 170px;
   background-color: var(--base-blue-dark);
   color: white;
   border: none;
-  padding: 10px;
+  padding: 8px;
   border-radius: 8px;
 }
 .moreButton {

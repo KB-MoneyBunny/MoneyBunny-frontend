@@ -2,7 +2,7 @@
   <div class="recommendation-section">
     <template v-if="policyList.length > 0">
       <div class="header">
-        <div>맞춤정책 추천 Top3</div>
+        <div>맞춤정책 추천 TOP3</div>
         <span class="more" @click="goToPolicy">더보기</span>
       </div>
       <div class="card-list">

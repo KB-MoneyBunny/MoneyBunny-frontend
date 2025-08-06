@@ -47,14 +47,16 @@ defineProps({
 }
 
 .rankCircle {
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 1.2rem;
+  height: 1.2rem;
   border-radius: 9999px;
   background-color: var(--base-blue-dark);
   color: white;
   text-align: center;
-  line-height: 1.3rem;
+  line-height: 1.2rem;
   font-size: 0.7rem;
+  margin-left: 0.1rem;
+  margin-right: 0.2rem;
 }
 
 .title {
@@ -66,7 +68,7 @@ defineProps({
 .right {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
 
 .amount {
@@ -81,8 +83,8 @@ defineProps({
   color: white;
   border: none;
   border-radius: 0.25rem;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.6rem;
   cursor: pointer;
   white-space: nowrap;
 }

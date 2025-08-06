@@ -1,7 +1,7 @@
 <template>
   <header class="top-header">
     <div class="header-inner">
-      <h1 class="logo-text font-28 font-bold">MoneyBunny</h1>
+      <div class="logo-text font-28 font-extrabold">MoneyBunny</div>
       <!--알림 이동-->
       <RouterLink to="/notification">
         <img
