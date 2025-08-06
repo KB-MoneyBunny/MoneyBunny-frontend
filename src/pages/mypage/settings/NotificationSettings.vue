@@ -149,17 +149,28 @@ const checkNotificationPermission = async () => {
     // 권한이 거부된 경우
     showPermissionNotice.value = true;
     permissionMessage.value = "브라우저 설정에서 알림 권한을 허용해주세요.";
-  } else {
+  } else if (permission === "granted") {
     // 권한이 있는 경우
     showPermissionNotice.value = false;
-    // 💪(상일) 권한이 있지만 FCM 토큰이 없는 경우 발급 및 초기 구독
+    // 💪(상일) 권한이 있지만 FCM 토큰이 없는 경우 즉시 발급 및 초기 구독
     const token = localStorage.getItem("fcm_token");
     if (!token) {
+      console.log("🔔 권한 허용됨, FCM 토큰 없음 - 즉시 발급 시작");
       try {
+        loading.value = true;
         await subscribeToPush();
-        await createInitialSubscription();
+        const newToken = localStorage.getItem("fcm_token");
+        if (newToken) {
+          console.log("✅ FCM 토큰 발급 완료");
+          await createInitialSubscription();
+          console.log("✅ 초기 구독 설정 완료");
+        }
       } catch (error) {
-        console.error("FCM 토큰 발급 실패:", error);
+        console.error("❌ FCM 토큰 발급 또는 구독 설정 실패:", error);
+        showPermissionNotice.value = true;
+        permissionMessage.value = "알림 설정 초기화에 실패했습니다. 페이지를 새로고침해주세요.";
+      } finally {
+        loading.value = false;
       }
     }
   }
@@ -206,7 +217,17 @@ const toggleNotification = async (type) => {
     return;
   }
 
+  // 💪(상일) FCM 토큰 존재 확인
+  const token = localStorage.getItem("fcm_token");
+  if (!token) {
+    console.error("FCM 토큰이 없습니다. 페이지를 새로고침해주세요.");
+    alert("알림 설정을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+    return;
+  }
+
   try {
+    loading.value = true;
+    
     // 💪(상일) reactive 객체는 .value 없이 접근
     let currentStatus = false;
     switch (type) {
@@ -225,9 +246,12 @@ const toggleNotification = async (type) => {
     }
 
     await toggleNotificationType(type, !currentStatus);
+    console.log(`✅ ${type} 알림 설정 변경 완료: ${!currentStatus}`);
   } catch (error) {
     console.error("알림 설정 변경 실패:", error);
     alert("알림 설정 변경에 실패했습니다. 다시 시도해주세요.");
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -246,8 +270,17 @@ onMounted(async () => {
     }
   }
 
+  // 💪(상일) 권한이 있고 토큰이 있을 때만 구독 상태 조회
   if (hasNotificationPermission.value) {
-    await fetchSubscriptionStatus();
+    const token = localStorage.getItem("fcm_token");
+    if (token) {
+      console.log("🔍 FCM 토큰 존재 - 구독 상태 조회 시작");
+      await fetchSubscriptionStatus();
+    } else {
+      console.log("⚠️ 권한은 있지만 FCM 토큰이 없음 - 구독 상태 조회 건너뜀");
+      // checkNotificationPermission에서 이미 토큰 발급을 시도했으므로
+      // 여기서는 추가 처리하지 않음
+    }
   }
 });
 </script>

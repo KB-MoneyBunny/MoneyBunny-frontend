@@ -85,14 +85,54 @@ export const refreshFCMToken = async () => {
 // 💪(상일) 앱 실행 시 알림 권한 체크 및 토큰 정리
 export const checkPermissionOnAppStart = async () => {
   try {
-    const permission = Notification.permission;
+    console.log('🔍 앱 시작 시 FCM 토큰 및 알림 권한 체크');
+    
+    // 💪(상일) 1단계: 권한과 무관하게 FCM 토큰 유효성 검증
     const savedToken = localStorage.getItem('fcm_token');
+    let validToken = null;
     
-    console.log('🔍 앱 시작 시 알림 권한 체크:', permission);
+    if (savedToken) {
+      console.log('📱 저장된 FCM 토큰 발견 - 유효성 검증 시작');
+      
+      try {
+        // Firebase에서 현재 유효한 토큰 가져오기
+        const currentToken = await getToken(messaging, {
+          vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+        });
+        
+        if (savedToken !== currentToken) {
+          console.log('🔄 FCM 토큰 변경 감지');
+          console.log('  이전 토큰:', savedToken.substring(0, 20) + '...');
+          console.log('  새 토큰:', currentToken.substring(0, 20) + '...');
+          localStorage.setItem('fcm_token', currentToken);
+          validToken = currentToken;
+        } else {
+          console.log('✅ FCM 토큰 유효함');
+          validToken = savedToken;
+        }
+      } catch (error) {
+        console.log('❌ FCM 토큰 무효화 감지 - 토큰 삭제');
+        console.warn('에러 상세:', error.message);
+        localStorage.removeItem('fcm_token');
+        
+        // Firebase에서도 토큰 삭제 시도
+        try {
+          await deleteToken(messaging);
+          console.log('✅ Firebase에서 무효 토큰 삭제 완료');
+        } catch (deleteError) {
+          console.warn('Firebase 토큰 삭제 실패:', deleteError);
+        }
+      }
+    }
     
-    // 알림 권한이 거부되었는데 토큰이 있는 경우
-    if (permission === 'denied' && savedToken) {
-      console.log('🚫 알림 권한 거부됨 - 저장된 FCM 토큰 제거');
+    // 💪(상일) 2단계: 알림 권한 상태 체크
+    const permission = Notification.permission;
+    console.log('🔔 알림 권한 상태:', permission);
+    
+    // 💪(상일) 3단계: 권한과 토큰 상태에 따른 처리
+    // 권한이 거부되었는데 토큰이 있는 경우
+    if (permission === 'denied' && validToken) {
+      console.log('🚫 알림 권한 거부됨 - FCM 토큰 제거');
       
       // Firebase에서 토큰 삭제
       try {
@@ -109,22 +149,28 @@ export const checkPermissionOnAppStart = async () => {
       return { status: 'removed', reason: 'permission_denied' };
     }
     
-    // 권한이 있고 토큰도 있는 경우
-    if (permission === 'granted' && savedToken) {
-      console.log('✅ 알림 권한 허용됨 - 토큰 유지');
-      return { status: 'kept', reason: 'permission_granted' };
+    // 권한이 있고 유효한 토큰도 있는 경우
+    if (permission === 'granted' && validToken) {
+      console.log('✅ 알림 권한 허용됨 - 유효한 토큰 확인');
+      return { status: 'active', reason: 'permission_granted_token_valid', token: validToken };
     }
     
     // 권한은 있지만 토큰이 없는 경우
-    if (permission === 'granted' && !savedToken) {
-      console.log('⚠️ 알림 권한은 있지만 토큰 없음');
+    if (permission === 'granted' && !validToken) {
+      console.log('⚠️ 알림 권한은 있지만 유효한 토큰 없음');
       return { status: 'no_token', reason: 'token_missing' };
     }
     
-    return { status: 'default', reason: 'no_permission_no_token' };
+    // 권한도 없고 토큰도 없는 경우
+    if (permission === 'default' && !validToken) {
+      console.log('📵 알림 권한 미설정, 토큰 없음');
+      return { status: 'default', reason: 'no_permission_no_token' };
+    }
+    
+    return { status: 'unknown', reason: 'unexpected_state' };
     
   } catch (error) {
-    console.error('❌ 알림 권한 체크 실패:', error);
+    console.error('❌ 알림 권한 및 토큰 체크 실패:', error);
     return { status: 'error', reason: error.message };
   }
 };

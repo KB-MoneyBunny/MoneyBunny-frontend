@@ -107,10 +107,34 @@ export const useNotificationStore = defineStore('notification', () => {
   // 💪(상일) 구독 상태 조회
   const fetchSubscriptionStatus = async () => {
     try {
-      const token = localStorage.getItem('fcm_token');
+      let token = localStorage.getItem('fcm_token');
+      
+      // 💪(상일) 토큰이 없으면 발급 시도 후 재호출
       if (!token) {
-        console.error('구독 상태 조회 실패: FCM 토큰 없음');
-        return;
+        console.log('📱 FCM 토큰 없음 - 자동 발급 시도');
+        
+        // 알림 권한 확인
+        if (Notification.permission !== 'granted') {
+          console.error('구독 상태 조회 실패: 알림 권한 없음');
+          return;
+        }
+        
+        try {
+          // subscribeToPush import 필요
+          const { subscribeToPush } = await import('@/firebase/notificationPermission');
+          await subscribeToPush();
+          token = localStorage.getItem('fcm_token');
+          
+          if (!token) {
+            console.error('FCM 토큰 발급 실패');
+            return;
+          }
+          
+          console.log('✅ FCM 토큰 자동 발급 완료');
+        } catch (error) {
+          console.error('FCM 토큰 발급 중 오류:', error);
+          return;
+        }
       }
       
       const response = await subscriptionAPI.getStatus(token);
