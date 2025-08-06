@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import api from "@/api";
+import { ref, onMounted } from 'vue';
+import { bookmarkAPI } from '@/api/bookmark';
 
-import ShareModal from "./ShareModal.vue";
-import PolicyApplyModal from "../component/PolicyApplyModal.vue";
-import bookmarkBefore from "@/assets/images/icons/policy/bookmark_before.png";
-import bookmarkAfter from "@/assets/images/icons/policy/bookmark_after.png";
-import shareIcon from "@/assets/images/icons/policy/share.png";
+import ShareModal from './ShareModal.vue';
+import PolicyApplyModal from '../component/PolicyApplyModal.vue';
+import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
+import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
+import shareIcon from '@/assets/images/icons/policy/share.png';
 
 const props = defineProps({
   policy: {
@@ -35,7 +35,7 @@ const policyId = props.policy?.id || props.policy?.policyId;
 // 북마크 상태 조회
 async function fetchBookmarkStatus() {
   try {
-    const res = await api.get("/api/policy-interaction/bookmark/list");
+    const res = await bookmarkAPI.getBookmarks();
     const list = res.data || [];
     bookmark.value = list.some(
       (item) => item.id === policyId || item.policyId === policyId
@@ -53,10 +53,10 @@ const toggleBookmark = async () => {
   if (!policyId) return;
   try {
     if (!bookmark.value) {
-      await api.post(`/api/policy-interaction/bookmark/${policyId}`);
+      await bookmarkAPI.addBookmark(policyId);
       bookmark.value = true;
     } else {
-      await api.delete(`/api/policy-interaction/bookmark/${policyId}`);
+      await bookmarkAPI.removeBookmark(policyId);
       bookmark.value = false;
     }
   } catch (e) {

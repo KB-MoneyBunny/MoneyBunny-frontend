@@ -1,7 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
-import api from '@/api';
+import { policyAPI } from '@/api/policy';
 import PolicyFilterModal from '../filter/PolicyFilterModal.vue';
 
 const filterData = ref({});
@@ -53,7 +53,7 @@ const userFilter = ref({
 
 const fetchUserPolicyFilter = async () => {
   try {
-    const res = await api.get('/api/userPolicy');
+    const res = await policyAPI.getUserPolicy();
     const d = res.data || {};
     // 모달용 초기값
     Object.assign(filterInitial.value, {

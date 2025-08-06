@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
-import api from '@/api'; // api 인스턴스 import 추가
+import { policyAPI } from '@/api/policy'; // 변경: policyAPI import
 
 import PolicyHeader from './PolicyHeader.vue';
 import PolicyTab from './PolicyTabs.vue';
@@ -71,7 +71,7 @@ const policyData = ref(null);
 // 정책 상세 API 호출
 async function fetchPolicyDetail(id) {
   try {
-    const res = await api.get(`/api/policy/detail/${id}`);
+    const res = await policyAPI.getPolicyDetail(id); // 변경: policyAPI 사용
     policyData.value = res.data;
   } catch (e) {
     policyData.value = null;
