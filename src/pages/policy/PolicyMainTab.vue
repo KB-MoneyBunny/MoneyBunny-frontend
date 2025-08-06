@@ -44,7 +44,7 @@
         </div>
         <p class="cardDesc font-13">{{ policy.policyBenefitDescription }}</p>
         <p class="cardDeadline font-11">
-          <span class="label font-regular">신청기간 : </span>
+          <span class="label">신청기간 : </span>
           <span class="date font-bold">
             {{ policy.endDate ? formatPeriod(policy.endDate) : '상시' }}
           </span>
@@ -196,10 +196,10 @@ function getUniqueLargeCategories(policy) {
   align-items: center;
   background-color: white;
   border: 1px solid var(--input-outline-2);
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 7px 14px;
   margin-bottom: 15px;
-  gap: 8px;
+  gap: 6px;
 }
 .searchBar input {
   border: none;
@@ -209,21 +209,21 @@ function getUniqueLargeCategories(policy) {
   background-color: transparent;
 }
 .searchIconImage {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 .policyCard {
   background-color: white;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
   cursor: pointer;
 }
 .cardHeader {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 4px;
+  margin-bottom: 6px;
   width: 100%;
   min-width: 0;
 }
@@ -232,7 +232,7 @@ function getUniqueLargeCategories(policy) {
   align-items: center;
   min-width: 0;
   flex: 1;
-  gap: 6px;
+  gap: 4px;
 }
 
 .topRank {
@@ -242,11 +242,11 @@ function getUniqueLargeCategories(policy) {
   font-size: 11px;
   font-weight: bold;
   border-radius: 999px;
-  width: 50px;
-  height: 24px;
+  width: 46px;
+  height: 22px;
   color: #fff;
   letter-spacing: -0.5px;
-  margin-right: 2px;
+  margin-right: 3px;
   flex-shrink: 0;
 }
 .rank1 {
@@ -272,31 +272,32 @@ function getUniqueLargeCategories(policy) {
   display: inline-block;
   background-color: var(--input-outline);
   color: var(--text-bluegray);
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 2px;
-  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 1px;
+  font-size: 11px;
   vertical-align: middle;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .cardDesc {
   color: var(--text-bluegray);
-  margin: 6px 0;
+  margin: 4px 0;
 }
 .cardDeadline {
-  margin-bottom: 12px;
+  margin-bottom: 11px;
 }
 .cardDeadline .label {
   color: var(--text-bluegray);
-  margin-right: 4px;
+  margin-right: 3px;
 }
 .cardDeadline .date {
   color: var(--base-blue-dark);
+  font-size: 12px;
 }
 .cardActions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 .buttonSecondary,
 .buttonPrimary {
@@ -306,7 +307,7 @@ function getUniqueLargeCategories(policy) {
   width: 170px;
   background-color: var(--input-bg-2);
   border: none;
-  padding: 8px;
+  padding: 6px;
   border-radius: 8px;
   color: var(--text-bluegray);
 }
@@ -315,7 +316,7 @@ function getUniqueLargeCategories(policy) {
   background-color: var(--base-blue-dark);
   color: white;
   border: none;
-  padding: 8px;
+  padding: 6px;
   border-radius: 8px;
 }
 .moreButton {
@@ -327,7 +328,7 @@ function getUniqueLargeCategories(policy) {
   color: var(--base-blue-dark);
   border-radius: 8px;
   border: 1px solid var(--input-outline);
-  margin-top: 15px;
+  /* margin-top: 15px */
 }
 .fakeInput {
   pointer-events: auto;
