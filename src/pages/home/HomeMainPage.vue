@@ -1,9 +1,9 @@
 <template>
-  <div class="home-container">
+  <div class="homeContainer">
     <TotalSummaryCard />
     <AssetCompareCard />
-    <PolicyRecommendationCard class="with-gap-top" />
-    <DailyMessageCard class="tight-top-margin" />
+    <PolicyRecommendationCard class="withGapTop" />
+    <DailyMessageCard class="tightTopMargin" />
   </div>
 </template>
 
@@ -15,19 +15,18 @@ import DailyMessageCard from '@/pages/home/main/DailyMessageCard.vue';
 </script>
 
 <style scoped>
-.home-container {
-  padding: 1.25rem;
+.homeContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  /* gap: 0.5rem; */
 }
 
 /* 한마디 카드는 아래 간격만 살짝 줄여주기 */
-.tight-top-margin {
-  margin-top: 0.5rem;
+.tightTopMargin {
+  margin-top: 1rem;
 }
 
-.with-gap-top {
-  margin-top: 0.5rem;
+.withGapTop {
+  margin-top: 1rem;
 }
 </style>
