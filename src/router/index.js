@@ -261,6 +261,8 @@ router.beforeEach(async (to, from, next) => {
     "/resetPassword",
 
     // 회원 가입
+    "/signUpEmailRequest",
+    "/signUpEmailCode",
     "/signUpEmailVerify",
     "/signUpProfile",
 
