@@ -54,10 +54,10 @@ const toggleBookmark = async () => {
   if (!policyId) return;
   try {
     if (!bookmark.value) {
-      await api.post(`/api/policy-interaction/bookmark?policyId=${policyId}`);
+      await api.post(`/api/policy-interaction/bookmark/${policyId}`);
       bookmark.value = true;
     } else {
-      await api.delete(`/api/policy-interaction/bookmark?policyId=${policyId}`);
+      await api.delete(`/api/policy-interaction/bookmark/${policyId}`);
       bookmark.value = false;
     }
   } catch (e) {
