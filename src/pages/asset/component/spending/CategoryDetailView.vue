@@ -5,10 +5,8 @@
       :title="headerTitle"
       :current-month="formattedCurrentMonth"
       @back="$emit('back')"
-      @month-change="handleHeaderMonthChange"
+      @month-change="handleMonthChange"
     />
-
-    <!-- CalendarSection 제거 - 헤더의 드롭다운만 사용 -->
 
     <!-- 카테고리 정보 + 거래내역 카드 -->
     <DetailInfoCard>
@@ -36,7 +34,7 @@
       <template #additional>
         <div class="transaction-section">
           <div class="section-header">
-            <h4 class="section-title">결제 내역</h4>
+            <h4 class="section-title">거래 내역</h4>
             <span class="transaction-count"
               >{{ filteredTransactions.length }}건</span
             >
@@ -104,7 +102,7 @@ const selectedMonth = ref(currentDate.value.toISOString().slice(0, 7));
 const formattedCurrentMonth = computed(() => selectedMonth.value);
 
 // 헤더 제목
-const headerTitle = computed(() => `카테고리별 결제내역`);
+const headerTitle = computed(() => `카테고리별 거래내역`);
 
 // 선택된 월 텍스트
 const getSelectedMonthText = () => {
@@ -121,8 +119,8 @@ watch(
   }
 );
 
-// DetailHeader에서 월 드롭다운 변경 시 처리
-const handleHeaderMonthChange = (newMonthString) => {
+// DetailHeader에서 월 변경 시 처리 (중복 제거된 통합 로직)
+const handleMonthChange = (newMonthString) => {
   console.log('Header 월 변경:', newMonthString);
   selectedMonth.value = newMonthString;
 
@@ -130,24 +128,6 @@ const handleHeaderMonthChange = (newMonthString) => {
   const [year, month] = newMonthString.split('-');
   const newDate = new Date(parseInt(year), parseInt(month) - 1, 1);
   currentDate.value = newDate;
-};
-
-// CalendarSection에서 월 변경 시 처리
-const handleCalendarMonthChange = (monthNumber) => {
-  console.log('Calendar 월 변경:', monthNumber);
-  const year = currentDate.value.getFullYear();
-  const newMonthString = `${year}-${String(monthNumber).padStart(2, '0')}`;
-  selectedMonth.value = newMonthString;
-};
-
-// CalendarSection에서 날짜 업데이트 시 처리
-const updateSelectedDate = (newDate) => {
-  console.log('날짜 업데이트:', newDate);
-  currentDate.value = newDate;
-  const newMonthString = newDate.toISOString().slice(0, 7);
-  if (selectedMonth.value !== newMonthString) {
-    selectedMonth.value = newMonthString;
-  }
 };
 
 // 거래내역 필터링

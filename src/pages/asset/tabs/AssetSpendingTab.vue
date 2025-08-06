@@ -1,51 +1,49 @@
 <!-- src/pages/asset/tabs/AssetSpendingTab.vue -->
 <template>
   <div class="asset-spending-tab">
-    <!-- 일반 지출 탭 화면 -->
     <!-- 상단 지출 요약 카드 -->
     <SummaryCard
       title="이번 달 총 지출액"
-      :main-amount="totalSpending"
-      right-label="지난달 대비"
-      :right-value="comparisonText"
-      right-unit=""
-      variant="spending"
+      :mainAmount="totalSpending"
+      :rightLabel="'지난달 대비'"
+      :rightValue="comparisonText"
+      :rightUnit="''"
     />
 
     <!-- 월별 네비게이션 -->
     <CalendarSection
-      :selected-date="currentDate"
+      :selectedDate="currentDate"
       @update:selectedDate="updateSelectedDate"
-      @month-change="handleMonthChange"
+      @monthChange="handleMonthChange"
     />
 
     <!-- 도넛 차트 -->
     <CategoryDonutChart
-      :total-spending="totalSpending"
-      :chart-data="chartData"
-      @category-click="handleCategoryClick"
+      :totalSpending="totalSpending"
+      :chartData="chartData"
+      @categoryClick="handleCategoryClick"
     />
 
     <!-- 카테고리 리스트 -->
     <CategoryList
       :categories="categoryList"
-      :show-all="showAllCategories"
-      @toggle-show-all="toggleShowAll"
-      @category-click="handleCategoryDetailClick"
+      :showAll="showAllCategories"
+      @toggleShowAll="toggleShowAll"
+      @categoryClick="handleCategoryDetailClick"
     />
 
     <!-- 월별 지출 추이 차트 -->
     <CategoryChart
-      :monthly-trend-data="monthlyTrendData"
-      :selected-month="selectedMonth"
+      :monthlyTrendData="monthlyTrendData"
+      :selectedMonth="selectedMonth"
     />
 
     <!-- 카테고리 상세보기 모달 -->
     <DetailModal :visible="showCategoryDetail" @close="closeCategoryDetail">
       <CategoryDetailView
         v-if="selectedCategoryData"
-        :category-data="selectedCategoryData"
-        :selected-date="currentDate"
+        :categoryData="selectedCategoryData"
+        :selectedDate="currentDate"
         @back="closeCategoryDetail"
       />
     </DetailModal>
@@ -106,14 +104,20 @@ const toggleShowAll = () => {
   showAllCategories.value = !showAllCategories.value;
 };
 
-// 카테고리 클릭 핸들러 (도넛 차트 & 리스트 공통)
-const handleCategoryClick = (category) => {
+// 카테고리 클릭 핸들러 (도넛 차트용)
+const handleCategoryClick = (categoryIndex) => {
+  const category = categoryList.value[categoryIndex];
+  if (category) {
+    selectedCategoryData.value = category;
+    showCategoryDetail.value = true;
+  }
+};
+
+// 리스트에서 카테고리 클릭
+const handleCategoryDetailClick = (category) => {
   selectedCategoryData.value = category;
   showCategoryDetail.value = true;
 };
-
-// 리스트에서 카테고리 클릭 (handleCategoryClick과 동일하므로 통합)
-const handleCategoryDetailClick = handleCategoryClick;
 
 // 카테고리 상세보기 닫기
 const closeCategoryDetail = () => {

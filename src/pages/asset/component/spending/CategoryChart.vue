@@ -16,11 +16,11 @@
       <div class="chart-bars">
         <div
           v-for="(value, index) in chartData.amounts"
-          :key="index"
+          :key="`bar-${index}`"
           class="chart-bar"
           :style="{
             height: `${getBarHeight(value)}%`,
-            backgroundColor: getBarColor(parseInt(chartData.months[index])), // 월 값 사용
+            backgroundColor: getBarColor(index),
           }"
         ></div>
       </div>
@@ -28,8 +28,9 @@
       <div class="chart-labels">
         <span
           v-for="(label, index) in chartData.months"
-          :key="index"
+          :key="`label-${index}`"
           class="chart-label"
+          :class="{ active: isCurrentMonth(index) }"
         >
           {{ label }}
         </span>
@@ -65,14 +66,24 @@ const maxValue = computed(() => {
   return Math.max(...amounts, 1);
 });
 
+// 막대 높이 계산 (최소 높이 보장)
 const getBarHeight = (value) => {
-  if (!value || value === 0) return 2;
-  return Math.max((value / maxValue.value) * 100, 2);
+  if (!value || value === 0) return 3; // 최소 높이 2px → 3px (모바일 가시성)
+  return Math.max((value / maxValue.value) * 100, 3);
 };
 
-// 실제 월과 selectedMonth 비교
-const getBarColor = (month) => {
-  return month === props.selectedMonth
+// 현재 월인지 확인 (인덱스 기반)
+const isCurrentMonth = (index) => {
+  const monthStr = chartData.value.months[index];
+  if (!monthStr) return false;
+
+  const monthNum = parseInt(monthStr.replace('월', ''));
+  return monthNum === props.selectedMonth;
+};
+
+// 막대 색상 결정 (단순화)
+const getBarColor = (index) => {
+  return isCurrentMonth(index)
     ? 'var(--base-blue-dark)'
     : 'var(--base-blue-light)';
 };
@@ -83,7 +94,6 @@ const getBarColor = (month) => {
   background: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
-
   margin-top: 1.5rem;
 }
 
@@ -123,8 +133,8 @@ const getBarColor = (month) => {
 .chart-bar {
   flex: 1;
   border-radius: 0.25rem 0.25rem 0 0;
-  transition: all 0.2s ease;
-  min-height: 2px;
+  transition: background-color 0.2s ease; /* 모바일 최적화: transition 단순화 */
+  min-height: 3px; /* 모바일 가시성 개선 */
 }
 
 .chart-labels {
@@ -138,6 +148,13 @@ const getBarColor = (month) => {
   text-align: center;
   font-size: 0.75rem;
   color: var(--text-bluegray);
+  transition: color 0.2s ease;
+}
+
+/* 현재 월 라벨 강조 */
+.chart-label.active {
+  color: var(--base-blue-dark);
+  font-weight: 600;
 }
 
 .no-data {

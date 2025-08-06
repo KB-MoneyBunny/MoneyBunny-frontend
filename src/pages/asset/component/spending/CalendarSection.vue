@@ -20,19 +20,20 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 
 const props = defineProps({
   selectedDate: {
     type: Date,
-    default: () => new Date(), // 현재 날짜로 자동 설정
+    default: () => new Date(),
   },
 });
 
-const emit = defineEmits(['update:selectedDate', 'month-change']); // month-change 이벤트 추가
+const emit = defineEmits(['update:selectedDate', 'monthChange']);
 
-const currentDate = ref(new Date()); // 현재 날짜로 자동 초기화
+const currentDate = ref(new Date());
 
 // 부모에서 받은 selectedDate 변화 감지
 watch(
@@ -42,34 +43,32 @@ watch(
   }
 );
 
+// 날짜 포맷팅 (통합된 유틸리티 함수)
 const formatDate = (date) => {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   return `${month}월 ${year}년`;
 };
 
-// 이전 달 이동
-const previousMonth = () => {
+// 월 이동 로직 (중복 제거된 통합 함수)
+const changeMonth = (monthOffset) => {
   const newDate = new Date(currentDate.value);
-  newDate.setMonth(newDate.getMonth() - 1);
+  newDate.setMonth(newDate.getMonth() + monthOffset);
   currentDate.value = newDate;
   emit('update:selectedDate', newDate);
-  emit('month-change', newDate.getMonth() + 1);
+  emit('monthChange', newDate.getMonth() + 1);
 };
 
+// 이전 달 이동
+const previousMonth = () => changeMonth(-1);
+
 // 다음 달 이동
-const nextMonth = () => {
-  const newDate = new Date(currentDate.value);
-  newDate.setMonth(newDate.getMonth() + 1);
-  currentDate.value = newDate;
-  emit('update:selectedDate', newDate);
-  emit('month-change', newDate.getMonth() + 1);
-};
+const nextMonth = () => changeMonth(1);
 
 // 컴포넌트 마운트시 부모에게 초기 날짜 전달
 onMounted(() => {
   emit('update:selectedDate', currentDate.value);
-  emit('month-change', currentDate.value.getMonth() + 1);
+  emit('monthChange', currentDate.value.getMonth() + 1);
 });
 </script>
 

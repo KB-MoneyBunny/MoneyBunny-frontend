@@ -39,13 +39,13 @@ const props = defineProps({
     default: () => [],
   },
   showAll: {
+    // show-all → showAll
     type: Boolean,
     default: false,
   },
 });
-
 // Emits 정의
-const emit = defineEmits(['toggle-show-all', 'category-click']);
+const emit = defineEmits(['toggleShowAll', 'categoryClick']);
 
 // 표시할 카테고리 계산
 const displayedCategories = computed(() => {
