@@ -192,8 +192,14 @@ const save = async () => {
   router.push({ name: 'mypage' });
 };
 
-const redoQuiz = () => {
-  router.push({ name: 'policyIntroForm' });
+const redoQuiz = async () => {
+  try {
+    await api.delete('/api/userPolicy');
+    router.push({ path: '/policy' });
+  } catch (e) {
+    // 실패 시 기존 동작(폼 이동) 유지
+    router.push({ path: '/policy' });
+  }
 };
 </script>
 
