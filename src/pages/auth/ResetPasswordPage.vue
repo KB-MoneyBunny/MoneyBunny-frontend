@@ -103,11 +103,11 @@ const goToLogin = () => {
       </transition>
 
       <div class="card" v-if="!showSuccess">
-        <div class="title font-26 font-extrabold">MoneyBunny</div>
-        <p class="subtitle font-14">새 비밀번호를 입력해주세요</p>
+        <div class="title font-24 font-extrabold">MoneyBunny</div>
+        <p class="subtitle font-13">새 비밀번호를 입력해주세요</p>
 
         <div class="formGroup">
-          <label for="password" class="font-14">새 비밀번호</label>
+          <label for="password" class="font-13">새 비밀번호</label>
           <input
             id="password"
             type="password"
@@ -115,13 +115,13 @@ const goToLogin = () => {
             placeholder="새 비밀번호를 입력하세요"
             autocomplete="new-password"
           />
-          <div :class="[passwordHintClass, 'font-12']">
+          <div :class="[passwordHintClass, 'font-10']">
             {{ passwordHintMsg }}
           </div>
         </div>
 
         <div class="formGroup">
-          <label for="confirmPassword" class="font-14">비밀번호 확인</label>
+          <label for="confirmPassword" class="font-13">비밀번호 확인</label>
           <input
             id="confirmPassword"
             type="password"
@@ -130,25 +130,25 @@ const goToLogin = () => {
             autocomplete="new-password"
           />
           <!-- ✨ 에러 메시지 (불일치) -->
-          <div v-if="confirmErrorMsg" class="inputError font-12">
+          <div v-if="confirmErrorMsg" class="inputError font-11">
             {{ confirmErrorMsg }}
           </div>
         </div>
 
         <!-- template 부분, 버튼 쪽만 이렇게! -->
         <button
-          class="resetButton font-15"
+          class="resetButton font-14"
           @click="showSuccess ? goToLogin() : handleReset()"
         >
           {{ showSuccess ? '로그인하러 가기' : '비밀번호 변경' }}
         </button>
 
-        <div class="loginLink font-12">
+        <div class="loginLink font-11">
           <a href="/findId">아이디 찾기</a>
           <span>|</span>
           <a href="/">로그인</a>
         </div>
-        <div class="signupLink font-12" v-if="!showSuccess">
+        <div class="signupLink font-11" v-if="!showSuccess">
           계정이 없으신가요? <a href="/signUpEmailVerify">회원가입</a>
         </div>
       </div>
@@ -172,7 +172,7 @@ const goToLogin = () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 360px;
+  max-width: 320px;
 }
 
 .bunnyImage {
@@ -183,10 +183,10 @@ const goToLogin = () => {
 }
 .card {
   width: 100%;
-  max-width: 360px;
-  min-height: 460px;
+  max-width: 320px;
+  min-height: 420px;
   background-color: white;
-  padding: 32px 24px;
+  padding: 28px 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -203,19 +203,19 @@ const goToLogin = () => {
 .subtitle {
   text-align: center;
   color: var(--text-bluegray);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  margin-bottom: 22px; /* 간격 넉넉하게 */
+  margin-bottom: 14px; /* 간격 넉넉하게 */
 }
 
 .formGroup label {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: bold;
   color: var(--text-bluegray);
   margin-bottom: 7px;
   margin-left: 3px;
@@ -223,13 +223,13 @@ const goToLogin = () => {
 }
 
 input {
-  font-size: 14px;
-  padding: 13px 16px;
+  font-size: 12px;
+
+  padding: 10px 14px;
   border: 1.2px solid var(--input-outline);
   border-radius: 8px;
   background-color: transparent;
   outline: none;
-  transition: border-color 0.18s;
 }
 input:focus {
   border: 1.5px solid var(--input-outline-2);
@@ -239,11 +239,11 @@ input:focus {
   width: 100%;
   background-color: var(--base-blue-dark);
   color: white;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
-  margin-top: 8px;
   cursor: pointer;
+  margin-top: 6px;
 }
 
 .resetButton:disabled {
@@ -265,7 +265,7 @@ input:focus {
 
 .signupLink {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 14px;
   color: var(--text-lightgray);
 }
 
@@ -273,7 +273,7 @@ input:focus {
   color: var(--base-lavender);
   text-decoration: none;
   margin-left: 6px;
-  font-size: 13px;
+  font-size: 12px;
 }
 .errorMessage {
   background-color: var(--alert-light-3);
@@ -295,7 +295,7 @@ input:focus {
   color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   min-width: 300px;
   max-width: 400px;
   pointer-events: none;
@@ -306,22 +306,21 @@ input:focus {
 
 .inputHint {
   color: var(--text-hint);
-  font-size: 11px;
-  margin-top: 4px;
+  font-size: 10px;
+  margin-top: 3px;
   margin-left: 4px;
   letter-spacing: -0.01em;
 }
 .inputSuccess {
   color: var(--success-text);
-  font-size: 11px;
-  margin-top: 4px;
+  font-size: 10px;
+  margin-top: 3px;
   margin-left: 4px;
   letter-spacing: -0.01em;
 }
 .inputError {
   color: var(--alert-red);
-  font-size: 11px;
-  margin-top: 4px;
+  font-size: 10px;
   margin-left: 4px;
 }
 </style>
