@@ -1,9 +1,11 @@
 <template>
   <header class="top-header">
     <div class="header-inner">
-      <h1 class="logo-text font-28 font-bold">MoneyBunny</h1>
+      <RouterLink to="/home" class="logo-link">
+        <h1 class="logo-text font-28 font-bold">MoneyBunny</h1>
+      </RouterLink>
       <!--💪(상일) 알림 이동 (미읽은 개수 배지 포함)-->
-      <RouterLink to="/notification" class="notification-link">
+      <RouterLink to="/notification" class="notification-link" :class="{ shake: shouldShakeIcon }">
         <div class="notification-wrapper">
           <img
             src="@/assets/images/icons/bunny/notification_bunny_background.png"
@@ -20,16 +22,22 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useNotificationStore } from '@/stores/notification';
 
 // 💪(상일) 알림 스토어 사용
 const notificationStore = useNotificationStore();
-const { unreadCount, fetchUnreadCount } = notificationStore;
+const unreadCount = computed(() => notificationStore.unreadCount);
+const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 
 // 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회
-onMounted(() => {
-  fetchUnreadCount();
+onMounted(async () => {
+  try {
+    await notificationStore.fetchUnreadCount();
+    console.log('🔔 Header: 미읽은 알림 개수 조회 완료', notificationStore.unreadCount);
+  } catch (error) {
+    console.error('❌ Header: 미읽은 알림 개수 조회 실패', error);
+  }
 });
 </script>
 
@@ -63,13 +71,24 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
-/* 텍스트 가운데 정렬 */
-.logo-text {
-  color: var(--base-blue-dark);
+/* 로고 링크 및 텍스트 가운데 정렬 */
+.logo-link {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo-text {
+  color: var(--base-blue-dark);
+  margin: 0;
+  transition: opacity 0.2s ease;
+}
+
+.logo-link:hover .logo-text {
+  opacity: 0.7;
 }
 
 /* 💪(상일) 알림 링크 및 이미지 스타일 */
@@ -100,7 +119,7 @@ onMounted(() => {
   right: -5px;
   min-width: 18px;
   height: 18px;
-  background-color: #ff4757;
+  background-color: #f86814;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -112,5 +131,22 @@ onMounted(() => {
   box-sizing: border-box;
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 💪(상일) 알림 아이콘 흔들기 애니메이션 */
+@keyframes shake {
+  0%, 100% { 
+    transform: translateY(-50%) rotate(0deg); 
+  }
+  10%, 30%, 50%, 70%, 90% { 
+    transform: translateY(-50%) rotate(-8deg) scale(1.1); 
+  }
+  20%, 40%, 60%, 80% { 
+    transform: translateY(-50%) rotate(8deg) scale(1.1); 
+  }
+}
+
+.notification-link.shake {
+  animation: shake 0.5s ease-in-out;
 }
 </style>
