@@ -81,7 +81,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
-import api from '@/api';
+import { policyAPI } from '@/api/policy';
 
 import EditEducationModal from '../modals/EditEducationModal.vue';
 import EditMajorModal from '../modals/EditMajorModal.vue';
@@ -121,7 +121,7 @@ const priorityOptions = ['금액', '만료일', '조회수'];
 // 서버에서 초기값 받아오기
 onMounted(async () => {
   try {
-    const { data } = await api.get('/api/userPolicy');
+    const { data } = await policyAPI.getUserPolicy();
     originalData.value = data; // 전체 데이터 저장
     summary.value = {
       학력: codeToLabel(educationLevelCodeMap, data.educationLevels?.[0] || ''),
@@ -188,6 +188,20 @@ const save = async () => {
     showToast.value = false;
     router.push({ name: 'mypage' });
   }, 1300);
+  // 기존 값 유지, 수정된 값만 덮어쓰기
+  const payload = {
+    ...originalData.value,
+    educationLevels: [
+      labelToCode(educationLevelCodeMap, summary.value['학력']),
+    ],
+    majors: [labelToCode(majorCodeMap, summary.value['전공 요건'])],
+    employmentStatuses: [
+      labelToCode(employmentStatusCodeMap, summary.value['현재 상황']),
+    ],
+    ...rankObj,
+  };
+  await policyAPI.saveUserPolicy(payload);
+  router.push({ name: 'mypage' });
 };
 
 // 기존 값 유지, 수정된 값만 덮어쓰기
@@ -205,10 +219,9 @@ router.push({ name: 'mypage' });
 
 const redoQuiz = async () => {
   try {
-    await api.delete('/api/userPolicy');
+    await policyAPI.deleteUserPolicy();
     router.push({ path: '/policy' });
   } catch (e) {
-    // 실패 시 기존 동작(폼 이동) 유지
     router.push({ path: '/policy' });
   }
 };
