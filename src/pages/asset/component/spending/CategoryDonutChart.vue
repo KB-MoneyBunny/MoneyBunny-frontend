@@ -16,7 +16,6 @@
 
 <script setup>
 import { ref, onMounted, watch, nextTick, onUnmounted } from 'vue';
-import SpendingNodata from './SpendingNodata.vue';
 import { Chart as ChartJS, ArcElement, DoughnutController } from 'chart.js';
 
 // Chart.js 등록 (필요한 요소만)
