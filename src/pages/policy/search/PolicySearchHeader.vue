@@ -128,8 +128,8 @@ onMounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  max-width: 474px;
-  height: 70px;
+  max-width: 390px;
+  height: 65px;
   width: 100%;
   margin: 0 auto;
   z-index: 1000;
