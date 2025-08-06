@@ -25,13 +25,14 @@
       <button v-else class="set-main-btn" @click.stop="$emit('set-main', card)">
         대표 설정
       </button>
-      <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
+      <!--🥕카드 삭제 기능 제거-->
+      <!-- <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
         <img src="@/assets/images/icons/common/Trash.png" alt="삭제" />
-      </button>
+      </button> -->
     </div>
 
     <!-- 삭제 확인 모달 -->
-    <DeleteConfirmModal
+    <!-- <DeleteConfirmModal
       :visible="isDeleteModalOpen"
       title="카드 삭제"
       message="카드를 삭제하시겠습니까?"
@@ -39,7 +40,7 @@
       warning="삭제된 카드는 복구할 수 없습니다."
       @close="isDeleteModalOpen = false"
       @confirm="handleDelete"
-    />
+    /> -->
     <!-- 상세 모달 -->
     <DetailModal :visible="showDetail" @close="showDetail = false">
       <CardDetail :cardData="card" @close="showDetail = false" />

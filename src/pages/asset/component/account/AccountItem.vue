@@ -34,9 +34,10 @@
       >
         대표 설정
       </button>
-      <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
+      <!--🥕 계좌 삭제 기능 제거-->
+      <!-- <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
         <img src="@/assets/images/icons/common/Trash.png" alt="삭제" />
-      </button>
+      </button> -->
     </div>
 
     <!-- 삭제 확인 모달 -->
