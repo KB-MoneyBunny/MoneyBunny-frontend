@@ -3,34 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- 주소창 테마 색상 지정 -->
-    <meta name="theme-color" content="#42b983" />
-
-    <link rel="manifest" href="/manifest.json" />
-    <link
-      rel="apple-touch-icon"
-      sizes="192x192"
-      href="/icons/icon-192x192.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="256x256"
-      href="/icons/icon-256x256.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="384x384"
-      href="/icons/icon-384x384.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="512x512"
-      href="/icons/icon-512x512.png"
-    />
-
     <title>머니버니</title>
+
+    <!-- ✅ 기본 안내 화면 (모바일 Safari용) -->
+    <style>
+      #ios-inapp-message {
+        display: none;
+        padding: 2rem;
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.6;
+      }
+    </style>
+
+    <script>
+      (function () {
+        const ua = navigator.userAgent.toLowerCase();
+        const isKakao = ua.includes("kakaotalk");
+        const isAndroid = ua.includes("android");
+        const isIOS = ua.includes("iphone") || ua.includes("ipad");
+        const isRedirectPage = location.pathname === "/kakao-redirect";
+        const to = new URLSearchParams(location.search).get("to");
+
+        if (isKakao && isRedirectPage && to) {
+          const targetUrl = location.origin + to;
+
+          if (isAndroid) {
+            // ✅ Android는 외부 브라우저로 강제 이동
+            location.href =
+              "kakaotalk://web/openExternal?url=" +
+              encodeURIComponent(targetUrl);
+          } else if (isIOS) {
+            // ✅ iOS는 안내 메시지 표시 (뷰 렌더링 대신)
+            document.addEventListener("DOMContentLoaded", function () {
+              const msg = document.getElementById("ios-inapp-message");
+              if (msg) msg.style.display = "block";
+            });
+          }
+        }
+      })();
+    </script>
   </head>
+
   <body>
+    <!-- ✅ iOS fallback 안내 메시지 기본으로 숨겨놓기 -->
+    <div id="ios-inapp-message">
+      <h2>외부 브라우저에서 열어주세요</h2>
+      <p>
+        카카오톡 내에서는 이 페이지가 정상 작동하지 않습니다.<br />
+        우측 상단 <strong>•••</strong> 버튼을 누른 후<br />
+        <strong>"Safari에서 열기"</strong> 또는
+        <strong>"Chrome으로 열기"</strong>를 선택해주세요.
+      </p>
+    </div>
+
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>

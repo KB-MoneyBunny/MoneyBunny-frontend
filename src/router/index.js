@@ -96,6 +96,14 @@ const routes = [
     name: "signUpEmailCode",
     component: SignUpEmailCodePage,
   },
+  // 카카오톡 리다이렉트 전용 라우트 (빈 컴포넌트)
+  {
+    path: "/kakao-redirect",
+    name: "KakaoRedirect",
+    component: () => ({
+      template: "<div></div>", // 빈 컴포넌트 (index.html의 스크립트가 처리)
+    }),
+  },
   //
   // ─── 마이페이지 ─────────────────────────────────────
   { path: "/mypage/settings", name: "myPageSettings", component: SettingMain },
