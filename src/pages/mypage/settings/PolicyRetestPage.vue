@@ -170,6 +170,7 @@ const updatePriority = (list) => {
   priorityOrder.value = list;
   priorityModal.value = false;
 };
+
 const save = async () => {
   showToast.value = true;
 
@@ -188,6 +189,7 @@ const save = async () => {
     showToast.value = false;
     router.push({ name: 'mypage' });
   }, 1300);
+
   // 기존 값 유지, 수정된 값만 덮어쓰기
   const payload = {
     ...originalData.value,
@@ -203,19 +205,6 @@ const save = async () => {
   await policyAPI.saveUserPolicy(payload);
   router.push({ name: 'mypage' });
 };
-
-// 기존 값 유지, 수정된 값만 덮어쓰기
-const payload = {
-  ...originalData.value,
-  educationLevels: [labelToCode(educationLevelCodeMap, summary.value['학력'])],
-  majors: [labelToCode(majorCodeMap, summary.value['전공 요건'])],
-  employmentStatuses: [
-    labelToCode(employmentStatusCodeMap, summary.value['현재 상황']),
-  ],
-  ...rankObj,
-};
-await api.put('/api/userPolicy', payload);
-router.push({ name: 'mypage' });
 
 const redoQuiz = async () => {
   try {
