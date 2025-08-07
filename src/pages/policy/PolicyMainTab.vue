@@ -23,40 +23,41 @@
         v-for="(policy, index) in visiblePolicies"
         :key="policy.policyId"
         class="policyCard"
+        @click="goToDetail(policy.policyId)"
       >
         <div class="cardHeader">
           <span v-if="index < 3" class="topRank" :class="`rank${index + 1}`">
             TOP {{ index + 1 }}
           </span>
           <div class="titleTagRow">
-            <span class="cardTitle font-bold font-15">{{ policy.title }}</span>
+            <span class="cardTitle font-bold font-14">{{ policy.title }}</span>
             <!-- 대분류 태그 중복 제거 후 표시 -->
             <template v-if="getUniqueLargeCategories(policy).length">
               <span
                 v-for="tag in getUniqueLargeCategories(policy)"
                 :key="tag"
-                class="cardTag font-12"
+                class="cardTag font-11"
                 >{{ tag }}</span
               >
             </template>
           </div>
         </div>
-        <p class="cardDesc font-14">{{ policy.policyBenefitDescription }}</p>
-        <p class="cardDeadline font-12">
-          <span class="label font-regular">신청기간 : </span>
+        <p class="cardDesc font-13">{{ policy.policyBenefitDescription }}</p>
+        <p class="cardDeadline font-11">
+          <span class="label">신청기간 : </span>
           <span class="date font-bold">
             {{ policy.endDate ? formatPeriod(policy.endDate) : '상시' }}
           </span>
         </p>
         <div class="cardActions">
           <button
-            class="buttonSecondary font-14"
+            class="buttonSecondary font-13"
             @click="goToDetail(policy.policyId)"
           >
             자세히 보기
           </button>
           <button
-            class="buttonPrimary font-14"
+            class="buttonPrimary font-13"
             @click="goToApplyPage(policy.applyUrl)"
           >
             신청하기
@@ -75,7 +76,7 @@
     <!-- 더 많은 정책 보기 버튼 -->
     <button
       v-if="showMoreBtn"
-      class="moreButton font-bold font-16"
+      class="moreButton font-bold font-15"
       @click="loadMore"
     >
       더 많은 정책 보기
@@ -186,7 +187,6 @@ function getUniqueLargeCategories(policy) {
 
 <style scoped>
 .policyWrapper {
-  padding: 10px;
   background-color: var(--input-bg-2);
 }
 .searchBar {
@@ -194,35 +194,34 @@ function getUniqueLargeCategories(policy) {
   align-items: center;
   background-color: white;
   border: 1px solid var(--input-outline-2);
-  border-radius: 8px;
-  padding: 9px 16px;
-  margin-top: 12px;
-  margin-bottom: 20px;
-  gap: 8px;
+  border-radius: 6px;
+  padding: 7px 14px;
+  margin-bottom: 15px;
+  gap: 6px;
 }
 .searchBar input {
   border: none;
   outline: none;
   flex: 1;
-  font-size: 15px;
+  font-size: 14px;
   background-color: transparent;
 }
 .searchIconImage {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 .policyCard {
   background-color: white;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  cursor: pointer;
 }
 .cardHeader {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 4px;
+  margin-bottom: 6px;
   width: 100%;
   min-width: 0;
 }
@@ -231,21 +230,21 @@ function getUniqueLargeCategories(policy) {
   align-items: center;
   min-width: 0;
   flex: 1;
-  gap: 6px;
+  gap: 4px;
 }
 
 .topRank {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   border-radius: 999px;
-  width: 50px;
-  height: 24px;
+  width: 46px;
+  height: 22px;
   color: #fff;
   letter-spacing: -0.5px;
-  margin-right: 2px;
+  margin-right: 3px;
   flex-shrink: 0;
 }
 .rank1 {
@@ -259,7 +258,7 @@ function getUniqueLargeCategories(policy) {
 }
 .cardTitle {
   color: var(--text-login);
-  font-size: 16px;
+  font-size: 15px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -271,50 +270,51 @@ function getUniqueLargeCategories(policy) {
   display: inline-block;
   background-color: var(--input-outline);
   color: var(--text-bluegray);
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 2px;
-  font-size: 13px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 1px;
+  font-size: 11px;
   vertical-align: middle;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .cardDesc {
   color: var(--text-bluegray);
-  margin: 6px 0;
+  margin: 4px 0;
 }
 .cardDeadline {
-  margin-bottom: 12px;
+  margin-bottom: 11px;
 }
 .cardDeadline .label {
   color: var(--text-bluegray);
-  margin-right: 4px;
+  margin-right: 3px;
 }
 .cardDeadline .date {
   color: var(--base-blue-dark);
+  font-size: 12px;
 }
 .cardActions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 .buttonSecondary,
 .buttonPrimary {
   flex: 1;
 }
 .buttonSecondary {
-  width: 185px;
+  width: 170px;
   background-color: var(--input-bg-2);
   border: none;
-  padding: 10px;
+  padding: 6px;
   border-radius: 8px;
   color: var(--text-bluegray);
 }
 .buttonPrimary {
-  width: 185px;
+  width: 170px;
   background-color: var(--base-blue-dark);
   color: white;
   border: none;
-  padding: 10px;
+  padding: 6px;
   border-radius: 8px;
 }
 .moreButton {
@@ -326,7 +326,7 @@ function getUniqueLargeCategories(policy) {
   color: var(--base-blue-dark);
   border-radius: 8px;
   border: 1px solid var(--input-outline);
-  margin-top: 15px;
+  /* margin-top: 15px */
 }
 .fakeInput {
   pointer-events: auto;
