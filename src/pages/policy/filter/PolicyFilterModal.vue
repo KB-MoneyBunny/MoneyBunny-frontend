@@ -498,22 +498,29 @@ const areaSelectModalProps = computed(() => ({
           </button>
         </div>
       </div>
+
       <div class="modalFooter">
-        <button class="resetBtn font-18" @click="reset">초기화</button>
-        <button
-          class="saveBtn font-18"
-          @click="page === 'main' ? confirm() : (page = 'main')"
-        >
-          {{ page === 'main' ? '저장' : '적용' }}
+        <button class="autoFillBtn font-16" @click="$emit('autoFill')">
+          내 정보 자동입력
         </button>
+        <div class="footerBtnRow">
+          <button class="resetBtn font-16" @click="reset">초기화</button>
+          <button
+            class="saveBtn font-16"
+            @click="page === 'main' ? confirm() : (page = 'main')"
+          >
+            {{ page === 'main' ? '저장' : '적용' }}
+          </button>
+        </div>
       </div>
+
+      <AreaSelectModal
+        v-if="showRegionModal"
+        v-bind="areaSelectModalProps"
+        @close="showRegionModal = false"
+        @selected="handleRegionSelected"
+      />
     </div>
-    <AreaSelectModal
-      v-if="showRegionModal"
-      v-bind="areaSelectModalProps"
-      @close="showRegionModal = false"
-      @selected="handleRegionSelected"
-    />
   </div>
 </template>
 
@@ -695,7 +702,8 @@ const areaSelectModalProps = computed(() => ({
 
 .modalFooter {
   display: flex;
-  gap: 4px;
+  flex-direction: column;
+  gap: 0px;
   padding: 0 16px 16px 16px;
   margin-top: 10px;
 }
@@ -705,8 +713,11 @@ const areaSelectModalProps = computed(() => ({
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 45px;
+  font-size: 18px;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
-
 .resetBtn {
   height: 45px;
   flex: 1;
@@ -833,5 +844,21 @@ const areaSelectModalProps = computed(() => ({
   font-size: 13px;
   cursor: pointer;
   padding: 0 0 0 2px;
+}
+.autoFillBtn {
+  width: 100%;
+  height: 42px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #f4f5fb; /* 연한 회색 느낌 */
+  color: var(--base-blue-dark);
+  cursor: pointer;
+  text-align: center;
+}
+
+.footerBtnRow {
+  display: flex;
+  gap: 4px;
 }
 </style>
