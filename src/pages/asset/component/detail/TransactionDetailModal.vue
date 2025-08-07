@@ -1,102 +1,107 @@
 <template>
   <div v-if="show" class="modal-overlay" @click.self="closeModal">
     <div class="modal-container">
-      <!-- ✅ 헤더 공통 -->
-      <DetailHeader :title="'거래 상세'" @back="closeModal" />
+      <!-- ✅ 헤더 - 가로폭 전체 사용 -->
+      <div class="modal-header">
+        <DetailHeader :title="'거래 상세'" @back="closeModal" />
+      </div>
 
-      <!-- 거래 정보 카드 -->
-      <div class="info-card">
-        <div class="info-top">
-          <div class="info-left">
-            <div class="bank-logo">{{ transaction.bankInitial || '우' }}</div>
-            <div class="info-text">
-              <p class="transaction-title">{{ transaction.description }}</p>
+      <!-- 컨텐츠 영역 - 패딩 적용 -->
+      <div class="modal-content">
+        <!-- 거래 정보 카드 -->
+        <div class="info-card">
+          <div class="info-top">
+            <div class="info-left">
+              <div class="bank-logo">{{ transaction.bankInitial }}</div>
+              <div class="info-text">
+                <p class="transaction-title">{{ transaction.description }}</p>
+              </div>
+            </div>
+            <div class="amount-section">
+              <p :class="['transaction-amount', amountClass]">
+                {{ amountSign }}{{ formatAmount(transaction.amount) }}원
+              </p>
+              <span class="amount-label">거래금액</span>
             </div>
           </div>
-          <div class="amount-section">
-            <p :class="['transaction-amount', amountClass]">
-              {{ amountSign }}{{ formatAmount(transaction.amount) }}원
-            </p>
-            <span class="amount-label">거래금액</span>
+
+          <!--상세 리스트 -->
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">거래시각</span>
+              <span class="detail-value"
+                >{{ transaction.date }} {{ transaction.time }}</span
+              >
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">거래구분</span>
+              <span :class="['detail-value', 'transaction-type', amountClass]">
+                {{ type === 'account' ? transaction.type : transaction.status }}
+              </span>
+            </div>
+
+            <!-- 카드 전용: 카테고리 표시 -->
+            <div
+              class="detail-item"
+              v-if="type === 'card' && transaction.category"
+            >
+              <span class="detail-label">카테고리</span>
+              <span class="detail-value">{{ transaction.category }}</span>
+            </div>
+
+            <!-- 계좌 전용: 거래후 잔액 -->
+            <div class="detail-item" v-if="type === 'account'">
+              <span class="detail-label">거래후 잔액</span>
+              <span class="detail-value balance"
+                >{{ formatAmount(transaction.balanceAfter) }}원</span
+              >
+            </div>
+
+            <!-- 카드 전용: 환불 정보 (환불인 경우만) -->
+            <div
+              class="detail-item"
+              v-if="
+                type === 'card' &&
+                transaction.isCancel &&
+                transaction.cancelAmount
+              "
+            >
+              <span class="detail-label">환불금액</span>
+              <span class="detail-value positive"
+                >+{{ formatAmount(transaction.cancelAmount) }}원</span
+              >
+            </div>
           </div>
         </div>
 
-        <!--상세 리스트 -->
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">거래시각</span>
-            <span class="detail-value"
-              >{{ transaction.date }} {{ transaction.time }}</span
+        <!-- 거래 메모 카드 -->
+        <div class="memo-card">
+          <h3>메모</h3>
+          <input
+            type="text"
+            v-model="memoText"
+            maxlength="20"
+            placeholder="메모를 입력하세요 (최대 20자)"
+            class="memo-input"
+            @input="updateMemoCount"
+          />
+          <div class="memo-footer">
+            <span class="memo-count">{{ memoText.length }}/20</span>
+            <button
+              class="memo-save"
+              :class="{ active: isSaveActive }"
+              :disabled="!isSaveActive"
+              @click="saveMemo"
             >
-          </div>
-
-          <div class="detail-item">
-            <span class="detail-label">거래구분</span>
-            <span :class="['detail-value', 'transaction-type', amountClass]">
-              {{ type === 'account' ? transaction.type : transaction.status }}
-            </span>
-          </div>
-
-          <!-- 카드 전용: 카테고리 표시 -->
-          <div
-            class="detail-item"
-            v-if="type === 'card' && transaction.category"
-          >
-            <span class="detail-label">카테고리</span>
-            <span class="detail-value">{{ transaction.category }}</span>
-          </div>
-
-          <!-- 계좌 전용: 거래후 잔액 -->
-          <div class="detail-item" v-if="type === 'account'">
-            <span class="detail-label">거래후 잔액</span>
-            <span class="detail-value balance"
-              >{{ formatAmount(transaction.balanceAfter) }}원</span
-            >
-          </div>
-
-          <!-- 카드 전용: 환불 정보 (환불인 경우만) -->
-          <div
-            class="detail-item"
-            v-if="
-              type === 'card' &&
-              transaction.isCancel &&
-              transaction.cancelAmount
-            "
-          >
-            <span class="detail-label">환불금액</span>
-            <span class="detail-value positive"
-              >+{{ formatAmount(transaction.cancelAmount) }}원</span
-            >
+              저장
+            </button>
           </div>
         </div>
+
+        <!-- 확인 버튼 -->
+        <button class="confirm-btn" @click="closeModal">확인</button>
       </div>
-
-      <!-- 거래 메모 카드 -->
-      <div class="memo-card">
-        <h3>메모</h3>
-        <input
-          type="text"
-          v-model="memoText"
-          maxlength="20"
-          placeholder="메모를 입력하세요 (최대 20자)"
-          class="memo-input"
-          @input="updateMemoCount"
-        />
-        <div class="memo-footer">
-          <span class="memo-count">{{ memoText.length }}/20</span>
-          <button
-            class="memo-save"
-            :class="{ active: isSaveActive }"
-            :disabled="!isSaveActive"
-            @click="saveMemo"
-          >
-            저장
-          </button>
-        </div>
-      </div>
-
-      <!-- 확인 버튼 -->
-      <button class="confirm-btn" @click="closeModal">확인</button>
     </div>
   </div>
 </template>
@@ -128,7 +133,6 @@ const amountSign = computed(() => {
   return props.transaction.type === '입금' ? '+' : '-';
 });
 
-// 함수들
 const closeModal = () => {
   memoText.value = ''; // 모달 닫을 때 메모 초기화
   emit('close');
@@ -178,7 +182,33 @@ watch(
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 헤더 영역 - 전체 가로폭 사용 */
+.modal-header {
+  width: 100%;
+  background: var(--input-bg-2);
+  flex-shrink: 0; /* 헤더 높이 고정 */
+}
+
+/* 헤더 내부 컴포넌트 스타일 강제 적용 */
+.modal-header :deep(.detail-header),
+.modal-header :deep(.header-container),
+.modal-header :deep(.fixed-header) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+/* 컨텐츠 영역 - 스크롤 가능, 패딩 적용 */
+.modal-content {
+  flex: 1;
   padding: 0 1rem 2rem;
+  overflow-y: auto;
   box-sizing: border-box;
 }
 
@@ -333,7 +363,6 @@ watch(
   margin-top: 0.25rem;
   font-size: 0.9rem;
   box-sizing: border-box;
-  transition: border-color 0.2s ease;
 }
 
 .memo-input:focus {
@@ -361,14 +390,10 @@ watch(
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
   font-weight: 500;
-  transition: all 0.2s ease;
 }
 
 .memo-save.active {
   background: var(--base-blue-dark);
-  cursor: pointer;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(48, 70, 99, 0.3);
 }
 
 /* 확인 버튼 */
@@ -381,14 +406,10 @@ watch(
   font-size: 1.05rem;
   font-weight: 600;
   margin-top: 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(48, 70, 99, 0.3);
 }
 
 .confirm-btn:active {
   background: #263952;
-  transform: translateY(1px);
-  box-shadow: 0 2px 6px rgba(48, 70, 99, 0.3);
 }
 </style>
