@@ -1,35 +1,35 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
 // 🎵 회원가입 - 이메일 인증 시작 페이지
 const router = useRouter();
-const signUpEmail = ref('');
+const signUpEmail = ref("");
 const isRequesting = ref(false);
-const errorMsg = ref('');
+const errorMsg = ref("");
 const showToast = ref(false);
 
 // 인증코드 전송
 const requestSignUpCode = async () => {
-  errorMsg.value = '';
+  errorMsg.value = "";
 
   // 이메일 입력 확인
   if (!signUpEmail.value.trim()) {
-    errorMsg.value = '이메일을 입력해주세요.';
+    errorMsg.value = "이메일을 입력해주세요.";
     return;
   }
 
   // 이메일 형식 확인
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(signUpEmail.value)) {
-    errorMsg.value = '올바른 이메일 형식을 입력해주세요.';
+    errorMsg.value = "올바른 이메일 형식을 입력해주세요.";
     return;
   }
 
   try {
     isRequesting.value = true;
-    await axios.post('/api/auth/signup-request-email', {
+    await axios.post("/api/auth/send-join-code", {
       email: signUpEmail.value,
     });
     showToast.value = true;
@@ -37,14 +37,14 @@ const requestSignUpCode = async () => {
       showToast.value = false;
       // 회원가입 인증코드 입력 페이지로 이동 (route 네임은 프로젝트에 맞게!)
       router.push({
-        name: 'signUpEmailCode',
+        name: "signUpEmailCode",
         query: { email: signUpEmail.value },
       });
     }, 1200);
   } catch (err) {
     errorMsg.value =
       err.response?.data?.message ||
-      '이미 가입된 이메일이거나 오류가 발생했습니다.';
+      "이미 가입된 이메일이거나 오류가 발생했습니다.";
   } finally {
     isRequesting.value = false;
   }
