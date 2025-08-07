@@ -4,6 +4,13 @@ import { FCMTokenManager } from '@/firebase/FCMTokenManager';
 
 import axios from 'axios'; // axios 임포트 // <- 추가
 
+// 💪(상일) 다른 Pinia 스토어들 import
+import { useBookmarkStore } from '@/stores/bookmark';
+import { useNotificationStore } from '@/stores/notification';
+import { useAssetStore } from '@/stores/asset';
+import { usePolicyQuizStore } from '@/stores/policyQuizStore';
+import { usePolicyMatchingStore } from '@/stores/policyMatchingStore';
+
 // 초기 상태 템플릿
 const initState = {
   token: '', // JWT 접근 토큰
@@ -124,6 +131,26 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       console.error("[Logout] 로그아웃 처리 중 예외 발생:", error);
     } finally {
+      // 💪(상일) 모든 Pinia 스토어 초기화
+      try {
+        const bookmarkStore = useBookmarkStore();
+        const notificationStore = useNotificationStore();
+        const assetStore = useAssetStore();
+        const policyQuizStore = usePolicyQuizStore();
+        const policyMatchingStore = usePolicyMatchingStore();
+        
+        // 각 스토어 초기 상태로 리셋
+        bookmarkStore.$reset();
+        notificationStore.$reset();
+        assetStore.$reset();
+        policyQuizStore.$reset();
+        policyMatchingStore.$reset();
+        
+        console.log("[Logout] 모든 Pinia 스토어 초기화 완료");
+      } catch (storeError) {
+        console.warn("[Logout] 일부 스토어 초기화 실패:", storeError);
+      }
+      
       // 💪(상일) 무조건 로컬 상태 완전 초기화 (원자성 보장)
       localStorage.clear();
       state.value = { ...initState };
