@@ -31,15 +31,38 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 
-const currentAsset = ref(null);
-const expectedAsset = ref(null);
-const increaseAmount = ref(null);
-const increaseRate = ref(null);
+// props로 총 자산과 정책 혜택 총합 전달받음
+const props = defineProps({
+  totalAsset: {
+    type: Number,
+    required: true,
+  },
+  top3TotalAmount: {
+    type: Number,
+    required: true,
+  },
+});
 
+// 현재 자산: 총 자산
+const currentAsset = computed(() => props.totalAsset ?? 0);
+// 예상 자산: 총 자산 + 정책 혜택 총합
+const expectedAsset = computed(
+  () => (props.totalAsset ?? 0) + (props.top3TotalAmount ?? 0)
+);
+// 증가 금액
+const increaseAmount = computed(() => expectedAsset.value - currentAsset.value);
+// 증가율
+const increaseRate = computed(() =>
+  currentAsset.value > 0
+    ? ((increaseAmount.value / currentAsset.value) * 100).toFixed(1)
+    : '0.0'
+);
+
+// 표시용 포맷 함수
 const format = (val, suffix = '원') =>
-  val ? val.toLocaleString() + suffix : '9,999' + suffix;
+  val != null ? val.toLocaleString() + suffix : '-';
 
 const currentAssetDisplay = computed(() => format(currentAsset.value));
 const expectedAssetDisplay = computed(() => format(expectedAsset.value));
@@ -47,7 +70,7 @@ const increaseAmountDisplay = computed(
   () => '+' + format(increaseAmount.value)
 );
 const increaseRateDisplay = computed(() =>
-  increaseRate.value ? `${increaseRate.value}%` : '9.9%'
+  increaseRate.value ? `${increaseRate.value}%` : '-'
 );
 </script>
 

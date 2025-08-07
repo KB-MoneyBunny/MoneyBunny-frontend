@@ -46,6 +46,11 @@ const monthlyExpenseDisplay = computed(() =>
     ? summary.value.thisMonthCardUsed.toLocaleString() + '원'
     : '-'
 );
+
+// expose summary to parent
+defineExpose({
+  summary,
+});
 </script>
 
 <style scoped>

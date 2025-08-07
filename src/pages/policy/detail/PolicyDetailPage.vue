@@ -91,6 +91,16 @@ const policy = computed(() =>
     ? policyData.value
     : ALL_POLICIES.find((p) => p.policyId === policyId.value)
 );
+
+// supportContent 값 로그 출력
+watchEffect(() => {
+  if (policy.value) {
+    console.log(
+      'PolicyDetailPage에서 넘기는 policy.supportContent:',
+      policy.value.supportContent
+    );
+  }
+});
 // 기간 문자열 추출 (endDate 필드)
 const period = computed(() => policy.value?.endDate || '');
 </script>
