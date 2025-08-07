@@ -63,7 +63,11 @@ const userInfo = ref({
 
 // 💪(상일) 북마크 스토어 연동
 const bookmarkStore = useBookmarkStore();
-const { bookmarks, loading: bookmarkLoading, error: bookmarkError } = storeToRefs(bookmarkStore);
+const {
+  bookmarks,
+  loading: bookmarkLoading,
+  error: bookmarkError,
+} = storeToRefs(bookmarkStore);
 const { fetchBookmarks } = bookmarkStore;
 
 const openModal = () => {
@@ -72,7 +76,7 @@ const openModal = () => {
 
 const changeTab = (tab) => {
   currentTab.value = tab;
-  
+
   // 💪(상일) 북마크 탭으로 전환 시 데이터 로드
   if (tab === 'bookmark' && bookmarks.value.length === 0) {
     fetchBookmarks();
@@ -94,20 +98,19 @@ onMounted(async () => {
   width: 100%;
   min-height: 100vh;
   background-color: var(--input-bg-2);
-  padding: 32px 20px;
   box-sizing: border-box;
 }
 
 .infoCard {
   background-color: white;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 20px;
 }
 
 .userCard {
   background-color: white;
-  border-radius: 20px;
-  padding: 24px;
+  border-radius: 10px;
+  padding: 20px;
   margin-bottom: 24px;
 }
 
@@ -118,12 +121,12 @@ onMounted(async () => {
 }
 
 .profileImage {
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-color: var(--input-bg-3);
   object-fit: cover;
-  margin-right: 16px;
+  margin-right: 12px;
 }
 
 .userText {
@@ -142,14 +145,14 @@ onMounted(async () => {
 }
 
 .editIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
 }
 
 .infoCard {
   background-color: white;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 20px;
 }
 

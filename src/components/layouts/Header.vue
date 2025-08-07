@@ -50,7 +50,7 @@ onMounted(async () => {
   right: 0;
 
   width: 100%;
-  max-width: 474px;
+  max-width: 390px;
   margin: 0 auto;
   height: 65px;
   border-bottom: 1px solid var(--base-lavender);

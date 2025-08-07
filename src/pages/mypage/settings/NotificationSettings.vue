@@ -37,14 +37,14 @@
           @click="toggleNotification('bookmark')"
           :disabled="!hasNotificationPermission || loading || isTokenGenerating"
         >
-          {{ subscriptionStatus.isActiveBookmark ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveBookmark ? 'ON' : 'OFF' }}
         </button>
       </div>
 
       <div class="setting-item">
         <div class="setting-info">
-          <h3 class="setting-title font-16 font-bold">TOP3 추천 알림</h3>
-          <p class="setting-desc font-13">
+          <h3 class="setting-title font-15 font-bold">TOP3 추천 알림</h3>
+          <p class="setting-desc font-14">
             머니버니가 추천하는 맞춤 정책 TOP3를 알려드려요
           </p>
         </div>
@@ -57,7 +57,7 @@
           @click="toggleNotification('top3')"
           :disabled="!hasNotificationPermission || loading || isTokenGenerating"
         >
-          {{ subscriptionStatus.isActiveTop3 ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveTop3 ? 'ON' : 'OFF' }}
         </button>
       </div>
 
@@ -77,7 +77,7 @@
           @click="toggleNotification('newPolicy')"
           :disabled="!hasNotificationPermission || loading || isTokenGenerating"
         >
-          {{ subscriptionStatus.isActiveNewPolicy ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveNewPolicy ? 'ON' : 'OFF' }}
         </button>
       </div>
 
@@ -97,7 +97,7 @@
           @click="toggleNotification('feedback')"
           :disabled="!hasNotificationPermission || loading || isTokenGenerating"
         >
-          {{ subscriptionStatus.isActiveFeedback ? "ON" : "OFF" }}
+          {{ subscriptionStatus.isActiveFeedback ? 'ON' : 'OFF' }}
         </button>
       </div>
     </div>
@@ -136,9 +136,9 @@ const goBack = () => {
 
 // 💪(상일) 알림 권한 확인 - FCMTokenManager 사용으로 간소화
 const checkNotificationPermission = async () => {
-  if (!("Notification" in window)) {
+  if (!('Notification' in window)) {
     showPermissionNotice.value = true;
-    permissionMessage.value = "이 브라우저는 알림을 지원하지 않습니다.";
+    permissionMessage.value = '이 브라우저는 알림을 지원하지 않습니다.';
     return;
   }
 
@@ -268,16 +268,16 @@ const toggleNotification = async (type) => {
     // 💪(상일) reactive 객체는 .value 없이 접근
     let currentStatus = false;
     switch (type) {
-      case "bookmark":
+      case 'bookmark':
         currentStatus = subscriptionStatus.isActiveBookmark;
         break;
-      case "top3":
+      case 'top3':
         currentStatus = subscriptionStatus.isActiveTop3;
         break;
-      case "newPolicy":
+      case 'newPolicy':
         currentStatus = subscriptionStatus.isActiveNewPolicy;
         break;
-      case "feedback":
+      case 'feedback':
         currentStatus = subscriptionStatus.isActiveFeedback;
         break;
     }
