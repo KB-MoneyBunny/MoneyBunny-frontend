@@ -1,17 +1,18 @@
 <template>
   <header class="introHeader">
     <div class="resultHeader">
-      <div class="font-22 font-bold">맞춤 정책 분석 결과</div>
+      <div class="font-18">맞춤 정책 분석 결과</div>
     </div>
   </header>
-
+  <transition name="fade">
+    <div v-if="showToast" class="toastMsg">저장되었습니다!</div>
+  </transition>
   <div class="resultContainer">
-    <!-- 응답 결과 -->
     <section class="summarySection">
-      <div class="font-18 font-bold">응답 결과</div>
+      <div class="font-16 font-bold">응답 결과</div>
       <div class="summaryRow" v-for="(value, key) in summary" :key="key">
-        <span class="summaryLabel font-15">{{ key }}</span>
-        <span class="summaryValue font-15">
+        <span class="summaryLabel font-14">{{ key }}</span>
+        <span class="summaryValue font-14">
           {{ value }}
           <button class="editBtn" @click="openModal(key)">
             <img src="@/assets/images/icons/mypage/edit.png" alt="수정" />
@@ -23,7 +24,7 @@
     <!-- 우선순위 영역 -->
     <section class="prioritySection">
       <div class="priorityHeader">
-        <span class="font-18 font-bold">정책 신청 시 중요하게 여긴 항목</span>
+        <span class="font-16 font-bold">정책 선택 시 중요하게 본 기준</span>
         <button class="editBtn" @click="openPriorityModal">
           <img src="@/assets/images/icons/mypage/edit.png" alt="수정" />
         </button>
@@ -34,15 +35,15 @@
           :key="idx"
           class="priorityItem"
         >
-          <span class="priorityRank font-14">{{ idx + 1 }}순위</span>
-          <span class="priorityLabel font-16">{{ item }}</span>
+          <span class="priorityRank font-12">{{ idx + 1 }}순위</span>
+          <span class="priorityLabel font-14">{{ item }}</span>
         </li>
       </ul>
     </section>
 
     <footer class="buttonGroup">
-      <button class="btn-grey font-18" @click="redoQuiz">다시 검사하기</button>
-      <button class="btn-blue font-18" @click="save">저장하기</button>
+      <button class="btn-grey font-15" @click="redoQuiz">다시 검사하기</button>
+      <button class="btn-blue font-15" @click="save">저장하기</button>
     </footer>
   </div>
 
@@ -80,7 +81,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
-import api from '@/api';
+import { policyAPI } from '@/api/policy';
 
 import EditEducationModal from '../modals/EditEducationModal.vue';
 import EditMajorModal from '../modals/EditMajorModal.vue';
@@ -120,7 +121,7 @@ const priorityOptions = ['금액', '만료일', '조회수'];
 // 서버에서 초기값 받아오기
 onMounted(async () => {
   try {
-    const { data } = await api.get('/api/userPolicy');
+    const { data } = await policyAPI.getUserPolicy();
     originalData.value = data; // 전체 데이터 저장
     summary.value = {
       학력: codeToLabel(educationLevelCodeMap, data.educationLevels?.[0] || ''),
@@ -148,6 +149,8 @@ onMounted(async () => {
   }
 });
 
+const showToast = ref(false);
+
 // 항목별 수정 모달 오픈
 const openModal = (key) => {
   activeModal.value = key;
@@ -169,12 +172,23 @@ const updatePriority = (list) => {
 };
 
 const save = async () => {
+  showToast.value = true;
+
+  // 우선순위 rank 객체 생성
   const rankObj = {};
   priorityOrder.value.forEach((label, idx) => {
     if (label === '금액') rankObj.moneyRank = idx + 1;
     if (label === '만료일') rankObj.periodRank = idx + 1;
     if (label === '조회수') rankObj.popularityRank = idx + 1;
   });
+
+  // 실제 저장 로직 들어가면 이곳에 추가!
+
+  // 토스트 1.3초 후 닫고 페이지 이동
+  setTimeout(() => {
+    showToast.value = false;
+    router.push({ name: 'mypage' });
+  }, 1300);
 
   // 기존 값 유지, 수정된 값만 덮어쓰기
   const payload = {
@@ -188,16 +202,15 @@ const save = async () => {
     ],
     ...rankObj,
   };
-  await api.put('/api/userPolicy', payload);
+  await policyAPI.saveUserPolicy(payload);
   router.push({ name: 'mypage' });
 };
 
 const redoQuiz = async () => {
   try {
-    await api.delete('/api/userPolicy');
+    await policyAPI.deleteUserPolicy();
     router.push({ path: '/policy' });
   } catch (e) {
-    // 실패 시 기존 동작(폼 이동) 유지
     router.push({ path: '/policy' });
   }
 };
@@ -207,7 +220,6 @@ const redoQuiz = async () => {
 .introHeader {
   display: flex;
   justify-content: center;
-  margin-bottom: 10px;
 }
 .resultHeader {
   display: flex;
@@ -215,41 +227,36 @@ const redoQuiz = async () => {
   justify-content: center;
   background-color: var(--base-blue-dark);
   border-radius: 10px;
-  padding: 22px 16px;
+  padding: 20px 14px;
   color: white;
-  max-width: 420px;
+  max-width: 360px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
 }
 
 .resultContainer {
-  max-width: 480px;
+  max-width: 360px;
   margin: 0 auto;
-  padding: 26px 0;
+  padding: 20px 0;
   background: transparent;
   border-radius: 8px;
 }
 
 .summarySection {
   background: #fff;
-  border-radius: 16px;
-  margin-bottom: 28px;
-  padding: 28px 20px 18px 20px;
-  box-shadow: 0 6px 24px rgba(50, 60, 100, 0.05);
-}
-.summarySection h3 {
-  margin: 0 0 12px 0;
+  border-radius: 12px;
+  padding: 24px 18px;
 }
 
 .summaryRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 11px 14px;
+  padding: 10px 12px;
   background-color: var(--input-bg-2);
-  border-radius: 10px;
-  margin: 10px 0;
+  border-radius: 8px;
+  margin: 15px 0 10px 0;
 }
 .summaryLabel {
   color: var(--text-lightgray);
@@ -258,34 +265,34 @@ const redoQuiz = async () => {
   color: var(--text-login);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 .editBtn {
   background: none;
   border: none;
   padding: 0;
-  margin-left: 7px;
+  margin-left: 5px;
   cursor: pointer;
   display: flex;
   align-items: center;
 }
 .editBtn img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: block;
 }
 
 .prioritySection {
   background: #fff;
-  border-radius: 16px;
-  margin: 15px 0;
-  padding: 23px 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  padding: 20px 18px;
 }
 .priorityHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 11px;
+  margin-bottom: 13px;
 }
 
 .priorityList {
@@ -294,41 +301,43 @@ const redoQuiz = async () => {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .priorityItem {
   display: flex;
   align-items: center;
-  padding: 10px 16px;
-  border-radius: 10px;
+  padding: 8px 14px;
+  border-radius: 8px;
   background-color: var(--input-bg-2);
 }
 .priorityRank {
-  background-color: var(--base-blue-dark);
-  color: white;
-  border-radius: 10px;
-  padding: 4px 13px;
-  margin-right: 14px;
+  background: var(--priority-bg);
+  color: var(--base-blue-dark);
+  border-radius: 8px;
+  padding: 5px 10px;
+  margin-right: 10px;
 }
+
 .priorityLabel {
   color: var(--text-login);
 }
 
 .buttonGroup {
   display: flex;
-  flex-direction: column;
-  gap: 13px;
-  margin-top: 24px;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 18px;
   align-items: center;
 }
 .btn-grey,
 .btn-blue {
-  padding: 14px 0 14px 0;
-  border-radius: 10px;
-  width: 80%;
+  flex: 1 1 0;
+  padding: 10px 0;
+  border-radius: 8px;
+  text-align: center;
 }
 .btn-grey {
-  background-color: var(--input-bg-3);
+  background-color: var(--gray-light);
   color: var(--text-login);
   border: none;
 }
@@ -336,5 +345,25 @@ const redoQuiz = async () => {
   background-color: var(--base-blue-dark);
   color: white;
   border: none;
+}
+
+.toastMsg {
+  position: fixed;
+  left: 50%;
+  top: 20%;
+  z-index: 99999;
+  transform: translateX(-50%);
+  z-index: 5;
+  background: var(--base-blue-dark);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 235px;
+  max-width: 340px;
+  pointer-events: none;
+  text-align: center;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 </style>
