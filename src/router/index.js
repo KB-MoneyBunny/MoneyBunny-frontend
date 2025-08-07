@@ -232,7 +232,12 @@ router.beforeEach(async (to, from, next) => {
   // 🛠️ 제승 추가: 정책 메인 접근 전 조건 체크 네비게이션 가드
   if (to.path === '/policy' || to.path === '/policy/main') {
     try {
+<<<<<<< HEAD
       const res = await api.get('/api/userPolicy');
+=======
+      // 수정: policyAPI 사용
+      const res = await policyAPI.getUserPolicy();
+>>>>>>> origin/dev
       if (res.data && Object.keys(res.data).length > 0) {
         // 조건이 있으면 /policy/main 으로만 진입 허용
         if (to.path !== '/policy/main') {
