@@ -7,7 +7,11 @@
       </div>
       <div class="right">
         <div class="amount">+{{ amount.toLocaleString() }}원</div>
-        <button class="applyBtn">신청하기</button>
+        <img
+          class="nextIcon"
+          src="@/assets/images/icons/home/next.png"
+          alt="다음"
+        />
       </div>
     </div>
   </div>
@@ -36,56 +40,61 @@ defineProps({
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  gap: 0.2rem;
+  flex-wrap: nowrap;
 }
 
 .left {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.2rem;
+  flex-wrap: nowrap;
 }
 
 .rankCircle {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1rem;
+  height: 1rem;
   border-radius: 9999px;
   background-color: var(--base-blue-dark);
   color: white;
   text-align: center;
-  line-height: 1.2rem;
+  line-height: 1rem;
   font-size: 0.7rem;
-  margin-left: 0.1rem;
-  margin-right: 0.2rem;
+  margin-left: 0.05rem;
+  margin-right: 0.25rem;
 }
 
 .title {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: bold;
   color: var(--text-login);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 8.8rem;
+  display: block;
 }
 
 .right {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 .amount {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: bold;
   color: var(--base-blue-dark);
   white-space: nowrap;
 }
 
-.applyBtn {
-  background-color: var(--base-blue-dark);
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.6rem;
+.nextIcon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+
+  margin: 0 1.5px;
   cursor: pointer;
-  white-space: nowrap;
+  display: inline-block;
 }
 </style>
