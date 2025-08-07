@@ -33,8 +33,8 @@ defineProps({
   align-items: center;
   justify-content: center; /* 세로 가운데 정렬 */
   min-height: 5rem; /* 최소 높이 설정 (카드가 너무 낮지 않게) */
-  /* background: #fff0f4; */
-  background: #f5f6ff;
+  background: #fff0f4;
+  /* background: #f5f6ff; */
   /* background: #e6faf7; */
 
   border-radius: 0.5rem;

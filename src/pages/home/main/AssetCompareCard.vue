@@ -145,8 +145,8 @@ const increaseRateDisplay = computed(() =>
 .growthRate {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #3a57e8;
-  /* color: #6a7de7; */
+  /* color: #3a57e8; */
+  color: #6a7de7;
   min-width: 4.6rem;
   text-align: right;
   margin-right: 0.6rem;
