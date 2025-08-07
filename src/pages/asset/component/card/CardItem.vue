@@ -1,5 +1,8 @@
 <template>
   <div class="card-item" @click="openDetail">
+    <!-- ✅ 대표 뱃지: 카드 박스의 우측 상단 고정 -->
+    <span v-if="isRepresentative" class="main-badge top-right"> 대표 </span>
+
     <!-- 카드 이미지 -->
     <img
       :src="card.cardImage"
@@ -11,13 +14,12 @@
     <div class="card-info">
       <div class="info-top">
         <p class="card-name">{{ card.cardName }}</p>
-        <span v-if="isRepresentative" class="main-badge">대표</span>
       </div>
       <p class="card-number">{{ card.cardMaskedNumber }}</p>
       <p class="card-amount">{{ formatWon(card.thisMonthUsed) }}</p>
     </div>
 
-    <!-- 카드 컨트롤 영역 -->
+    <!-- 카드 컨트롤 -->
     <div class="card-control" @click.stop>
       <button v-if="isRepresentative" class="main-label" disabled>
         대표 카드
@@ -25,22 +27,8 @@
       <button v-else class="set-main-btn" @click.stop="$emit('set-main', card)">
         대표 설정
       </button>
-      <!--🥕카드 삭제 기능 제거-->
-      <!-- <button class="delete-btn" @click.stop="isDeleteModalOpen = true">
-        <img src="@/assets/images/icons/common/Trash.png" alt="삭제" />
-      </button> -->
     </div>
 
-    <!-- 삭제 확인 모달 -->
-    <!-- <DeleteConfirmModal
-      :visible="isDeleteModalOpen"
-      title="카드 삭제"
-      message="카드를 삭제하시겠습니까?"
-      :subtitle="`${card.cardName} • ${card.cardMaskedNumber}`"
-      warning="삭제된 카드는 복구할 수 없습니다."
-      @close="isDeleteModalOpen = false"
-      @confirm="handleDelete"
-    /> -->
     <!-- 상세 모달 -->
     <DetailModal :visible="showDetail" @close="showDetail = false">
       <CardDetail :cardData="card" @close="showDetail = false" />
@@ -50,7 +38,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import DeleteConfirmModal from '@/pages/asset/component/common/DeleteConfirmModal.vue';
 import DetailModal from '../detail/DetailModal.vue'; // 공통 전체화면 모달
 import CardDetail from './CardDetail.vue';
 
