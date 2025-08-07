@@ -1,38 +1,42 @@
+/* 거래금액 아이템 강조 */ .amount-item .detail-value { font-size: 1.125rem;
+font-weight: 700; } /* 거래금액 색상 */ .transaction-amount-detail.positive {
+color: var(--text-green); } .transaction-amount-detail.negative { color:
+var(--alert-red); }
 <template>
+  <!-- 거래 상세 모달 오버레이 -->
   <div v-if="show" class="modal-overlay" @click.self="closeModal">
     <div class="modal-container">
-      <!-- 헤더 - 가로폭 전체 사용 -->
+      <!-- 헤더 영역 - 전체 가로폭 사용 -->
       <div class="modal-header">
         <DetailHeader :title="'거래 상세'" @back="closeModal" />
       </div>
 
-      <!-- 컨텐츠 영역 - 패딩 적용 -->
+      <!-- 컨텐츠 영역 - 패딩 적용, 스크롤 가능 -->
       <div class="modal-content">
         <!-- 거래 정보 카드 -->
         <div class="info-card">
-          <div class="info-top">
-            <div class="info-left">
-              <div class="info-text">
-                <p class="transaction-title">{{ transaction.description }}</p>
-              </div>
-            </div>
-            <div class="amount-section">
-              <p :class="['transaction-amount', amountClass]">
-                {{ amountSign }}{{ formatAmount(transaction.amount) }}원
-              </p>
-              <span class="amount-label">거래금액</span>
-            </div>
+          <!-- 카테고리 태그 (카드인 경우만) -->
+          <div
+            v-if="type === 'card' && transaction.category"
+            class="category-tag"
+          >
+            #{{ transaction.category }}
           </div>
 
-          <!--상세 리스트 -->
+          <!-- 거래 제목 -->
+          <h2 class="transaction-title">{{ transaction.description }}</h2>
+
+          <!-- 상세 정보 리스트 -->
           <div class="detail-grid">
+            <!-- 거래 시각 -->
             <div class="detail-item">
               <span class="detail-label">거래시각</span>
               <span class="detail-value"
                 >{{ transaction.date }} {{ transaction.time }}</span
               >
             </div>
-            <!--거래 구분(계좌: 입금/출금, 카드: 환불/지출)-->
+
+            <!-- 거래 구분 (계좌: 입금/출금, 카드: 환불/지출) -->
             <div class="detail-item">
               <span class="detail-label">거래구분</span>
               <span :class="['detail-value', 'transaction-type', amountClass]">
@@ -40,41 +44,46 @@
               </span>
             </div>
 
-            <!-- 계좌 전용: 거래후 잔액 -->
-            <div class="detail-item" v-if="type === 'account'">
-              <span class="detail-label">거래후 잔액</span>
-              <span class="detail-value balance"
-                >{{ formatAmount(transaction.balanceAfter) }}원</span
+            <!-- 거래 금액 -->
+            <div class="detail-item amount-item">
+              <span class="detail-label">거래금액</span>
+              <span
+                :class="[
+                  'detail-value',
+                  'transaction-amount-detail',
+                  amountClass,
+                ]"
               >
+                {{ amountSign }}{{ formatAmount(transaction.amount) }}원
+              </span>
             </div>
 
-            <!-- 카드 전용: 결제방식(일시불) -->
+            <!-- 거래후 잔액 (계좌인 경우) -->
+            <div class="detail-item" v-if="type === 'account'">
+              <span class="detail-label">거래 후 잔액</span>
+              <span class="detail-value balance">
+                {{ formatAmount(transaction.balanceAfter) }}원
+              </span>
+            </div>
+
+            <!-- 카드정보 (카드인 경우) -->
             <div class="detail-item" v-if="type === 'card'">
-              <span class="detail-label">결제방식</span>
+              <span class="detail-label">카드정보</span>
               <span class="detail-value">{{
                 getPaymentType(transaction.paymentType)
               }}</span>
             </div>
 
-            <!-- 카드 전용: 매장유형 (있는 경우만) -->
+            <!-- 사용처 (매장유형이 있는 경우) -->
             <div
               class="detail-item"
               v-if="type === 'card' && transaction.storeType"
             >
-              <span class="detail-label">매장유형</span>
+              <span class="detail-label">사용처</span>
               <span class="detail-value">{{ transaction.storeType }}</span>
             </div>
 
-            <!-- 카드 전용: 카테고리 -->
-            <div
-              class="detail-item"
-              v-if="type === 'card' && transaction.category"
-            >
-              <span class="detail-label">카테고리</span>
-              <span class="detail-value">{{ transaction.category }}</span>
-            </div>
-
-            <!-- 카드 전용: 환불 정보 (환불인 경우만) -->
+            <!-- 카드 전용: 환불 정보 (환불인 경우만 표시) -->
             <div
               class="detail-item"
               v-if="
@@ -94,6 +103,7 @@
         <!-- 거래 메모 카드 -->
         <div class="memo-card">
           <h3>메모</h3>
+          <!-- 메모 입력 필드 -->
           <input
             type="text"
             v-model="memoText"
@@ -102,6 +112,7 @@
             class="memo-input"
             @input="updateMemoCount"
           />
+          <!-- 메모 하단: 글자수 카운터와 저장 버튼 -->
           <div class="memo-footer">
             <span class="memo-count">{{ memoText.length }}/20</span>
             <button
@@ -126,21 +137,22 @@
 import { ref, computed, watch } from 'vue';
 import DetailHeader from './DetailHeader.vue';
 
+// Props 정의
 const props = defineProps({
-  show: Boolean,
-  transaction: { type: Object, required: true },
-  type: { type: String, required: true },
+  show: Boolean, // 모달 표시 여부
+  transaction: { type: Object, required: true }, // 거래 데이터
+  type: { type: String, required: true }, // 'account' | 'card'
 });
 const emit = defineEmits(['close']);
 
 // 메모 관련 상태
 const memoText = ref('');
 
-// Computed
-const isSaveActive = computed(() => memoText.value.trim().length > 0);
-const formatAmount = (value) => value?.toLocaleString() ?? '0';
+// Computed 속성들
+const isSaveActive = computed(() => memoText.value.trim().length > 0); // 저장 버튼 활성화 여부
+const formatAmount = (value) => value?.toLocaleString() ?? '0'; // 금액 포맷팅
 
-//금액 색상 클래스: (입금/환불: 초록색, 출금/지출: 빨간색)
+// 금액 색상 클래스 결정 (입금/환불: 초록색, 출금/지출: 빨간색)
 const amountClass = computed(() => {
   if (props.type === 'card')
     return props.transaction.isCancel ? 'positive' : 'negative';
@@ -153,13 +165,13 @@ const amountSign = computed(() => {
   return props.transaction.type === '입금' ? '+' : '-';
 });
 
-// 🥕결제방식 텍스트 변환 (카드 전용)
+// 결제방식 텍스트 변환 (카드 전용)
 const getPaymentType = (paymentType) => {
   if (paymentType === 'single') return '일시불';
   return paymentType || '일시불';
 };
 
-// 🥕거래구분 텍스트 결정 (계좌: 입금/출금, 카드: 환불/지출)
+// 거래구분 텍스트 결정 (계좌: 입금/출금, 카드: 환불/지출)
 const getTransactionType = () => {
   if (props.type === 'account') {
     return props.transaction.type; // 입금/출금
@@ -169,15 +181,18 @@ const getTransactionType = () => {
   return '';
 };
 
+// 모달 닫기 함수
 const closeModal = () => {
   memoText.value = ''; // 모달 닫을 때 메모 초기화
   emit('close');
 };
 
+// 메모 입력 이벤트 핸들러 (실제로는 v-model이 자동 처리)
 const updateMemoCount = () => {
   // input 이벤트에서 자동으로 v-model이 업데이트됨
 };
 
+// 메모 저장 함수
 const saveMemo = () => {
   if (memoText.value.trim()) {
     // TODO: API 호출하여 메모 저장
@@ -284,14 +299,16 @@ watch(
   min-width: 0; /* 텍스트가 줄어들 수 있도록 */
 }
 
-/* 거래 제목 (상점명 등) */
+/* 거래 제목 (상점명 등) - 크기 증가 */
 .transaction-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 0.25rem 0;
-  color: var(--base-blue-dark);
-  word-break: break-all; /* 긴 텍스트 줄바꿈 */
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--text-login);
+  margin: 0.75rem 0 1.5rem 0; /* 상단, 하단 마진 증가 */
   line-height: 1.3;
+  word-break: break-all;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--input-bg-1);
 }
 
 /* 거래 부제목 */
@@ -394,7 +411,6 @@ watch(
   border-radius: 1rem;
   padding: 1.5rem;
   margin-top: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* 메모 카드 제목 */
@@ -467,7 +483,6 @@ watch(
   font-size: 1.05rem;
   font-weight: 600;
   margin-top: 1.5rem;
-  box-shadow: 0 4px 12px rgba(48, 70, 99, 0.3);
 }
 
 /* 확인 버튼 터치 시 피드백 */
