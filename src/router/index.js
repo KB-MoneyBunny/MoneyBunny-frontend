@@ -216,18 +216,18 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition;
     }
-    
+
     // 해시(앵커) 링크가 있는 경우 해당 위치로 이동
     if (to.hash) {
       return {
         el: to.hash,
-        behavior: 'smooth'
+        behavior: "smooth",
       };
     }
-    
+
     // 기본적으로 모든 새로운 페이지 이동 시 최상단으로 이동
     return { top: 0 };
-  }
+  },
 });
 
 // 인증 가드
@@ -239,7 +239,7 @@ router.beforeEach(async (to, from, next) => {
   // 🛠️ 제승 추가: 정책 메인 접근 전 조건 체크 네비게이션 가드
   if (to.path === "/policy" || to.path === "/policy/main") {
     try {
-      const res = await policyAPI.getUserPolicy();
+      const res = await api.get("/api/userPolicy");
       if (res.data && Object.keys(res.data).length > 0) {
         // 조건이 있으면 /policy/main 으로만 진입 허용
         if (to.path !== "/policy/main") {
@@ -276,6 +276,8 @@ router.beforeEach(async (to, from, next) => {
     "/resetPassword",
 
     // 회원 가입
+    "/signUpEmailRequest",
+    "/signUpEmailCode",
     "/signUpEmailVerify",
     "/signUpProfile",
 
