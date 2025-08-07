@@ -137,12 +137,10 @@ onMounted(async () => {
     ALL_POLICIES.value = policyMatchingStore.recommendedPolicies;
   } else {
     try {
-      console.log('search API 요청:', '/api/userPolicy/search');
       const res = await policyAPI.getUserPolicySearch(); // GET 방식으로 변경
       policyMatchingStore.setRecommendedPolicies(res.data);
       ALL_POLICIES.value = res.data;
     } catch (e) {
-      console.error('search API error:', e);
       ALL_POLICIES.value = [];
     }
   }
