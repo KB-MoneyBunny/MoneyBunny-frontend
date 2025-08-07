@@ -38,6 +38,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { computed } from 'vue';
 
@@ -89,6 +90,7 @@ const getBarColor = (index) => {
     : 'var(--base-blue-light)';
 };
 </script>
+
 <style scoped>
 .category-chart {
   background: white;
@@ -134,7 +136,6 @@ const getBarColor = (index) => {
 .chart-bar {
   flex: 1;
   border-radius: 0.25rem 0.25rem 0 0;
-  transition: all 0.2s ease;
   min-height: 5px;
 }
 
@@ -149,7 +150,6 @@ const getBarColor = (index) => {
   text-align: center;
   font-size: 0.75rem;
   color: var(--text-bluegray);
-  transition: color 0.2s ease;
 }
 
 .chart-label.active {
