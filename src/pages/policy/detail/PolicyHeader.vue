@@ -122,8 +122,18 @@ const toggleShareModal = () => {
   showModal.value = true;
 };
 
+// helper: www로 시작하면 https:// 붙여주는 함수
+const normalizeUrl = (url) => {
+  if (typeof url === "string" && url.startsWith("www")) {
+    return `https://${url}`;
+  }
+  return url;
+};
+
 function openApplyModal(policy) {
-  selectedPolicy.value = policy;
+  // applyUrl 이 www.xxx 로 시작하면 프로토콜 붙이고, 아니면 그대로
+  const fixedUrl = normalizeUrl(policy.applyUrl);
+  selectedPolicy.value = { ...policy, applyUrl: fixedUrl };
   showApplyModal.value = true;
 }
 
