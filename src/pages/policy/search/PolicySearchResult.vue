@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { policyAPI } from '@/api/policy';
 import PolicySearchHeader from './PolicySearchHeader.vue';
+import NoResultView from './NoSearchResult.vue';
 
 const route = useRoute();
 const policies = ref([]);
@@ -135,9 +136,11 @@ function getUniqueLargeCategories(policy) {
         </div>
       </div>
     </div>
-    <div v-else>
-      <p>검색 결과가 없습니다.</p>
-    </div>
+    <NoResultView
+      v-else
+      :searchKeyword="route.query.q"
+      :popularKeywords="popularKeywords"
+    />
   </div>
 </template>
 
