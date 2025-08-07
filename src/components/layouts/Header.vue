@@ -27,23 +27,26 @@
 
 <script setup>
 import { onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { useNotificationStore } from '@/stores/notification';
 
-// 💪(상일) 알림 스토어 사용
+// 💪(상일) 알림 스토어 및 라우트 사용
+const route = useRoute();
 const notificationStore = useNotificationStore();
 const unreadCount = computed(() => notificationStore.unreadCount);
 const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 
-// 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회
+// 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회 - 특정 라우트에서만
 onMounted(async () => {
-  try {
-    await notificationStore.fetchUnreadCount();
-    console.log(
-      '🔔 Header: 미읽은 알림 개수 조회 완료',
-      notificationStore.unreadCount
-    );
-  } catch (error) {
-    console.error('❌ Header: 미읽은 알림 개수 조회 실패', error);
+  // 미읽은 알림 개수가 필요한 페이지만 체크
+  const targetRoutes = ['/home', '/asset', '/policy', '/mypage'];
+  if (targetRoutes.some(routePath => route.path.startsWith(routePath))) {
+    try {
+      await notificationStore.fetchUnreadCount();
+      console.log('🔔 Header: 미읽은 알림 개수 조회 완료', notificationStore.unreadCount);
+    } catch (error) {
+      console.error('❌ Header: 미읽은 알림 개수 조회 실패', error);
+    }
   }
 });
 </script>
