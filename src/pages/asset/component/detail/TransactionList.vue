@@ -89,6 +89,10 @@ function parseCardTransactions(rawList = []) {
       time,
       isCancel, // 필터링용
       category: tx.category || '', // 카테고리 추가
+      //🥕
+      paymentType: tx.paymentType,
+      storeType: tx.storeType,
+      cancelStatus: tx.cancelStatus,
     };
   });
 }
