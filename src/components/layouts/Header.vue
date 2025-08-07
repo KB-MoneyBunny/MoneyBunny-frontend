@@ -5,7 +5,11 @@
         <h1 class="logo-text font-28 font-bold">MoneyBunny</h1>
       </RouterLink>
       <!--💪(상일) 알림 이동 (미읽은 개수 배지 포함)-->
-      <RouterLink to="/notification" class="notification-link" :class="{ shake: shouldShakeIcon }">
+      <RouterLink
+        to="/notification"
+        class="notification-link"
+        :class="{ shake: shouldShakeIcon }"
+      >
         <div class="notification-wrapper">
           <img
             src="@/assets/images/icons/bunny/notification_bunny_background.png"
@@ -34,7 +38,10 @@ const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 onMounted(async () => {
   try {
     await notificationStore.fetchUnreadCount();
-    console.log('🔔 Header: 미읽은 알림 개수 조회 완료', notificationStore.unreadCount);
+    console.log(
+      '🔔 Header: 미읽은 알림 개수 조회 완료',
+      notificationStore.unreadCount
+    );
   } catch (error) {
     console.error('❌ Header: 미읽은 알림 개수 조회 실패', error);
   }
@@ -135,14 +142,22 @@ onMounted(async () => {
 
 /* 💪(상일) 알림 아이콘 흔들기 애니메이션 */
 @keyframes shake {
-  0%, 100% { 
-    transform: translateY(-50%) rotate(0deg); 
+  0%,
+  100% {
+    transform: translateY(-50%) rotate(0deg);
   }
-  10%, 30%, 50%, 70%, 90% { 
-    transform: translateY(-50%) rotate(-8deg) scale(1.1); 
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateY(-50%) rotate(-8deg) scale(1.1);
   }
-  20%, 40%, 60%, 80% { 
-    transform: translateY(-50%) rotate(8deg) scale(1.1); 
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateY(-50%) rotate(8deg) scale(1.1);
   }
 }
 

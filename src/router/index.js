@@ -33,7 +33,7 @@ import PolicyRetestPage from '@/pages/mypage/settings/PolicyRetestPage.vue';
 import HomeMainPage from '@/pages/home/HomeMainPage.vue'; // 홈메인
 import AssetMain from '@/pages/asset/AssetMain.vue'; //🥕성빈: 자산 메인탭
 import PolicyMainTab from '@/pages/policy/PolicyMainTab.vue';
-import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
+// import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 
 //
 // ─── 정책 추천 흐름 ────────────────────────────────────
@@ -141,11 +141,11 @@ const routes = [
       },
       // 💪(상일) 알림 설정 라우트 추가
       // 💪(상일) 알림 설정은 모달로 변경되어 라우트 제거
-      {
-        path: 'notification',
-        name: 'notification',
-        component: NotificationCenter,
-      },
+      // {
+      //   path: "notification",
+      //   name: "notification",
+      //   component: NotificationCenter,
+      // },
 
       // 정책 추천 플로우
       { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
@@ -232,8 +232,12 @@ router.beforeEach(async (to, from, next) => {
   // 🛠️ 제승 추가: 정책 메인 접근 전 조건 체크 네비게이션 가드
   if (to.path === '/policy' || to.path === '/policy/main') {
     try {
+<<<<<<< HEAD
+      const res = await api.get('/api/userPolicy');
+=======
       // 수정: policyAPI 사용
       const res = await policyAPI.getUserPolicy();
+>>>>>>> origin/dev
       if (res.data && Object.keys(res.data).length > 0) {
         // 조건이 있으면 /policy/main 으로만 진입 허용
         if (to.path !== '/policy/main') {
