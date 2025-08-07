@@ -22,12 +22,11 @@ import SignUpEmailCodePage from "@/pages/auth/SignUpEmailCodePage.vue";
 
 //
 // ─── 마이페이지 관련 ──────────────────────────────────
-import MypageMain from "@/pages/mypage/MypageMain.vue";
-import SettingMain from "@/pages/mypage/settings/SettingMain.vue";
-import ChangePassword from "@/pages/mypage/settings/ChangePassword.vue";
-import PolicyRetestPage from "@/pages/mypage/settings/PolicyRetestPage.vue";
-// 💪(상일) 알림 설정 페이지 import
-import NotificationSettings from "@/pages/mypage/settings/NotificationSettings.vue";
+import MypageMain from '@/pages/mypage/MypageMain.vue';
+import SettingMain from '@/pages/mypage/settings/SettingMain.vue';
+import ChangePassword from '@/pages/mypage/settings/ChangePassword.vue';
+import PolicyRetestPage from '@/pages/mypage/settings/PolicyRetestPage.vue';
+// 💪(상일) 알림 설정은 모달로 변경됨
 
 //
 // ─── 탭 메인 페이지 ────────────────────────────────────
@@ -141,13 +140,7 @@ const routes = [
         component: PolicyRetestPage,
       },
       // 💪(상일) 알림 설정 라우트 추가
-      {
-        path: "notification",
-        name: "notification",
-        path: "mypage/settings/notification",
-        name: "notificationSettings",
-        component: NotificationSettings,
-      },
+      // 💪(상일) 알림 설정은 모달로 변경되어 라우트 제거
       {
         path: "notification",
         name: "notification",
