@@ -23,7 +23,6 @@
       v-if="isModalOpen"
       :name="userInfo.name"
       :email="userInfo.email"
-      :phone="userInfo.phone"
       :profileImage="userInfo.profileImage"
       @close="isModalOpen = false"
       @update="handleUpdate"
