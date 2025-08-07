@@ -75,7 +75,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 import { usePolicyMatchingStore } from '@/stores/policyMatchingStore'; // 🛠️ 제승 수정: 정책 매칭 스토어 import
-import api from '@/api';
+import { policyAPI } from '@/api/policy';
 
 export default {
   name: 'PolicyResultSummary',
@@ -115,7 +115,7 @@ export default {
         return;
       }
       try {
-        const res = await api.get('/api/userPolicy/search');
+        const res = await policyAPI.getUserPolicySearch();
         previewPolicies.value = res.data;
         policyMatchingStore.setRecommendedPolicies(res.data);
       } catch (e) {
@@ -151,8 +151,19 @@ export default {
       return dateStr;
     }
 
-    const redoQuiz = () => {
-      router.push({ name: 'policyIntroForm' });
+    const redoQuiz = async () => {
+      try {
+        await policyAPI.deleteUserPolicy();
+        policyQuizStore.resetQuiz(); // 스토어 값 완전 초기화
+        localStorage.removeItem('policyQuiz');
+        sessionStorage.removeItem('policyQuiz');
+        router.push({ name: 'policyIntroForm' });
+      } catch (e) {
+        policyQuizStore.resetQuiz();
+        localStorage.removeItem('policyQuiz');
+        sessionStorage.removeItem('policyQuiz');
+        router.push({ name: 'policyIntroForm' });
+      }
     };
 
     const goToAllPolicies = () => {

@@ -1,10 +1,13 @@
 <template>
   <div class="category-detail-view">
     <!-- 헤더 -->
-    <DetailHeader
-      :title="headerTitle"
-      :currentMonth="selectedMonth"
-      @back="$emit('back')"
+    <DetailHeader :title="headerTitle" @back="$emit('back')" />
+
+    <!-- 필터 + 월 선택 -->
+    <TransactionFilter
+      v-model="currentFilter"
+      :current-month="selectedMonth"
+      type="category"
       @month-change="handleMonthChange"
     />
 
@@ -14,18 +17,20 @@
       <template #custom-icon>
         <div
           class="category-icon"
-          :style="{ backgroundColor: categoryData.color + '20' }"
+          :style="{ backgroundColor: (categoryData.color || '#999') + '20' }"
         >
           <div
             class="category-dot"
-            :style="{ backgroundColor: categoryData.color }"
+            :style="{ backgroundColor: categoryData.color || '#999' }"
           ></div>
         </div>
       </template>
 
       <!-- 카테고리 정보 -->
       <template #custom-content>
-        <p class="category-name">{{ categoryData.name }}</p>
+        <p class="category-name">
+          {{ categoryData.name || '알 수 없는 카테고리' }}
+        </p>
         <p class="category-period">{{ getSelectedMonthText() }} 총 지출</p>
         <p class="category-amount">{{ formatAmount(filteredAmount) }}</p>
       </template>
@@ -34,7 +39,7 @@
       <template #additional>
         <div class="transaction-section">
           <div class="section-header">
-            <h4 class="section-title">결제 내역</h4>
+            <h4 class="section-title">거래 내역</h4>
             <span class="transaction-count"
               >{{ filteredTransactions.length }}건</span
             >
@@ -47,17 +52,11 @@
           >
             <div
               v-for="transaction in sortedFilteredTransactions"
-              :key="transaction.id || transaction.transactionId"
+              :key="
+                transaction.id || transaction.transactionId || Math.random()
+              "
               class="transaction-item"
             >
-              <div class="transaction-icon">
-                <div class="icon-circle">
-                  <span class="icon-text">{{
-                    getCategoryInitial(categoryData.name)
-                  }}</span>
-                </div>
-              </div>
-
               <div class="transaction-info">
                 <p class="transaction-title">
                   {{ getTransactionTitle(transaction) }}
@@ -70,7 +69,9 @@
 
               <div class="transaction-amount">
                 <p class="amount-text">
-                  -{{ formatAmount(transaction.amount || transaction.price) }}
+                  -{{
+                    formatAmount(transaction.amount || transaction.price || 0)
+                  }}
                 </p>
               </div>
             </div>
@@ -79,7 +80,8 @@
           <!-- 거래내역 없음 -->
           <div v-else class="no-transactions">
             <p class="no-transactions-text">
-              이 카테고리의 거래 내역이 없습니다
+              {{ getSelectedMonthText() }}에는 이 카테고리의 거래 내역이
+              없습니다
             </p>
           </div>
         </div>
@@ -89,22 +91,37 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import DetailHeader from '../detail/DetailHeader.vue';
 import DetailInfoCard from '../detail/DetailInfoCard.vue';
+import TransactionFilter from '../detail/TransactionFilter.vue';
 
 const props = defineProps({
   categoryData: {
     type: Object,
     required: true,
+    default: () => ({ name: '', color: '#999', transactions: [] }),
+  },
+  selectedDate: {
+    type: Date,
+    required: true,
+    default: () => new Date(),
   },
 });
+
 const emit = defineEmits(['back']);
 
-const selectedMonth = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
+// 현재 날짜 상태
+const currentDate = ref(new Date(props.selectedDate));
+
+// 선택된 월 상태 (YYYY-MM 형식)
+const selectedMonth = ref(currentDate.value.toISOString().slice(0, 7));
+
+// 필터 상태
+const currentFilter = ref('전체');
 
 // 헤더 제목
-const headerTitle = computed(() => `카테고리별 결제내역`);
+const headerTitle = computed(() => `카테고리별 거래내역`);
 
 // 선택된 월 텍스트
 const getSelectedMonthText = () => {
@@ -112,67 +129,103 @@ const getSelectedMonthText = () => {
   return `${parseInt(month)}월`;
 };
 
-// 월 변경 시 필터링
-const handleMonthChange = (newMonth) => {
-  selectedMonth.value = newMonth;
+// Props 변화 감지
+watch(
+  () => props.selectedDate,
+  (newDate) => {
+    if (newDate) {
+      currentDate.value = new Date(newDate);
+      selectedMonth.value = newDate.toISOString().slice(0, 7);
+    }
+  }
+);
+
+// 월 변경 처리
+const handleMonthChange = (newMonthString) => {
+  selectedMonth.value = newMonthString;
+  const [year, month] = newMonthString.split('-');
+  const newDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+  currentDate.value = newDate;
 };
 
-// 거래내역 필터링 (선택된 월 기준)
+// 거래내역 필터링
 const filteredTransactions = computed(() => {
+  if (
+    !props.categoryData?.transactions ||
+    !Array.isArray(props.categoryData.transactions)
+  ) {
+    return [];
+  }
+
   return props.categoryData.transactions.filter((t) => {
-    const date = new Date(t.date.replace(/\./g, '-'));
-    const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}`;
-    return month === selectedMonth.value;
+    if (!t.date) return false;
+
+    try {
+      let dateStr = t.date;
+      if (typeof dateStr === 'string') {
+        dateStr = dateStr.replace(/\./g, '-');
+      }
+
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return false;
+
+      const month = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, '0')}`;
+      return month === selectedMonth.value;
+    } catch (error) {
+      return false;
+    }
   });
 });
 
 // 거래내역 총합
-const filteredAmount = computed(() =>
-  filteredTransactions.value.reduce((sum, t) => sum + (t.amount || t.price), 0)
-);
+const filteredAmount = computed(() => {
+  return filteredTransactions.value.reduce((sum, t) => {
+    const amount = t.amount || t.price || 0;
+    return sum + (typeof amount === 'number' ? amount : 0);
+  }, 0);
+});
 
 // 최신순 정렬
 const sortedFilteredTransactions = computed(() => {
   return [...filteredTransactions.value].sort((a, b) => {
-    const dateA = new Date(a.date.replace(/\./g, '-'));
-    const dateB = new Date(b.date.replace(/\./g, '-'));
-    return dateB - dateA;
+    try {
+      const dateA = new Date(a.date.replace(/\./g, '-'));
+      const dateB = new Date(b.date.replace(/\./g, '-'));
+      return dateB - dateA;
+    } catch (error) {
+      return 0;
+    }
   });
 });
 
-// 금액 포맷팅
-const formatAmount = (amount) => `${amount.toLocaleString()}원`;
-
-// 거래내역 제목
-const getTransactionTitle = (transaction) =>
-  transaction.merchant ||
-  transaction.description ||
-  transaction.storeName ||
-  transaction.title ||
-  transaction.memo ||
-  '거래';
-
-// 날짜 포맷
-const formatTransactionDate = (dateStr) => {
-  if (!dateStr) return '';
-  const date = new Date(dateStr.replace(/\./g, '-'));
-  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+// 유틸리티 함수들
+const formatAmount = (amount) => {
+  if (typeof amount !== 'number' || isNaN(amount)) return '0원';
+  return `${amount.toLocaleString()}원`;
 };
 
-// 카테고리 초성
-const getCategoryInitial = (categoryName) => {
-  const initials = {
-    식비: '식',
-    교통비: '교',
-    쇼핑: '쇼',
-    '취미/여가': '취',
-    생활: '생',
-    기타: '기',
-  };
-  return initials[categoryName] || categoryName.charAt(0);
+const getTransactionTitle = (transaction) => {
+  return (
+    transaction.merchant ||
+    transaction.description ||
+    transaction.storeName ||
+    transaction.title ||
+    transaction.memo ||
+    '거래'
+  );
+};
+
+const formatTransactionDate = (dateStr) => {
+  try {
+    if (!dateStr) return '';
+    const date = new Date(dateStr.replace(/\./g, '-'));
+    if (isNaN(date.getTime())) return dateStr;
+    return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+  } catch (error) {
+    return dateStr || '';
+  }
 };
 </script>
 
@@ -203,17 +256,20 @@ const getCategoryInitial = (categoryName) => {
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--base-blue-dark);
+  margin: 0 0 0.25rem 0;
 }
 
 .category-period {
   font-size: 0.875rem;
   color: var(--text-bluegray);
+  margin: 0 0 0.5rem 0;
 }
 
 .category-amount {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--base-blue-dark);
+  margin: 0;
 }
 
 /* 거래내역 섹션 */
@@ -222,6 +278,7 @@ const getCategoryInitial = (categoryName) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--input-bg-3);
 }
 
@@ -229,6 +286,7 @@ const getCategoryInitial = (categoryName) => {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-login);
+  margin: 0;
 }
 
 .transaction-count {
@@ -236,7 +294,7 @@ const getCategoryInitial = (categoryName) => {
   color: var(--text-bluegray);
 }
 
-/* 거래내역 리스트 */
+/* 거래내역 아이템 */
 .transaction-item {
   display: flex;
   align-items: center;
@@ -244,29 +302,12 @@ const getCategoryInitial = (categoryName) => {
   border-bottom: 1px solid var(--input-bg-3);
 }
 
-.transaction-icon {
-  margin-right: 0.75rem;
-}
-
-.icon-circle {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background-color: var(--base-blue-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-text {
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 600;
+.transaction-item:last-child {
+  border-bottom: none;
 }
 
 .transaction-info {
   flex: 1;
-  min-width: 0;
 }
 
 .transaction-title {
@@ -276,17 +317,20 @@ const getCategoryInitial = (categoryName) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin: 0 0 0.25rem 0;
 }
 
 .transaction-meta {
   font-size: 0.75rem;
   color: var(--text-bluegray);
+  margin: 0;
 }
 
 .transaction-amount .amount-text {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--alert-red);
+  margin: 0;
 }
 
 .no-transactions {
@@ -297,5 +341,6 @@ const getCategoryInitial = (categoryName) => {
 .no-transactions-text {
   font-size: 0.875rem;
   color: var(--text-lightgray);
+  margin: 0;
 }
 </style>

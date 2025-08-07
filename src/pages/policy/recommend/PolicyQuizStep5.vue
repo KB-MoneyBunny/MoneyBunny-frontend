@@ -1,7 +1,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import api from '@/api';
+import { policyAPI } from '@/api/policy';
 import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 
 export default {
@@ -86,7 +86,8 @@ export default {
       const payload = policyQuizStore.getRequestPayload();
 
       try {
-        await api.post('/api/userPolicy', payload);
+        // 정책 정보 저장(신규)
+        await policyAPI.createUserPolicy(payload);
         router.push({
           name: 'policyResultSummary',
           query: {
