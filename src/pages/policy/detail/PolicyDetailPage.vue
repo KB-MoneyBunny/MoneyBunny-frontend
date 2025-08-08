@@ -62,6 +62,16 @@ const ALL_POLICIES = [
 ];
 
 const route = useRoute();
+const router = useRouter();
+
+function goPolicyTypeTest() {
+  // 예시: 정책 유형 검사 첫 화면으로 이동
+  router.push({ name: 'policyTypeIntro' }); // 라우터 이름에 맞게 수정!
+}
+function goAllPolicy() {
+  router.push({ name: 'policyList' }); // 라우터 이름에 맞게 수정!
+}
+
 const selectedTab = ref('정책 개요');
 
 // 라우터 param에서 policyId 추출 (문자일 수도 있으니 숫자 변환)

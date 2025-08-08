@@ -67,11 +67,7 @@
       </div>
     </template>
     <template v-else>
-      <div
-        style="text-align: center; color: var(--text-bluegray); margin: 40px 0"
-      >
-        조건에 맞는 정책 목록이 없습니다.
-      </div>
+      <PolicyNoResult @retry="goPolicyTypeTest" @showAll="goAllPolicy" />
     </template>
 
     <!-- 더 많은 정책 보기 버튼 -->
@@ -265,6 +261,13 @@ function getUniqueLargeCategories(policy) {
   }
   return [];
 }
+
+const goPolicyTypeTest = () => {
+  router.push({ name: 'policyIntroForm' });
+};
+const goAllPolicy = () => {
+  router.push({ name: 'policySearch' });
+};
 </script>
 
 <style scoped>
@@ -289,8 +292,8 @@ function getUniqueLargeCategories(policy) {
   background-color: transparent;
 }
 .searchIconImage {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 .policyCard {
   background-color: white;
