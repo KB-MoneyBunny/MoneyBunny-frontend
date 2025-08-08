@@ -1,7 +1,8 @@
 // src/assets/utils/useSpendingData.js (수정된 버전)
 import { ref, computed } from 'vue';
-import cardsData from '@/assets/data/cards.json';
+import cardsData from '@/assets/data/cards.json'; // 🥕 더미데이터
 import { normalizeCard } from './dataAdapter';
+
 // ✅ CSS 변수에서 색상 추출 함수
 function getCssVar(hexVarName) {
   return getComputedStyle(document.documentElement)
