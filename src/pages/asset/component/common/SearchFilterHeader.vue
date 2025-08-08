@@ -3,23 +3,19 @@
     <!-- 검색 입력 영역 -->
     <div class="search-container">
       <div class="search-input-wrapper">
-        <svg
-          class="search-icon"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-        >
-          <path
-            d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+        <button class="search-button" @click="onSearchSubmit">
+          <img
+            src="@/assets/images/icons/policy/search.png"
+            alt="검색"
+            class="search-icon"
           />
-        </svg>
+        </button>
         <input
           v-model="searchKeyword"
           type="text"
           :placeholder="searchPlaceholder"
           class="search-input"
-          @input="onSearchInput"
+          @keyup.enter="onSearchSubmit"
         />
       </div>
     </div>
@@ -119,8 +115,8 @@ function openFilterModal() {
   emit('filter-modal-open');
 }
 
-// 검색어 입력 핸들러
-function onSearchInput() {
+// 🥕 수정: 검색 버튼 클릭 또는 엔터 키 입력 시 검색 실행
+function onSearchSubmit() {
   emit('update:modelValue', searchKeyword.value);
   emit('search-input', searchKeyword.value);
 }
@@ -162,11 +158,34 @@ watch(
   align-items: center;
 }
 
-.search-icon {
+/* 🥕 수정: 검색 버튼 (클릭 가능한 아이콘) */
+.search-button {
   position: absolute;
   left: 0.75rem;
-  color: var(--text-lightgray);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.search-button:hover .search-icon {
+  opacity: 1;
+}
+
+.search-button:active {
+  transform: scale(0.95);
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
 }
 
 .search-input {
