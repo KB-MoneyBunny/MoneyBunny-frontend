@@ -8,7 +8,11 @@
         {{ item.status }}
       </div>
       <!-- 💪(상일) 북마크 제거 버튼 추가 -->
-      <button class="removeBtn" @click="handleRemoveBookmark" title="북마크 제거">
+      <button
+        class="removeBtn"
+        @click="handleRemoveBookmark"
+        title="북마크 제거"
+      >
         ✕
       </button>
     </div>
@@ -17,8 +21,12 @@
     <div class="desc">{{ item.description }}</div>
 
     <div class="info">
-      <span>지원금액: <strong>{{ item.supportAmount }}</strong></span>
-      <span>마감: <strong>{{ item.deadline }}</strong></span>
+      <span
+        >지원금액: <strong>{{ item.supportAmount }}</strong></span
+      >
+      <span
+        >마감: <strong>{{ item.deadline }}</strong></span
+      >
     </div>
 
     <div class="meta">
@@ -47,7 +55,7 @@ const bookmarkStore = useBookmarkStore();
 // 💪(상일) 정책 상세 페이지로 이동
 const handleDetailClick = () => {
   if (props.item.policyId) {
-    router.push(`/policy/detail/${props.item.policyId}`);
+    router.push(`/policy/${props.item.policyId}`);
   }
 };
 

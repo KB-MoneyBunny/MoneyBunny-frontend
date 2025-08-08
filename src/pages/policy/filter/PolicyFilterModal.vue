@@ -373,7 +373,7 @@ const areaSelectModalProps = computed(() => ({
       <hr class="divider" />
 
       <div v-if="page === 'main'" class="modalBody">
-        <div class="fieldLabel font-15 font-bold">지역</div>
+        <div class="fieldLabel font-14 font-bold">지역</div>
         <div class="selectOpenInput" @click="showRegionModal = true">
           <span v-if="selectedRegion.length">{{ displayRegionText }}</span>
           <span v-else class="placeholder">지역 선택</span>
@@ -383,12 +383,12 @@ const areaSelectModalProps = computed(() => ({
           />
         </div>
         <!-- 혼인여부 -->
-        <div class="fieldLabel font-15 font-bold">혼인 여부</div>
+        <div class="fieldLabel font-14 font-bold">혼인 여부</div>
         <div class="selectGroup">
           <button
             v-for="s in maritalOptions"
             :key="s"
-            class="selectBtn font-14"
+            class="selectBtn font-13"
             :class="{ active: selectedMarital.includes(s) }"
             @click="toggleMarital(s)"
             type="button"
@@ -398,8 +398,8 @@ const areaSelectModalProps = computed(() => ({
         </div>
 
         <!-- 연령 -->
-        <div class="fieldLabel font-15 font-bold">연령</div>
-        <div class="inputRow font-14">
+        <div class="fieldLabel font-14 font-bold">연령</div>
+        <div class="inputRow font-13">
           <span class="font-14">만</span>
           <input
             type="number"
@@ -409,24 +409,24 @@ const areaSelectModalProps = computed(() => ({
             @blur="isAgeFocus = false"
             class="miniInput"
           />
-          <span class="font-14">세</span>
+          <span class="font-13">세</span>
         </div>
         <!-- 연소득 -->
-        <div class="fieldLabel font-15 font-bold">연소득</div>
+        <div class="fieldLabel font-14 font-bold">연소득</div>
         <div class="inputRow">
-          <span class="font-14">약</span>
+          <span class="font-13">약</span>
           <input
             type="number"
-            class="longInput font-14"
+            class="longInput font-13"
             :placeholder="isIncomeFocus ? '' : '0'"
             v-model="income"
             @focus="isIncomeFocus = true"
             @blur="isIncomeFocus = false"
           />
-          <span class="font-14">만원</span>
+          <span class="font-13">만원</span>
         </div>
         <!-- 학력 -->
-        <div class="fieldLabel font-15 font-bold">학력</div>
+        <div class="fieldLabel font-14 font-bold">학력</div>
         <div class="selectOpenInput" @click="page = 'education'">
           <span v-if="selectedEducation.length">
             {{ displayEducationText }}
@@ -438,7 +438,7 @@ const areaSelectModalProps = computed(() => ({
           />
         </div>
         <!-- 전공 요건 -->
-        <div class="fieldLabel font-15 font-bold">전공 요건</div>
+        <div class="fieldLabel font-14 font-bold">전공 요건</div>
         <div class="selectOpenInput" @click="page = 'major'">
           <span v-if="selectedMajor.length">
             {{ displayMajorText }}
@@ -450,7 +450,7 @@ const areaSelectModalProps = computed(() => ({
           />
         </div>
         <!-- 취업 상태 -->
-        <div class="fieldLabel font-15 font-bold">취업 상태</div>
+        <div class="fieldLabel font-14 font-bold">취업 상태</div>
         <div class="selectOpenInput" @click="page = 'jobStatus'">
           <span v-if="selectedJobStatus.length">
             {{ displayJobStatusText }}
@@ -462,7 +462,7 @@ const areaSelectModalProps = computed(() => ({
           />
         </div>
         <!-- 특화 분야 -->
-        <div class="fieldLabel font-15 font-bold">특화 분야</div>
+        <div class="fieldLabel font-14 font-bold">특화 분야</div>
         <div class="selectOpenInput" @click="page = 'specialty'">
           <span v-if="selectedSpecialty.length">
             {{ displaySpecialtyText }}
@@ -500,13 +500,13 @@ const areaSelectModalProps = computed(() => ({
       </div>
 
       <div class="modalFooter">
-        <button class="autoFillBtn font-16" @click="$emit('autoFill')">
+        <button class="autoFillBtn font-15" @click="$emit('autoFill')">
           내 정보 자동입력
         </button>
         <div class="footerBtnRow">
-          <button class="resetBtn font-16" @click="reset">초기화</button>
+          <button class="resetBtn font-15" @click="reset">초기화</button>
           <button
-            class="saveBtn font-16"
+            class="saveBtn font-15"
             @click="page === 'main' ? confirm() : (page = 'main')"
           >
             {{ page === 'main' ? '저장' : '적용' }}
@@ -535,8 +535,8 @@ const areaSelectModalProps = computed(() => ({
   justify-content: center;
 }
 .modalContent {
-  width: 95vw;
-  max-width: 350px;
+  width: 100vw;
+  max-width: 330px;
   background: #fff;
   border-radius: 12px;
   display: flex;
@@ -544,7 +544,7 @@ const areaSelectModalProps = computed(() => ({
   position: relative;
   overflow-y: auto;
   max-height: 96vh;
-  padding: 5px;
+  padding: 10px;
 }
 
 .modalHeader {
@@ -553,12 +553,10 @@ const areaSelectModalProps = computed(() => ({
   justify-content: space-between;
   padding: 12px 12px 0 12px;
 }
-.modalTitle {
-  color: var(--base-blue-dark);
-}
+
 .iconBack {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   margin-right: 4px;
   vertical-align: middle;
@@ -578,7 +576,7 @@ const areaSelectModalProps = computed(() => ({
 .closeBtn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 18px;
   color: #222;
   cursor: pointer;
 }
@@ -705,7 +703,7 @@ const areaSelectModalProps = computed(() => ({
   flex-direction: column;
   gap: 0px;
   padding: 0 16px 16px 16px;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .resetBtn,
@@ -714,7 +712,6 @@ const areaSelectModalProps = computed(() => ({
   align-items: center;
   justify-content: center;
   height: 45px;
-  font-size: 18px;
   border-radius: 8px;
   box-sizing: border-box;
 }
@@ -745,8 +742,8 @@ const areaSelectModalProps = computed(() => ({
   min-height: 32px;
   border: 1px solid var(--input-outline-2);
   border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 14px;
+  padding: 8px 14px;
+  font-size: 12px;
   margin-bottom: 12px;
   color: var(--text-bluegray);
   display: flex;
@@ -757,6 +754,7 @@ const areaSelectModalProps = computed(() => ({
 .selectOpenInput span,
 .selectOpenInput .placeholder {
   background: transparent !important;
+  font-size: 13px;
 }
 
 .selectOpenInput .selectDownIcon {

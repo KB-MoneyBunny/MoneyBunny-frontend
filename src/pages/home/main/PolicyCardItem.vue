@@ -1,5 +1,5 @@
 <template>
-  <div class="policyTop3Card">
+  <div class="policyTop3Card" @click="goDetail">
     <div class="contentRow">
       <div class="left">
         <div class="rankCircle">{{ rank }}</div>
@@ -18,12 +18,21 @@
 </template>
 
 <script setup>
-defineProps({
+import { useRouter } from 'vue-router';
+
+const props = defineProps({
   rank: Number,
   title: String,
   amount: Number,
   highlighted: Boolean,
+  policyId: [String, Number], // 정책 ID 필요하면
 });
+
+const router = useRouter();
+
+function goDetail() {
+  router.push({ name: 'policyDetail', params: { id: props.policyId } });
+}
 </script>
 
 <style scoped>
