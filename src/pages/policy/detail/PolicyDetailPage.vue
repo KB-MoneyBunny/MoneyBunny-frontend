@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watchEffect } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { policyAPI } from '@/api/policy'; // 변경: policyAPI import
 
 import PolicyHeader from './PolicyHeader.vue';
@@ -8,6 +8,7 @@ import PolicyTab from './PolicyTabs.vue';
 import PolicyTabContent from './PolicyTabContent.vue';
 import PolicyConditionTab from './PolicyConditionTab.vue';
 import PolicyApplyTab from './PolicyApplyTab.vue';
+import PolicyNoResult from './PolicyNoResult.vue';
 
 // 실제 데이터(예시)
 const ALL_POLICIES = [
@@ -58,6 +59,16 @@ const ALL_POLICIES = [
 ];
 
 const route = useRoute();
+const router = useRouter();
+
+function goPolicyTypeTest() {
+  // 예시: 정책 유형 검사 첫 화면으로 이동
+  router.push({ name: 'policyTypeIntro' }); // 라우터 이름에 맞게 수정!
+}
+function goAllPolicy() {
+  router.push({ name: 'policyList' }); // 라우터 이름에 맞게 수정!
+}
+
 const selectedTab = ref('정책 개요');
 
 // 라우터 param에서 policyId 추출 (문자일 수도 있으니 숫자 변환)
@@ -130,7 +141,7 @@ const period = computed(() => policy.value?.endDate || '');
       </PolicyTabContent>
     </div>
   </div>
-  <div v-else class="noData">정책 정보를 찾을 수 없습니다.</div>
+  <PolicyNoResult v-else @retry="goPolicyTypeTest" @showAll="goAllPolicy" />
 </template>
 
 <style scoped>
