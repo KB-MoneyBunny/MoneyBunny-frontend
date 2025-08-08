@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { policyAPI } from '@/api/policy';
 import PolicyFilterModal from '../filter/PolicyFilterModal.vue';
 
@@ -9,12 +9,29 @@ const showFilterModal = ref(false);
 const openFilter = () => (showFilterModal.value = true);
 
 const router = useRouter();
-const searchQuery = ref('');
+const props = defineProps({
+  searchQuery: {
+    type: String,
+    default: '',
+  },
+});
+const searchQuery = ref(props.searchQuery);
 const goBack = () => router.back();
+const emit = defineEmits(['confirm']);
 
 function handleConfirm(selected) {
   filterData.value = selected;
   showFilterModal.value = false;
+  emit('confirm', selected); // 부모로 필터 데이터 전달
+
+  // 저장(적용) 시 검색 결과 페이지로 이동
+  router.push({
+    name: 'policySearchResult',
+    query: {
+      q: searchQuery.value,
+      filter: encodeURIComponent(JSON.stringify(selected)),
+    },
+  });
 }
 
 function onSearch() {
@@ -26,6 +43,13 @@ function onSearch() {
     },
   });
 }
+
+watch(
+  () => props.searchQuery,
+  (val) => {
+    searchQuery.value = val;
+  }
+);
 
 // 🟦 모달에 넘길 초기값 (PolicyFilterModal이 기대하는 구조)
 const filterInitial = ref({
