@@ -30,6 +30,7 @@ const props = defineProps({
 
 const router = useRouter();
 
+// 👸🏻(은잔) : 상세페이지로 연결해줘야함
 function goDetail() {
   router.push({ name: 'policyDetail', params: { id: props.policyId } });
 }

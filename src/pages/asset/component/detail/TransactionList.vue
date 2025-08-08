@@ -235,7 +235,6 @@ onUnmounted(() => {
   background: #fff; /* 화이트 카드 스타일 */
   border-radius: 0.75rem;
   margin: 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
