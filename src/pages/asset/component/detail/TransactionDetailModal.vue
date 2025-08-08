@@ -136,6 +136,10 @@ var(--alert-red); }
 <script setup>
 import { ref, computed, watch } from 'vue';
 import DetailHeader from './DetailHeader.vue';
+import {
+  updateCardTransactionMemo,
+  updateAccountTransactionMemo,
+} from '@/api/assetApi';
 
 // Props 정의
 const props = defineProps({
@@ -143,9 +147,10 @@ const props = defineProps({
   transaction: { type: Object, required: true }, // 거래 데이터
   type: { type: String, required: true }, // 'account' | 'card'
 });
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'memo-updated']);
 
 // 메모 관련 상태
+const isSaving = ref(false); // 저장 중 상태
 const memoText = ref('');
 
 // Computed 속성들
@@ -183,7 +188,6 @@ const getTransactionType = () => {
 
 // 모달 닫기 함수
 const closeModal = () => {
-  memoText.value = ''; // 모달 닫을 때 메모 초기화
   emit('close');
 };
 
@@ -192,23 +196,38 @@ const updateMemoCount = () => {
   // input 이벤트에서 자동으로 v-model이 업데이트됨
 };
 
+console.log(props.transaction);
+
 // 메모 저장 함수
-const saveMemo = () => {
-  if (memoText.value.trim()) {
-    // TODO: API 호출하여 메모 저장
-    console.log('메모 저장:', memoText.value);
-    // 저장 후 초기화하거나 성공 메시지 표시
+const saveMemo = async () => {
+  if (!memoText.value.trim()) return;
+  try {
+    isSaving.value = true;
+    const txId = props.transaction.id ?? props.transaction.transactionId;
+    let res;
+    if (props.type === 'account') {
+      res = await updateAccountTransactionMemo(txId, memoText.value);
+    } else {
+      res = await updateCardTransactionMemo(txId, memoText.value);
+    }
+    const newMemo = res.data;
+    memoText.value = newMemo;
+    props.transaction.memo = newMemo;
+    emit('memo-updated', { id: txId, memo: newMemo });
+    alert('메모 저장 완료!');
+  } catch (e) {
+    alert('메모 저장 실패');
+  } finally {
+    isSaving.value = false;
   }
 };
 
-// 모달이 열릴 때마다 메모 초기화
 watch(
-  () => props.show,
+  () => props.transaction.memo,
   (newVal) => {
-    if (newVal) {
-      memoText.value = '';
-    }
-  }
+    memoText.value = newVal || '';
+  },
+  { immediate: true }
 );
 </script>
 
