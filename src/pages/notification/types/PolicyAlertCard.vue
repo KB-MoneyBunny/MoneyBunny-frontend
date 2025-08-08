@@ -2,10 +2,6 @@
   <NotificationItem :is-read="item.read" :notification-type="item.type" @delete="handleDelete">
     <h3 class="title">{{ item.title }}</h3>
     <p class="message">{{ item.description }}</p>
-    <div class="badges">
-      <span v-if="item.benefit" class="badge">{{ item.benefit }}</span>
-      <span v-if="item.dday" class="badge dday">D-{{ item.dday }}</span>
-    </div>
     <div class="bottom">
       <small class="date">{{ formatDate(item.created_at || item.date) }}</small>
       <button 
@@ -55,7 +51,7 @@ const getRoutePath = (type, targetUrl) => {
     case 'TOP3':
       return '/policy';
     case 'FEEDBACK':
-      return '/asset';
+      return '/asset?tab=지출';
     default:
       return targetUrl || '/';
   }
@@ -93,31 +89,12 @@ const handleDelete = async () => {
 </script>
 
 <style scoped>
-.badges {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
 
-.badge {
-  font-size: 13px;
-  background-color: #f1f3f5;
-  padding: 4px 8px;
-  border-radius: 6px;
-  color: #333;
-}
-
-.dday {
-  background-color: var(--alert-light-2);
-  color: var(--alert-strong);
-  font-weight: bold;
-}
 
 .bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0; /* 💪(상일) 바디 메시지와 하단 영역 사이 공간 제거 */
 }
 
 .action-btn {

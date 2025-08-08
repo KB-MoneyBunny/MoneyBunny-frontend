@@ -5,7 +5,6 @@
     <div class="bottom">
       <small class="date">{{ formatDate(item.created_at || item.date) }}</small>
       <button 
-        v-if="item.targetUrl" 
         class="action-btn"
         @click="handleButtonClick"
       >
@@ -51,7 +50,7 @@ const getRoutePath = (type, targetUrl) => {
     case 'TOP3':
       return '/policy';
     case 'FEEDBACK':
-      return '/asset';
+      return '/asset?tab=지출';
     default:
       return targetUrl || '/';
   }
@@ -89,7 +88,6 @@ const handleDelete = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0; /* 💪(상일) 바디 메시지와 하단 영역 사이 공간 제거 */
 }
 
 .action-btn {
@@ -100,6 +98,8 @@ const handleDelete = async () => {
   border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
+  flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
+  min-width: 60px; /* 최소 너비 보장 */
 }
 
 </style>
