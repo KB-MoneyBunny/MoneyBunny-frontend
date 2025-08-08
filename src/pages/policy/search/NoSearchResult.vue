@@ -13,6 +13,43 @@
       </div>
     </div>
 
+    <!-- 인기 검색어 영역(검색 결과 없음) -->
+    <div class="popularBox">
+      <div class="popularTitle font-15 font-bold">인기 검색어</div>
+      <div class="popularRankGrid">
+        <div class="rankCol">
+          <div
+            class="popularItem"
+            v-for="(item, i) in popularKeywords.slice(
+              0,
+              Math.ceil(popularKeywords.length / 2)
+            )"
+            :key="i"
+            @click="$emit('search', item)"
+          >
+            <span class="number">{{ i + 1 }}</span>
+            <span class="text font-14">{{ item }}</span>
+          </div>
+        </div>
+        <div class="rankCol">
+          <div
+            class="popularItem"
+            v-for="(item, i) in popularKeywords.slice(
+              Math.ceil(popularKeywords.length / 2),
+              popularKeywords.length
+            )"
+            :key="i + Math.ceil(popularKeywords.length / 2)"
+            @click="$emit('search', item)"
+          >
+            <span class="number">{{
+              i + 1 + Math.ceil(popularKeywords.length / 2)
+            }}</span>
+            <span class="text font-14">{{ item }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="tipBox">
       <div class="tipTitle font-15 font-bold">검색 팁</div>
       <div class="tipList">
@@ -50,20 +87,6 @@
         </div>
       </div>
     </div>
-
-    <div class="popularBox">
-      <div class="popularTitle font-15 font-bold">인기 검색어</div>
-      <div class="popularList">
-        <div
-          class="popularItem"
-          v-for="(item, idx) in popularKeywords"
-          :key="item"
-        >
-          <span class="popularNum">{{ idx + 1 }}</span>
-          <span class="popularText font-14">{{ item }}</span>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -92,7 +115,9 @@ const props = defineProps({
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
+  height: 200px;
   margin-bottom: 12px;
 }
 .noResultImage {
@@ -162,21 +187,40 @@ const props = defineProps({
   gap: 10px 10px;
 }
 .popularItem {
-  display: flex;
-  align-items: center;
-  background: var(--input-bg-1, #f6f8fe);
+  background-color: var(--input-bg-1);
   border-radius: 8px;
-  padding: 5px 10px;
-  color: var(--base-blue-dark);
-  margin-bottom: 2px;
-  cursor: pointer;
-  min-width: 0;
-}
-.popularNum {
-  color: var(--text-bluegray);
-  display: inline-flex;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
   align-items: center;
-  justify-content: center;
-  margin-right: 7px;
+  font-size: 13px;
+  cursor: pointer;
+  max-width: 120px;
+  overflow: hidden;
+  transition: background 0.14s;
+}
+.number {
+  font-weight: bold;
+  color: var(--base-blue-dark);
+  min-width: 18px;
+  text-align: center;
+}
+.text {
+  display: inline-block;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.popularRankGrid {
+  display: flex;
+  gap: 10px;
+}
+.rankCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>
