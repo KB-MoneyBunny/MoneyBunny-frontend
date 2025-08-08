@@ -1,17 +1,17 @@
 <template>
-  <!-- 카테고리 선택 모달 오버레이 -->
+  <!-- 카테고리 선택 모달 -->
   <div v-if="show" class="modal-overlay" @click.self="closeModal">
     <div class="modal-container">
-      <!-- 헤더 영역 -->
+      <!-- 헤더 -->
       <div class="modal-header">
         <DetailHeader :title="'카테고리 변경'" @back="closeModal" />
       </div>
 
-      <!-- 컨텐츠 영역 -->
+      <!-- 내용 -->
       <div class="modal-content">
         <!-- 미리 정의된 카테고리 -->
         <div class="category-section">
-          <h3 class="section-title">미리 정의된 카테고리</h3>
+          <h3 class="section-title">카테고리 목록</h3>
           <div class="category-grid">
             <div
               v-for="category in predefinedCategories"
@@ -41,11 +41,10 @@
         </div>
 
         <!-- 사용자 정의 카테고리 -->
-        <div class="category-section">
+        <!--
+        <div class="category-section" v-if="userDefinedCategories.length">
           <h3 class="section-title">사용자 정의 카테고리</h3>
-
-          <!-- 기존 사용자 정의 카테고리 목록 -->
-          <div v-if="userDefinedCategories.length > 0" class="category-grid">
+          <div class="category-grid">
             <div
               v-for="category in userDefinedCategories"
               :key="category.name"
@@ -53,82 +52,15 @@
               :class="{ selected: selectedCategory?.name === category.name }"
               @click="selectCategory(category)"
             >
-              <div
-                class="category-icon"
-                :style="{ backgroundColor: category.color + '20' }"
-              >
-                <div
-                  class="category-dot"
-                  :style="{ backgroundColor: category.color }"
-                ></div>
+              <div class="category-icon" :style="{ backgroundColor: category.color + '20' }">
+                <div class="category-dot" :style="{ backgroundColor: category.color }"></div>
               </div>
               <span class="category-name">{{ category.name }}</span>
-              <div
-                v-if="selectedCategory?.name === category.name"
-                class="check-icon"
-              >
-                ✓
-              </div>
-            </div>
-          </div>
-
-          <!-- 새 카테고리 추가 버튼 -->
-          <button class="add-category-btn" @click="toggleNewCategoryForm">
-            <span class="plus-icon">+</span>
-            새 카테고리 만들기
-          </button>
-
-          <!-- 새 카테고리 입력 폼 -->
-          <div v-if="showNewCategoryForm" class="new-category-form">
-            <div class="input-section">
-              <label class="input-label">카테고리 이름</label>
-              <input
-                type="text"
-                v-model="newCategoryName"
-                maxlength="10"
-                placeholder="카테고리 이름 (최대 10자)"
-                class="name-input"
-                :class="{ error: nameError }"
-              />
-              <div class="input-footer">
-                <span class="char-count">{{ newCategoryName.length }}/10</span>
-                <span v-if="nameError" class="error-text">{{ nameError }}</span>
-              </div>
-            </div>
-
-            <div class="input-section">
-              <label class="input-label">색상 선택</label>
-              <div class="color-grid">
-                <div
-                  v-for="color in colorOptions"
-                  :key="color"
-                  class="color-option"
-                  :class="{ selected: newCategoryColor === color }"
-                  :style="{ backgroundColor: color }"
-                  @click="selectColor(color)"
-                >
-                  <div v-if="newCategoryColor === color" class="check-icon">
-                    ✓
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-buttons">
-              <button class="cancel-form-btn" @click="cancelNewCategory">
-                취소
-              </button>
-              <button
-                class="create-btn"
-                :class="{ active: canCreateCategory }"
-                :disabled="!canCreateCategory"
-                @click="createNewCategory"
-              >
-                생성
-              </button>
+              <div v-if="selectedCategory?.name === category.name" class="check-icon">✓</div>
             </div>
           </div>
         </div>
+        -->
 
         <!-- 선택된 카테고리 미리보기 -->
         <div v-if="selectedCategory" class="selected-preview">
