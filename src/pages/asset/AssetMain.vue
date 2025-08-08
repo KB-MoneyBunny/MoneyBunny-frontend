@@ -112,6 +112,7 @@
         <CategoryDetailView
           v-if="selectedCategoryData"
           :category-data="selectedCategoryData"
+          :selected-date="currentDate"
           @back="closeCategoryDetail"
         />
       </DetailModal>
