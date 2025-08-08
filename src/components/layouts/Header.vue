@@ -40,10 +40,13 @@ const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 onMounted(async () => {
   // 미읽은 알림 개수가 필요한 페이지만 체크
   const targetRoutes = ['/home', '/asset', '/policy', '/mypage'];
-  if (targetRoutes.some(routePath => route.path.startsWith(routePath))) {
+  if (targetRoutes.some((routePath) => route.path.startsWith(routePath))) {
     try {
       await notificationStore.fetchUnreadCount();
-      console.log('🔔 Header: 미읽은 알림 개수 조회 완료', notificationStore.unreadCount);
+      console.log(
+        '🔔 Header: 미읽은 알림 개수 조회 완료',
+        notificationStore.unreadCount
+      );
     } catch (error) {
       console.error('❌ Header: 미읽은 알림 개수 조회 실패', error);
     }
@@ -58,11 +61,10 @@ onMounted(async () => {
   top: 0;
   left: 0;
   right: 0;
-
   width: 100%;
   max-width: 390px;
   margin: 0 auto;
-  height: 65px;
+  height: 60px;
   border-bottom: 1px solid var(--base-lavender);
   background: white;
   display: flex;

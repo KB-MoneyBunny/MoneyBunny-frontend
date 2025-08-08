@@ -123,10 +123,12 @@ onMounted(() => {
       <input
         type="text"
         class="searchInput"
-        placeholder="정책을 검색해보세요 (예: 청년, 주거, 창업)"
+        placeholder="정책을 검색해보세요"
         v-model="searchQuery"
         @keyup.enter="onSearch"
+        maxlength="40"
       />
+
       <button class="searchIconBtn" @click="onSearch" aria-label="검색">
         <img src="@/assets/images/icons/policy/search.png" class="searchIcon" />
       </button>
@@ -153,7 +155,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   max-width: 390px;
-  height: 65px;
+  height: 60px;
   width: 100%;
   margin: 0 auto;
   z-index: 1000;
@@ -174,12 +176,12 @@ onMounted(() => {
 
 .searchInput {
   width: 100%;
-  height: 40px;
+  height: 35px;
   padding: 10px 45px 10px 15px;
   border: 1px solid var(--input-outline-2);
   border-radius: 8px;
   background: #fff;
-  font-size: 15px;
+  font-size: 14px;
   outline: none;
   box-sizing: border-box;
 }
@@ -202,19 +204,19 @@ onMounted(() => {
 }
 
 .searchIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .filterIcon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }
 
 .goBackIcon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }
 </style>
