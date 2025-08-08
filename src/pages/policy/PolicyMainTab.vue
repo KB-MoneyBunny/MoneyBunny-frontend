@@ -1,19 +1,5 @@
 <template>
   <div class="policyWrapper">
-    <button
-      class="tempButton"
-      @click="showStatusModal = true"
-      style="
-        margin: 12px 0;
-        border: 1px solid #c7d1ee;
-        border-radius: 8px;
-        padding: 9px 16px;
-        font-size: 14px;
-      "
-    >
-      정책 신청 현황 모달(임시) 열기
-    </button>
-
     <!-- 정책 검색창 -->
     <div class="searchBar" @click="goToSearchPage" style="cursor: pointer">
       <img
@@ -66,13 +52,13 @@
         <div class="cardActions">
           <button
             class="buttonSecondary font-13"
-            @click="goToDetail(policy.policyId)"
+            @click.stop="goToDetail(policy.policyId)"
           >
             자세히 보기
           </button>
           <button
             class="buttonPrimary font-13"
-            @click="goToApplyPage(policy.applyUrl)"
+            @click.stop="openApplyModal(policy)"
           >
             신청하기
           </button>
@@ -94,22 +80,21 @@
     <BottomNav />
   </div>
 
+  <!-- 💪(상일) 신청 모달 -->
   <PolicyApplyModal
     v-if="showApplyModal"
     :policyTitle="selectedPolicy?.title"
     :applyUrl="selectedPolicy?.applyUrl"
+    :policyId="selectedPolicy?.policyId"
     @close="closeApplyModal"
+    @showStatusModal="handleShowStatusModal"
   />
 
-  <!-- 정책신청현황 모달 (임시용) -->
+  <!-- 💪(상일) 정책신청현황 모달 -->
   <PolicyApplyStatusModal
     v-model="showStatusModal"
-    :policyTitle="tempPolicyTitle"
-    @submit="
-      (status) => {
-        console.log('선택한 상태:', status);
-      }
-    "
+    :policyTitle="currentApplication?.title || ''"
+    @submit="handleStatusSubmit"
     @later="
       () => {
         showStatusModal = false;
@@ -125,12 +110,11 @@ import BottomNav from '@/components/layouts/NavBar.vue';
 import PolicyApplyModal from './component/PolicyApplyModal.vue';
 import { usePolicyMatchingStore } from '@/stores/policyMatchingStore';
 import { policyAPI } from '@/api/policy';
-import PolicyNoResult from './detail/PolicyNoResult.vue';
-
-// 👸🏻(은진) : 임시로
-import PolicyApplyStatusModal from './component/PolicyApplyStatusModal.vue'; // 경로 맞게
+// 💪(상일) 정책 신청 기능
+import { policyInteractionAPI } from '@/api/policyInteraction';
+import PolicyApplyStatusModal from './component/PolicyApplyStatusModal.vue';
 const showStatusModal = ref(false);
-const tempPolicyTitle = ref('청년내일채움공제'); // 임시 타이틀 (원하면 바꿔도 됨)
+const currentApplication = ref(null); // 💪(상일) 현재 처리 중인 신청
 
 const router = useRouter();
 const policyMatchingStore = usePolicyMatchingStore();
@@ -146,10 +130,26 @@ const goToSearchPage = () => {
   router.push({ name: 'policySearch' });
 };
 
-const goToApplyPage = (url) => {
-  if (url) {
-    window.open(url, '_blank');
-  }
+// 💪(상일) 신청 모달 열기
+const openApplyModal = (policy) => {
+  selectedPolicy.value = policy;
+  showApplyModal.value = true;
+};
+
+const closeApplyModal = () => {
+  showApplyModal.value = false;
+  selectedPolicy.value = null;
+};
+
+// 💪(상일) 신청 후 즉시 상태 모달 표시
+const handleShowStatusModal = (applicationData) => {
+  // 신청 모달 닫고 상태 모달 표시
+  showApplyModal.value = false;
+  selectedPolicy.value = null;
+
+  // 현재 신청 정보 설정
+  currentApplication.value = applicationData;
+  showStatusModal.value = true;
 };
 
 const formatPeriod = (periodStr) => {
@@ -165,6 +165,57 @@ const formatPeriod = (periodStr) => {
 // 정책 데이터 관리 (스토어/동적 API)
 const ALL_POLICIES = ref([]);
 
+// 💪(상일) 미완료 신청 체크
+const checkIncompleteApplication = async () => {
+  try {
+    const response = await policyInteractionAPI.getIncompleteApplication();
+    if (response.data) {
+      currentApplication.value = response.data;
+      showStatusModal.value = true;
+    }
+  } catch (error) {
+    // 404는 미완료 신청이 없는 정상 상황
+    if (error.response?.status !== 404) {
+      console.error('미완료 신청 조회 실패:', error);
+    }
+  }
+};
+
+// 💪(상일) 모달 응답 처리
+const handleStatusSubmit = async (status) => {
+  if (!currentApplication.value) return;
+
+  try {
+    switch (status) {
+      case 'applied':
+        // 신청 완료 처리
+        await policyInteractionAPI.completeApplication(
+          currentApplication.value.policyId
+        );
+        break;
+
+      case 'notYet':
+        // 신청 기록 삭제
+        await policyInteractionAPI.removeApplication(
+          currentApplication.value.policyId
+        );
+        break;
+
+      case 'notEligible':
+        // 💪(상일) 조건 미충족으로 신청 불가한 경우 신청 기록 삭제
+        await policyInteractionAPI.removeApplication(
+          currentApplication.value.policyId
+        );
+        break;
+    }
+  } catch (error) {
+    console.error('신청 상태 처리 실패:', error);
+  } finally {
+    currentApplication.value = null;
+    showStatusModal.value = false;
+  }
+};
+
 onMounted(async () => {
   try {
     const res = await policyAPI.getUserPolicySearch(); // 항상 요청
@@ -173,6 +224,9 @@ onMounted(async () => {
   } catch (e) {
     ALL_POLICIES.value = [];
   }
+
+  // 💪(상일) 미완료 신청 체크
+  await checkIncompleteApplication();
 });
 
 const policiesToShow = ref(3);

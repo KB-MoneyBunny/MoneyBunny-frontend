@@ -45,14 +45,16 @@
     v-if="showApplyModal"
     :policyTitle="selectedPolicy?.title"
     :applyUrl="selectedPolicy?.applyUrl"
+    :policyId="selectedPolicy?.policyId"
     @close="closeApplyModal"
+    @showStatusModal="handleShowStatusModal"
   />
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { bookmarkAPI } from '@/api/bookmark';
+import { ref, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { bookmarkAPI } from "@/api/policyInteraction";
 
 import ShareModal from './ShareModal.vue';
 import PolicyApplyModal from '../component/PolicyApplyModal.vue';
@@ -74,6 +76,9 @@ const props = defineProps({
     required: false,
   },
 });
+
+// 💪(상일) 부모 컴포넌트로 이벤트 전달용
+const emit = defineEmits(['showStatusModal']);
 
 const showApplyModal = ref(false);
 const selectedPolicy = ref(null);
@@ -133,13 +138,27 @@ const normalizeUrl = (url) => {
 function openApplyModal(policy) {
   // applyUrl 이 www.xxx 로 시작하면 프로토콜 붙이고, 아니면 그대로
   const fixedUrl = normalizeUrl(policy.applyUrl);
-  selectedPolicy.value = { ...policy, applyUrl: fixedUrl };
+  selectedPolicy.value = { 
+    ...policy, 
+    applyUrl: fixedUrl,
+    policyId: policy.policyId || policy.id // 💪(상일) policyId 확실히 전달
+  };
   showApplyModal.value = true;
 }
 
 function closeApplyModal() {
   showApplyModal.value = false;
 }
+
+// 💪(상일) 신청 후 즉시 상태 모달 표시 - 부모 컴포넌트로 전달
+const handleShowStatusModal = (applicationData) => {
+  // 신청 모달 닫기
+  showApplyModal.value = false;
+  selectedPolicy.value = null;
+  
+  // 부모 컴포넌트(PolicyDetailPage)로 이벤트 전달
+  emit('showStatusModal', applicationData);
+};
 </script>
 
 <style scoped>
