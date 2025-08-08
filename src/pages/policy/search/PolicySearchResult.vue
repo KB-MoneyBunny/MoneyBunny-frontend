@@ -1,12 +1,15 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { policyAPI } from '@/api/policy';
 import PolicySearchHeader from './PolicySearchHeader.vue';
 import NoResultView from './NoSearchResult.vue';
 
 const route = useRoute();
+const router = useRouter();
 const policies = ref([]);
+const searchText = ref(''); // 현재 검색어
+const filterData = ref({}); // 현재 필터 데이터
 
 function buildSearchPayload(filter, query = '') {
   return {
@@ -35,6 +38,8 @@ async function fetchPolicies() {
   } catch (e) {
     filter = {};
   }
+  searchText.value = query;
+  filterData.value = filter;
   const payload = buildSearchPayload(filter, query);
   try {
     const res = await policyAPI.searchUserPolicy(payload);
@@ -42,6 +47,18 @@ async function fetchPolicies() {
   } catch (e) {
     policies.value = [];
   }
+}
+
+// 필터 모달에서 저장(적용) 시 실행되는 함수
+function handleFilterConfirm(selectedFilter) {
+  // 쿼리 파라미터 갱신 → 검색 결과 재조회
+  router.replace({
+    name: route.name,
+    query: {
+      ...route.query,
+      filter: encodeURIComponent(JSON.stringify(selectedFilter)),
+    },
+  });
 }
 
 onMounted(fetchPolicies);
@@ -84,7 +101,10 @@ function getUniqueLargeCategories(policy) {
 
 <template>
   <div>
-    <PolicySearchHeader />
+    <PolicySearchHeader
+      :searchQuery="searchText"
+      @confirm="handleFilterConfirm"
+    />
     <div v-if="policies.length">
       <div
         v-for="(policy, index) in policies"

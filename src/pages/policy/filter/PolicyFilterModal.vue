@@ -10,6 +10,7 @@ import { majorCodeMap } from '@/assets/utils/majorCodeMap.js';
 import { employmentStatusCodeMap } from '@/assets/utils/employmentStatusCodeMap.js';
 import { specialConditionCodeMap } from '@/assets/utils/specialConditionCodeMap.js';
 import { regionCodeMap } from '@/assets/utils/regionCodeMap.js';
+import { usePolicyFilterStore } from '@/stores/policyFilterStore'; // Pinia 스토어 import
 
 // 코드→라벨 역매핑 생성
 const educationLevelLabelMap = Object.fromEntries(
@@ -174,7 +175,31 @@ const reset = () => {
   selectedSpecialty.value = [];
 };
 const emit = defineEmits(['close', 'confirm', 'reset']);
+const store = usePolicyFilterStore();
+
+// 필터값을 스토어에서 불러와서 초기값으로 세팅
+onMounted(() => {
+  selectedMarital.value = store.marital ? [...store.marital] : [];
+  selectedRegion.value = store.region ? [...store.region] : [];
+  age.value = store.age || '';
+  income.value = store.income || '';
+  selectedEducation.value = store.education ? [...store.education] : [];
+  selectedMajor.value = store.major ? [...store.major] : [];
+  selectedJobStatus.value = store.jobStatus ? [...store.jobStatus] : [];
+  selectedSpecialty.value = store.specialty ? [...store.specialty] : [];
+});
+
+// confirm 시 스토어에 값 저장
 const confirm = () => {
+  store.marital = [...selectedMarital.value];
+  store.region = [...selectedRegion.value];
+  store.age = age.value;
+  store.income = income.value;
+  store.education = [...selectedEducation.value];
+  store.major = [...selectedMajor.value];
+  store.jobStatus = [...selectedJobStatus.value];
+  store.specialty = [...selectedSpecialty.value];
+
   emit('confirm', {
     region:
       selectedRegion.value && selectedRegion.value.length > 0
@@ -290,46 +315,71 @@ function regionNameToCode(name) {
   return name;
 }
 
-onMounted(() => {
+// 사용자 정보 자동입력 함수 (예시: 실제 데이터는 props나 API 등에서 받아와야 함)
+function autoFillUserInfo() {
+  // 예시: userInfo는 실제 사용자 정보 객체로 교체 필요
+  const userInfo = {
+    marital: props.initialMarital,
+    region: props.initialRegion,
+    age: props.initialAge,
+    income: props.initialIncome,
+    education: props.initialEducation,
+    major: props.initialMajor,
+    jobStatus: props.initialJobStatus,
+    specialty: props.initialSpecialty,
+  };
+
   // 혼인여부 코드 → 라벨
-  if (props.initialMarital && props.initialMarital.length > 0) {
-    selectedMarital.value = props.initialMarital
-      .map((code) => maritalCodeToLabel[code])
-      .filter(Boolean);
-  }
+  selectedMarital.value =
+    userInfo.marital && userInfo.marital.length > 0
+      ? userInfo.marital.map((code) => maritalCodeToLabel[code]).filter(Boolean)
+      : [];
   // 지역 코드 → 지역명 변환
-  if (props.initialRegion && props.initialRegion.length > 0) {
-    selectedRegion.value = props.initialRegion
-      .map((code) => codeToRegionName(code))
-      .filter(Boolean);
-  }
-  if (props.initialAge) age.value = props.initialAge;
-  if (props.initialIncome) income.value = props.initialIncome;
+  selectedRegion.value =
+    userInfo.region && userInfo.region.length > 0
+      ? userInfo.region.map((code) => codeToRegionName(code)).filter(Boolean)
+      : [];
+  age.value = userInfo.age || '';
+  income.value = userInfo.income || '';
   // 학력 코드 → 라벨
-  if (props.initialEducation && props.initialEducation.length > 0) {
-    selectedEducation.value = props.initialEducation
-      .map((code) => educationLevelLabelMap[code])
-      .filter(Boolean);
-  }
+  selectedEducation.value =
+    userInfo.education && userInfo.education.length > 0
+      ? userInfo.education
+          .map((code) => educationLevelLabelMap[code])
+          .filter(Boolean)
+      : [];
   // 전공 코드 → 라벨
-  if (props.initialMajor && props.initialMajor.length > 0) {
-    selectedMajor.value = props.initialMajor
-      .map((code) => majorLabelMap[code])
-      .filter(Boolean);
-  }
+  selectedMajor.value =
+    userInfo.major && userInfo.major.length > 0
+      ? userInfo.major.map((code) => majorLabelMap[code]).filter(Boolean)
+      : [];
   // 취업상태 코드 → 라벨
-  if (props.initialJobStatus && props.initialJobStatus.length > 0) {
-    selectedJobStatus.value = props.initialJobStatus
-      .map((code) => employmentStatusLabelMap[code])
-      .filter(Boolean);
-  }
+  selectedJobStatus.value =
+    userInfo.jobStatus && userInfo.jobStatus.length > 0
+      ? userInfo.jobStatus
+          .map((code) => employmentStatusLabelMap[code])
+          .filter(Boolean)
+      : [];
   // 특화분야 코드 → 라벨
-  if (props.initialSpecialty && props.initialSpecialty.length > 0) {
-    selectedSpecialty.value = props.initialSpecialty
-      .map((code) => specialConditionLabelMap[code])
-      .filter(Boolean);
-  }
-});
+  selectedSpecialty.value =
+    userInfo.specialty && userInfo.specialty.length > 0
+      ? userInfo.specialty
+          .map((code) => specialConditionLabelMap[code])
+          .filter(Boolean)
+      : [];
+}
+
+// // onMounted에서 초기값 세팅 부분 제거 (모두 선택 안된 상태로)
+// onMounted(() => {
+//   selectedMarital.value = [];
+//   selectedRegion.value = [];
+//   age.value = '';
+//   income.value = '';
+//   selectedEducation.value = [];
+//   selectedMajor.value = [];
+//   selectedJobStatus.value = [];
+//   selectedSpecialty.value = [];
+// });
 
 // AreaSelectModal에 지역 코드값을 넘겨서, 사용자가 이전에 선택한 지역이 선택된 상태로 보이게 함
 const areaSelectModalProps = computed(() => ({
@@ -500,7 +550,7 @@ const areaSelectModalProps = computed(() => ({
       </div>
 
       <div class="modalFooter">
-        <button class="autoFillBtn font-15" @click="$emit('autoFill')">
+        <button class="autoFillBtn font-16" @click="autoFillUserInfo">
           내 정보 자동입력
         </button>
         <div class="footerBtnRow">
