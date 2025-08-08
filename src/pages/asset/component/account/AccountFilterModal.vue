@@ -16,8 +16,6 @@
 
       <!-- 필터 내용 -->
       <div class="modal-content">
-        <!-- 검색어 입력 -->
-
         <!-- 조회기간 -->
         <div class="filter-section">
           <h3>조회기간</h3>
