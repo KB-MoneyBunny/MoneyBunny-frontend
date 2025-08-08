@@ -1,5 +1,19 @@
 <template>
   <div class="policyWrapper">
+    <button
+      class="tempButton"
+      @click="showStatusModal = true"
+      style="
+        margin: 12px 0;
+        border: 1px solid #c7d1ee;
+        border-radius: 8px;
+        padding: 9px 16px;
+        font-size: 14px;
+      "
+    >
+      정책 신청 현황 모달(임시) 열기
+    </button>
+
     <!-- 정책 검색창 -->
     <div class="searchBar" @click="goToSearchPage" style="cursor: pointer">
       <img
@@ -90,6 +104,22 @@
     :applyUrl="selectedPolicy?.applyUrl"
     @close="closeApplyModal"
   />
+
+  <!-- 정책신청현황 모달 (임시용) -->
+  <PolicyApplyStatusModal
+    v-model="showStatusModal"
+    :policyTitle="tempPolicyTitle"
+    @submit="
+      (status) => {
+        console.log('선택한 상태:', status);
+      }
+    "
+    @later="
+      () => {
+        showStatusModal = false;
+      }
+    "
+  />
 </template>
 
 <script setup>
@@ -99,6 +129,10 @@ import BottomNav from '@/components/layouts/NavBar.vue';
 import PolicyApplyModal from './component/PolicyApplyModal.vue';
 import { usePolicyMatchingStore } from '@/stores/policyMatchingStore';
 import { policyAPI } from '@/api/policy';
+// 👸🏻(은진) : 임시로
+import PolicyApplyStatusModal from './component/PolicyApplyStatusModal.vue'; // 경로 맞게
+const showStatusModal = ref(false);
+const tempPolicyTitle = ref('청년내일채움공제'); // 임시 타이틀 (원하면 바꿔도 됨)
 
 const router = useRouter();
 const policyMatchingStore = usePolicyMatchingStore();
