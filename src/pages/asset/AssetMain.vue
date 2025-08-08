@@ -175,8 +175,8 @@ const {
 
 // 새로고침, 진입시 항상 동기화 + summary 최신화
 onMounted(async () => {
-  await syncAccounts(true);
-  await syncCards(true);
+  // await syncAccounts(true);
+  // await syncCards(true);
   await assetStore.loadSummary();
 });
 
