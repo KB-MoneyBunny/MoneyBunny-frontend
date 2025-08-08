@@ -2,7 +2,7 @@
   <header class="top-header">
     <div class="header-inner">
       <RouterLink to="/home" class="logo-link">
-        <h1 class="logo-text font-28 font-bold">MoneyBunny</h1>
+        <h1 class="logo-text font-28 font-extrabold">MoneyBunny</h1>
       </RouterLink>
       <!--💪(상일) 알림 이동 (미읽은 개수 배지 포함)-->
       <RouterLink

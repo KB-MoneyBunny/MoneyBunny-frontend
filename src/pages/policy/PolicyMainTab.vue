@@ -80,11 +80,7 @@
       </div>
     </template>
     <template v-else>
-      <div
-        style="text-align: center; color: var(--text-bluegray); margin: 40px 0"
-      >
-        조건에 맞는 정책 목록이 없습니다.
-      </div>
+      <PolicyNoResult @retry="goPolicyTypeTest" @showAll="goAllPolicy" />
     </template>
 
     <!-- 더 많은 정책 보기 버튼 -->
@@ -129,6 +125,8 @@ import BottomNav from '@/components/layouts/NavBar.vue';
 import PolicyApplyModal from './component/PolicyApplyModal.vue';
 import { usePolicyMatchingStore } from '@/stores/policyMatchingStore';
 import { policyAPI } from '@/api/policy';
+import PolicyNoResult from './detail/PolicyNoResult.vue';
+
 // 👸🏻(은진) : 임시로
 import PolicyApplyStatusModal from './component/PolicyApplyStatusModal.vue'; // 경로 맞게
 const showStatusModal = ref(false);
@@ -217,6 +215,13 @@ function getUniqueLargeCategories(policy) {
   }
   return [];
 }
+
+const goPolicyTypeTest = () => {
+  router.push({ name: 'policyIntroForm' });
+};
+const goAllPolicy = () => {
+  router.push({ name: 'policySearch' });
+};
 </script>
 
 <style scoped>
@@ -241,8 +246,8 @@ function getUniqueLargeCategories(policy) {
   background-color: transparent;
 }
 .searchIconImage {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 .policyCard {
   background-color: white;
