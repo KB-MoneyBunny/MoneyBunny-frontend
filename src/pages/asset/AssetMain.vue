@@ -102,13 +102,17 @@
       />
 
       <!-- 월별 지출 추이 차트 -->
-      <CategoryChart :spending-data="monthlyTrendChartData" />
+      <CategoryChart
+        :monthly-trend-data="monthlyTrendData"
+        :selected-month="currentDate.getMonth() + 1"
+      />
 
       <!-- 카테고리 상세보기 모달 -->
       <DetailModal :visible="showCategoryDetail" @close="closeCategoryDetail">
         <CategoryDetailView
           v-if="selectedCategoryData"
           :category-data="selectedCategoryData"
+          :selected-date="currentDate"
           @back="closeCategoryDetail"
         />
       </DetailModal>
