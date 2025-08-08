@@ -199,7 +199,8 @@ const handleStatusSubmit = async (status) => {
         break;
         
       case 'notEligible':
-        // 단순 모달 닫기
+        // 💪(상일) 조건 미충족으로 신청 불가한 경우 신청 기록 삭제
+        await policyInteractionAPI.removeApplication(currentApplication.value.policyId);
         break;
     }
   } catch (error) {
