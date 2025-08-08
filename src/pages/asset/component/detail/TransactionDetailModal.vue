@@ -1,7 +1,3 @@
-/* 거래금액 아이템 강조 */ .amount-item .detail-value { font-size: 1.125rem;
-font-weight: 700; } /* 거래금액 색상 */ .transaction-amount-detail.positive {
-color: var(--text-green); } .transaction-amount-detail.negative { color:
-var(--alert-red); }
 <template>
   <!-- 거래 상세 모달 오버레이 -->
   <div v-if="show" class="modal-overlay" @click.self="closeModal">

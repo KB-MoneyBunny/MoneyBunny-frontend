@@ -30,12 +30,6 @@
                 ></div>
               </div>
               <span class="category-name">{{ category.name }}</span>
-              <div
-                v-if="selectedCategory?.name === category.name"
-                class="check-icon"
-              >
-                ✓
-              </div>
             </div>
           </div>
         </div>

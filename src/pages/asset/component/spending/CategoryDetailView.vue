@@ -59,12 +59,12 @@
               @click="openTransactionDetail(transaction)"
             >
               <div class="transaction-info">
-                <p class="transaction-title">
-                  {{ getTransactionTitle(transaction) }}
-                </p>
                 <p class="transaction-meta">
                   {{ formatTransactionDate(transaction.date) }}
-                  {{ transaction.time || '' }}
+                </p>
+
+                <p class="transaction-title">
+                  {{ getTransactionTitle(transaction) }}
                 </p>
               </div>
 
