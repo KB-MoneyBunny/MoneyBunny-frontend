@@ -1,13 +1,13 @@
 <template>
-  <div 
-    class="notification-card" 
+  <div
+    class="notification-card"
     :class="[
       { unread: !isRead, read: isRead, swiping: isSwiping },
-      `type-${notificationType?.toLowerCase()}`
+      `type-${notificationType?.toLowerCase()}`,
     ]"
-    :style="{ 
+    :style="{
       transform: `translateX(${translateX}px)`,
-      opacity: opacity
+      opacity: opacity,
     }"
     @touchstart="handleTouchStart"
     @touchmove="handleTouchMove"
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 // 💪(상일) props 추가
 const props = defineProps({
@@ -40,7 +40,7 @@ const props = defineProps({
   },
   notificationType: {
     type: String,
-    default: '',
+    default: "",
   },
 });
 
@@ -64,15 +64,15 @@ const handleTouchStart = (e) => {
 // 💪(상일) 터치 이동
 const handleTouchMove = (e) => {
   if (!isDragging.value) return;
-  
+
   currentX.value = e.touches[0].clientX;
   const diff = currentX.value - startX.value;
-  
+
   // 왼쪽으로만 스와이프 가능 (삭제)
   if (diff < 0) {
     translateX.value = diff;
     isSwiping.value = true;
-    
+
     // 투명도 계산 (멀리 갈수록 투명해짐)
     // 300px 이동 시 완전 투명, 최소 투명도 0.2 유지
     opacity.value = Math.max(0.2, 1 + diff / 300);
@@ -82,25 +82,25 @@ const handleTouchMove = (e) => {
 // 💪(상일) 터치 종료
 const handleTouchEnd = () => {
   if (!isDragging.value) return;
-  
+
   // 화면 너비의 40% 또는 150px 중 큰 값 이상 스와이프하면 삭제
   const threshold = Math.max(150, window.innerWidth * 0.4);
-  
+
   if (translateX.value < -threshold) {
     // 완전히 사라지는 애니메이션
     translateX.value = -window.innerWidth;
     opacity.value = 0;
-    
+
     // 애니메이션 후 삭제
     setTimeout(() => {
-      emit('delete');
+      emit("delete");
     }, 300);
   } else {
     // 원위치로 복귀
     translateX.value = 0;
     opacity.value = 1;
   }
-  
+
   isDragging.value = false;
   isSwiping.value = false;
 };
@@ -113,10 +113,10 @@ const handleMouseDown = (e) => {
 
 const handleMouseMove = (e) => {
   if (!isDragging.value) return;
-  
+
   currentX.value = e.clientX;
   const diff = currentX.value - startX.value;
-  
+
   if (diff < 0) {
     translateX.value = diff;
     isSwiping.value = true;
@@ -127,22 +127,22 @@ const handleMouseMove = (e) => {
 
 const handleMouseUp = () => {
   if (!isDragging.value) return;
-  
+
   // 화면 너비의 40% 또는 150px 중 큰 값 이상 스와이프하면 삭제
   const threshold = Math.max(150, window.innerWidth * 0.4);
-  
+
   if (translateX.value < -threshold) {
     translateX.value = -window.innerWidth;
     opacity.value = 0;
-    
+
     setTimeout(() => {
-      emit('delete');
+      emit("delete");
     }, 300);
   } else {
     translateX.value = 0;
     opacity.value = 1;
   }
-  
+
   isDragging.value = false;
   isSwiping.value = false;
 };
@@ -225,6 +225,15 @@ const handleMouseUp = () => {
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.4;
+}
+
+/* 💪(상일) 피드백 알림은 글자 제한 없음 + 줄바꿈 표기 */
+.type-feedback ::v-deep(.message) {
+  display: block;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  overflow: visible;
+  white-space: pre-line; /* \n을 줄바꿈으로 표시 */
 }
 
 ::v-deep(.date) {
