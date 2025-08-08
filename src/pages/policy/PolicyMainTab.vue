@@ -293,7 +293,7 @@ function getUniqueLargeCategories(policy) {
 }
 .policyCard {
   background-color: white;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 14px;
   margin-bottom: 14px;
   cursor: pointer;
@@ -386,7 +386,7 @@ function getUniqueLargeCategories(policy) {
   width: 170px;
   background-color: var(--input-bg-2);
   border: none;
-  padding: 6px;
+  padding: 10px;
   border-radius: 8px;
   color: var(--text-bluegray);
 }
@@ -395,7 +395,7 @@ function getUniqueLargeCategories(policy) {
   background-color: var(--base-blue-dark);
   color: white;
   border: none;
-  padding: 6px;
+  padding: 10px;
   border-radius: 8px;
 }
 .moreButton {
