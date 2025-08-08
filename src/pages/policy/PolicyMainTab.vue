@@ -166,16 +166,12 @@ const formatPeriod = (periodStr) => {
 const ALL_POLICIES = ref([]);
 
 onMounted(async () => {
-  if (policyMatchingStore.recommendedPolicies.length > 0) {
-    ALL_POLICIES.value = policyMatchingStore.recommendedPolicies;
-  } else {
-    try {
-      const res = await policyAPI.getUserPolicySearch(); // GET 방식으로 변경
-      policyMatchingStore.setRecommendedPolicies(res.data);
-      ALL_POLICIES.value = res.data;
-    } catch (e) {
-      ALL_POLICIES.value = [];
-    }
+  try {
+    const res = await policyAPI.getUserPolicySearch(); // 항상 요청
+    policyMatchingStore.setRecommendedPolicies(res.data);
+    ALL_POLICIES.value = res.data;
+  } catch (e) {
+    ALL_POLICIES.value = [];
   }
 });
 
