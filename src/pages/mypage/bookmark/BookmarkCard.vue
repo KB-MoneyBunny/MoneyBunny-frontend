@@ -72,13 +72,14 @@ const handleRemoveBookmark = async () => {
 
 <style scoped>
 .bookmarkCard {
-  padding: 16px 0;
-  background-color: white;
-  border-radius: 16px;
+  padding: 12px;
+  background-color: var(--input-bg-2);
+  border-radius: 12px;
   box-shadow: var(--card-shadow);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  width: 100%;
 }
 
 /* 💪(상일) 카드 헤더 스타일 */
@@ -90,9 +91,9 @@ const handleRemoveBookmark = async () => {
 
 .badge {
   width: fit-content;
-  padding: 4px 10px;
+  padding: 6px 10px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .badgeActive {
@@ -114,22 +115,22 @@ const handleRemoveBookmark = async () => {
   cursor: pointer;
   padding: 4px;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
 }
 
-.removeBtn:hover {
+/* .removeBtn:hover {
   background-color: #f5f5f5;
   color: #ff3b30;
-}
+} */
 
 .title {
   font-size: 15px;
-  font-weight: 700; /* 💪(상일) 제목 진하게 */
+  font-weight: bold; /* 💪(상일) 제목 진하게 */
   color: var(--text-main);
   /* 💪(상일) 제목 말줄임 처리 */
   overflow: hidden;
@@ -138,19 +139,19 @@ const handleRemoveBookmark = async () => {
 }
 
 .desc {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-sub);
   /* 💪(상일) 설명 2줄 말줄임 처리 */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.4;
+  /* line-height: 1.2; */
 }
 
 .info,
 .meta {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-gray);
   display: flex;
   justify-content: space-between;
@@ -159,7 +160,7 @@ const handleRemoveBookmark = async () => {
 
 /* 💪(상일) 지원금액과 마감일 진하게 표시 */
 .info strong {
-  font-weight: 600;
+  font-weight: bold;
   color: var(--text-main);
 }
 
@@ -169,12 +170,11 @@ const handleRemoveBookmark = async () => {
   border: none;
   cursor: pointer;
   padding: 0;
-  font-weight: 600; /* 💪(상일) 자세히 보기 버튼 진하게 */
-  transition: color 0.2s;
+  font-weight: bold; /* 💪(상일) 자세히 보기 버튼 진하게 */
 }
 
-.detailBtn:hover {
+/* .detailBtn:hover {
   color: #2840c0;
   text-decoration: underline;
-}
+} */
 </style>
