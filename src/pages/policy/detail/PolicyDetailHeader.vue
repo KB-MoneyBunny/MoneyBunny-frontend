@@ -34,7 +34,7 @@ defineProps({
   width: 100%;
   max-width: 390px;
   margin: 0 auto;
-  height: 65px;
+  height: 60px;
   border-bottom: 1px solid var(--base-lavender);
   background: white;
   display: flex;
