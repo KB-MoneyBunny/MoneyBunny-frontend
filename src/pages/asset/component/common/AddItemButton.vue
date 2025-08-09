@@ -20,10 +20,10 @@ defineEmits(['click']);
 .add-item-button {
   width: 100%;
   height: 3rem;
-  background: none;
-  border: 2px solid var(--base-lavender);
+  background: var(--base-blue-light);
+  border: none;
   border-radius: 0.75rem;
-  color: var(--base-lavender);
+  color: var(--base-blue-light);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -34,6 +34,7 @@ defineEmits(['click']);
 }
 
 .add-item-button:hover {
+  background: var(--input-bg-1);
   border-color: var(--base-blue-dark);
   color: var(--base-blue-dark);
 }
@@ -43,8 +44,8 @@ defineEmits(['click']);
 }
 
 .plus-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1rem;
+  height: 1rem;
   opacity: 0.8;
   transition: opacity 0.2s ease;
 }
