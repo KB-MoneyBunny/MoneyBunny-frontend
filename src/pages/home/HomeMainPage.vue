@@ -1,10 +1,10 @@
 <template>
   <div class="homeContainer">
-    <!-- <AssetCompareCard
+    <TotalSummaryCard ref="totalSummaryCardRef" />
+    <AssetCompareCard
       :totalAsset="totalAsset"
       :top3TotalAmount="top3TotalAmount"
-    /> -->
-    <TotalSummaryCard ref="totalSummaryCardRef" />
+    />
     <!-- <RecommendationSection
       ref="policyRecommendationCardRef"
       class="withGapTop"

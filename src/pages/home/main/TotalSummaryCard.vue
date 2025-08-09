@@ -3,7 +3,7 @@
     <div class="homeCardSection">
       <div class="labelRow">
         <span class="homeCardLabel">총 자산</span>
-        <!-- <span class="homeCardRate">{{ rate }}</span> -->
+        <span class="homeCardRate">{{ rate }}</span>
       </div>
       <div class="homeCardValue">{{ totalAssetDisplay }}</div>
     </div>
@@ -56,8 +56,8 @@ defineExpose({
 <style scoped>
 .homeCard {
   background-color: var(--base-blue-dark);
-  border-radius: 12px;
-  padding: 12px 24px;
+  border-radius: 6px;
+  padding: 18px;
   color: white;
   margin-bottom: 1rem;
   height: 145px;
@@ -68,23 +68,19 @@ defineExpose({
 
 .homeCardLabel {
   font-size: 13px;
-  font-weight: bold;
-  color: var(--base-blue-light);
+  /* font-weight: bold; */
   letter-spacing: 0.03em;
   margin-bottom: 0.25rem;
 }
-
-/* .homeCardRate {
-  font-size: 12px;
-  color: var(--text-rate);
-} */
-
+.homeCardLate {
+  font-size: 15px;
+}
 .homeCardValue {
   font-size: 17px;
   font-weight: bold;
   color: white;
   line-height: 1.2;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   margin-top: 0;
 }
 

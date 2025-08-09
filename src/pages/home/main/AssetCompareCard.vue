@@ -1,6 +1,6 @@
 <template>
   <div class="assetCompareCard">
-    <!-- <div class="compareTitle">정책 적용 후 자산비교</div> -->
+    <div class="compareTitle">정책 적용 후 자산비교</div>
     <div class="assetRow">
       <div class="assetBlock nowAsset">
         <div class="assetLabel">현재 자산</div>
@@ -76,7 +76,7 @@ const increaseRateDisplay = computed(() =>
 
 <style scoped>
 .assetCompareCard {
-  background: var(--base-blue-dark);
+  background: white;
   border-radius: 1rem;
   padding: 1.35rem 1.1rem;
   display: flex;
@@ -110,15 +110,15 @@ const increaseRateDisplay = computed(() =>
 }
 
 .nowAsset {
-  /* background: #f8fafd; */
+  background: #f8fafd;
   /* border: 1.5px solid #e3e7f1; */
-  color: #f8fafd;
+  color: var(--base-blue-dark);
 }
 
 .expectedAsset {
   background: var(--base-blue-dark, #2a3557);
   color: #fff;
-  /* border: 1.5px solid #dde0ec; */
+  border: 1.5px solid #dde0ec;
 }
 
 .assetLabel {
