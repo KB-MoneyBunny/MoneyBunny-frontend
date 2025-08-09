@@ -207,6 +207,33 @@ export const useNotificationStore = defineStore("notification", () => {
     }, 600); // 0.6초 후 리셋
   };
 
+  // 💪(상일) 스토어 수동 초기화 (로그아웃 시 사용)
+  const resetStore = () => {
+    loading.value = true; // 초기화 중임을 표시
+    
+    notifications.value = [];
+    unreadCount.value = 0;
+    shouldShakeIcon.value = false;
+    
+    // reactive 객체 초기화
+    subscriptionStatus.subscribed = false;
+    subscriptionStatus.isActiveBookmark = false;
+    subscriptionStatus.isActiveTop3 = false;
+    subscriptionStatus.isActiveNewPolicy = false;
+    subscriptionStatus.isActiveFeedback = false;
+    subscriptionStatus.status = "INACTIVE";
+    subscriptionStatus.message = "";
+    
+    error.value = null;
+    
+    // 다음 렌더링 사이클에서 loading 해제
+    setTimeout(() => {
+      loading.value = false;
+    }, 0);
+    
+    console.log("✅ NotificationStore 수동 초기화 완료");
+  };
+
   // 💪(상일) 개별 알림 타입 토글 - FCMTokenManager 사용
   const toggleNotificationType = async (type, enabled) => {
     const { fcmTokenManager } = await import("@/firebase/FCMTokenManager");
@@ -299,5 +326,6 @@ export const useNotificationStore = defineStore("notification", () => {
     toggleNotificationType,
     createInitialSubscription,
     triggerIconShake,
+    resetStore,
   };
 });
