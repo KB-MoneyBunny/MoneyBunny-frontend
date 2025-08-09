@@ -18,9 +18,11 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import api from '@/api'; // 🛠️ 제승 수정: api import
 
 const route = useRoute();
+const router = useRouter();
 
 const navItems = [
   {
@@ -60,11 +62,9 @@ const isActive = (path) => route.path.startsWith(path);
   bottom: 0;
   left: 0;
   right: 0;
-
   width: 100%;
-  max-width: 474px;
+  max-width: 390px;
   margin: 0 auto;
-
   height: 60px;
   background: white;
   border-top: 1px solid #ddd;
