@@ -61,12 +61,10 @@ const avatarMap = {
   eyelash: imgEyelash,
   carrot: imgCarrot,
 };
-const avatarKey = localStorage.getItem("avatarKey") || "sprout"; // 기본값: sprout
 
 const userInfo = ref({
   name: "",
   email: "",
-  profileImage: avatarMap[avatarKey],
 });
 
 // 💪(상일) 북마크 스토어 연동
@@ -112,6 +110,13 @@ onMounted(async () => {
     console.log(res);
     userInfo.value.name = res.data.name;
     userInfo.value.email = res.data.email;
+
+    // DB profileImageId로 프사 매핑 (없거나 범위 밖이면 기존값/첫 번째로 폴백)
+    const idx = Number(res.data.profileImageId);
+    userInfo.value.profileImage =
+      Number.isInteger(idx) && idx >= 0 && idx < profileImages.length
+        ? profileImages[idx]
+        : profileImages[0];
   } catch (err) {
     console.error("프로필 불러오기 실패:", err);
   }

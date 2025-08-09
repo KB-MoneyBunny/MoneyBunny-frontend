@@ -2,7 +2,12 @@
   <header class="top-header">
     <div class="header-inner">
       <RouterLink to="/home" class="logo-link">
-        <h1 class="logo-text font-28 font-extrabold">MoneyBunny</h1>
+        <!-- 🎵(유정) 로고 이미지 임시 변경 -->
+        <img
+          src="@/assets/images/icons/logo/MoneyBunny_logo.png"
+          alt="MoneyBunny"
+          class="logo-img-text"
+        />
       </RouterLink>
       <!--💪(상일) 알림 이동 (미읽은 개수 배지 포함)-->
       <RouterLink
@@ -17,7 +22,7 @@
             class="logo-img"
           />
           <div v-if="unreadCount > 0" class="notification-badge">
-            {{ unreadCount > 9 ? '9+' : unreadCount }}
+            {{ unreadCount > 9 ? "9+" : unreadCount }}
           </div>
         </div>
       </RouterLink>
@@ -26,9 +31,9 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import { useNotificationStore } from '@/stores/notification';
+import { onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
+import { useNotificationStore } from "@/stores/notification";
 
 // 💪(상일) 알림 스토어 및 라우트 사용
 const route = useRoute();
@@ -38,19 +43,17 @@ const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 
 // 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회 - 특정 라우트에서만
 onMounted(async () => {
-  // 💪(상일) 미읽은 알림 개수가 필요한 페이지만 체크 (policy 메인만 포함)
-  const targetRoutes = ['/home', '/asset', '/mypage'];
-  const exactRoutes = ['/policy', '/policy/main'];
-  if (targetRoutes.some((routePath) => route.path.startsWith(routePath)) || 
-      exactRoutes.includes(route.path)) {
+  // 미읽은 알림 개수가 필요한 페이지만 체크
+  const targetRoutes = ["/home", "/asset", "/policy", "/mypage"];
+  if (targetRoutes.some((routePath) => route.path.startsWith(routePath))) {
     try {
       await notificationStore.fetchUnreadCount();
       console.log(
-        '🔔 Header: 미읽은 알림 개수 조회 완료',
+        "🔔 Header: 미읽은 알림 개수 조회 완료",
         notificationStore.unreadCount
       );
     } catch (error) {
-      console.error('❌ Header: 미읽은 알림 개수 조회 실패', error);
+      console.error("❌ Header: 미읽은 알림 개수 조회 실패", error);
     }
   }
 });
@@ -170,5 +173,12 @@ onMounted(async () => {
 
 .notification-link.shake {
   animation: shake 0.5s ease-in-out;
+}
+
+.logo-img-text {
+  height: 2.5rem; /* 로고 크기 줄임 */
+  object-fit: contain; /* 비율 유지 */
+  display: block;
+  margin: 0 auto; /* 좌우 가운데 정렬 */
 }
 </style>
