@@ -25,14 +25,15 @@ const props = defineProps({
   title: String,
   amount: Number,
   highlighted: Boolean,
-  policyId: [String, Number], // 정책 ID 필요하면
+  policyId: [String, Number], // String 또는 Number 허용
 });
 
 const router = useRouter();
 
 // 👸🏻(은잔) : 상세페이지로 연결해줘야함
 function goDetail() {
-  router.push({ name: 'policyDetail', params: { id: props.policyId } });
+  if (!props.policyId) return;
+  router.push({ name: 'policyDetail', params: { policyId: props.policyId } });
 }
 </script>
 
