@@ -1,14 +1,16 @@
 <template>
   <div class="homeContainer">
-    <TotalSummaryCard ref="totalSummaryCardRef" />
-    <AssetCompareCard
+    <!-- <AssetCompareCard
       :totalAsset="totalAsset"
       :top3TotalAmount="top3TotalAmount"
-    />
-    <PolicyRecommendationCard
+    /> -->
+    <TotalSummaryCard ref="totalSummaryCardRef" />
+    <!-- <RecommendationSection
       ref="policyRecommendationCardRef"
       class="withGapTop"
-    />
+    /> -->
+    <!-- <PolicyTop3Carousel class="withGapTop" /> -->
+
     <DailyMessageCard class="tightTopMargin" />
   </div>
 </template>
@@ -17,8 +19,8 @@
 import { ref, watch, nextTick } from 'vue';
 import TotalSummaryCard from '@/pages/home/main/TotalSummaryCard.vue';
 import AssetCompareCard from '@/pages/home/main/AssetCompareCard.vue';
-import PolicyRecommendationCard from '@/pages/home/main/PolicyRecommendationCard.vue';
 import DailyMessageCard from '@/pages/home/main/DailyMessageCard.vue';
+import PolicyTop3Carousel from './main/PolicyTop3Carousel.vue';
 
 const totalSummaryCardRef = ref();
 const policyRecommendationCardRef = ref();
@@ -51,10 +53,6 @@ watch(
 <style scoped>
 /* 한마디 카드는 아래 간격만 살짝 줄여주기 */
 .tightTopMargin {
-  margin-top: 1rem;
-}
-
-.withGapTop {
   margin-top: 1rem;
 }
 </style>

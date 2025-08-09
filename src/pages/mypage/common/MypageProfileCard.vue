@@ -6,14 +6,14 @@
         alt="프로필 이미지"
         class="profileImage"
       />
+      <!-- <button class="editBtn" @click="$emit('edit')">
+        <img src="@/assets/images/icons/mypage/edit.png" alt="수정" />
+      </button> -->
 
       <div class="userText">
         <p class="userName font-18 font-bold">{{ userInfo.name }}</p>
         <p class="userEmail font-13">{{ userInfo.email }}</p>
       </div>
-      <button class="editBtn" @click="$emit('edit')">
-        <img src="@/assets/images/icons/mypage/edit.png" alt="수정" />
-      </button>
     </div>
   </div>
 </template>
@@ -40,6 +40,7 @@ defineProps({ userInfo: Object });
 
 .profileImage {
   margin-left: 10px;
+  /* margin-right: 5px; */
   width: 80px;
   height: 80px;
   border-radius: 50%;
