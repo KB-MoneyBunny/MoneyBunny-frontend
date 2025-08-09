@@ -181,9 +181,27 @@ onMounted(async () => {
     // ?from=share 파라미터 제거한 URL
     const currentUrl = window.location.href.replace(/[?&]from=share/, '');
     
-    // 카카오톡 URL 스킴으로 외부 브라우저 열기
-    // Android는 Chrome/기본 브라우저로, iOS는 Safari로 자동 열림
-    window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(currentUrl);
+    // 💪(상일) Android와 iOS 구분 처리
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    if (isAndroid) {
+      // Android: intent 스킴으로 Chrome 직접 지정
+      const intentUrl = 'intent://' + currentUrl.replace(/^https?:\/\//, '') + 
+                       '#Intent;scheme=https;package=com.android.chrome;end';
+      
+      // 먼저 Chrome intent 시도
+      window.location.href = intentUrl;
+      
+      // intent 실패 시 대비 (Chrome 없는 경우) - 1초 후 카카오톡 기본 브라우저로
+      setTimeout(() => {
+        window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(currentUrl);
+      }, 1000);
+    } else {
+      // iOS: Safari로 열기 (카카오톡 스킴 사용)
+      window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(currentUrl);
+    }
+    
     return; // 리다이렉트 후 나머지 로직 실행 안 함
   }
   
