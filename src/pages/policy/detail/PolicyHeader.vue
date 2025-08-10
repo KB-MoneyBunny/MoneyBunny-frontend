@@ -1,7 +1,7 @@
 <template>
   <div class="policyHeader">
     <div class="headerTop">
-      <div class="title font-bold font-18">{{ title || policy.title }}</div>
+      <div class="title font-bold font-17">{{ title || policy.title }}</div>
       <!-- 로그인한 경우에만 북마크 아이콘 -->
       <img
         v-if="authStore.isLogin"
@@ -11,25 +11,25 @@
         @click="toggleBookmark"
       />
     </div>
-    <p class="desc font-13">
+    <p class="desc font-12">
       {{ description || policy.description }}
     </p>
 
-    <div class="tags">
+    <!-- <div class="tags">
       <span v-for="(tag, i) in policy.tags" :key="i" class="tag">{{
         tag
       }}</span>
-    </div>
+    </div> -->
 
-    <p class="supportAmount font-bold font-17">
+    <p class="supportAmount font-bold font-16">
       {{ policy.supportAmount }}
     </p>
 
     <div class="actions">
-      <button class="applyButton font-13" @click="openApplyModal(policy)">
+      <button class="applyButton font-12" @click="openApplyModal(policy)">
         바로 신청하기
       </button>
-      <button class="shareButton font-13" @click="toggleShareModal">
+      <button class="shareButton font-12" @click="toggleShareModal">
         <img :src="shareIcon" alt="공유" class="shareIcon" />
         공유하기
       </button>
@@ -52,9 +52,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useAuthStore } from "@/stores/auth";
-import { bookmarkAPI } from "@/api/policyInteraction";
+import { ref, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { bookmarkAPI } from '@/api/policyInteraction';
 
 import ShareModal from './ShareModal.vue';
 import PolicyApplyModal from '../component/PolicyApplyModal.vue';
@@ -138,10 +138,10 @@ const normalizeUrl = (url) => {
 function openApplyModal(policy) {
   // applyUrl 이 www.xxx 로 시작하면 프로토콜 붙이고, 아니면 그대로
   const fixedUrl = normalizeUrl(policy.applyUrl);
-  selectedPolicy.value = { 
-    ...policy, 
+  selectedPolicy.value = {
+    ...policy,
     applyUrl: fixedUrl,
-    policyId: policy.policyId || policy.id // 💪(상일) policyId 확실히 전달
+    policyId: policy.policyId || policy.id, // 💪(상일) policyId 확실히 전달
   };
   showApplyModal.value = true;
 }
@@ -155,7 +155,7 @@ const handleShowStatusModal = (applicationData) => {
   // 신청 모달 닫기
   showApplyModal.value = false;
   selectedPolicy.value = null;
-  
+
   // 부모 컴포넌트(PolicyDetailPage)로 이벤트 전달
   emit('showStatusModal', applicationData);
 };
@@ -164,41 +164,41 @@ const handleShowStatusModal = (applicationData) => {
 <style scoped>
 .policyHeader {
   background-color: white;
-  border-radius: 12px;
-  padding: 24px;
+  border-radius: 6px;
+  padding: 20px;
 }
 
 .headerTop {
   display: flex;
   justify-content: space-between;
   align-items: start;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .headerIcon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
 }
 
 .desc {
   color: var(--text-bluegray);
-  margin-bottom: 12px;
+  margin-bottom: 6px;
 }
 
-.tags {
+/* .tags {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 12px;
 }
 
 .tag {
   background-color: var(--input-outline);
   color: var(--text-bluegray);
-  font-size: 12px;
+  font-size: 11px;
   padding: 4px 10px;
   border-radius: 4px;
-}
+} */
 
 .supportAmount {
   color: var(--base-blue-dark);
@@ -216,23 +216,23 @@ const handleShowStatusModal = (applicationData) => {
   color: white;
   border: none;
   padding: 12px;
-  border-radius: 8px;
-  margin-right: 5px;
+  border-radius: 6px;
+  /* margin-right: 5px; */
 }
 
 .shareButton {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   background-color: var(--input-bg-2);
   color: var(--text-bluegray);
   border: none;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 6px;
 }
 
 .shareIcon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 </style>

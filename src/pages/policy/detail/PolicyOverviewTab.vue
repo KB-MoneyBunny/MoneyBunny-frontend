@@ -23,23 +23,23 @@ const splitLines = (str) =>
 
 <template>
   <div class="tabContent">
-    <div class="font-bold font-16 mb-2">정책 설명</div>
-    <div class="font-13 text-bluegray mb-4">
+    <div class="font-bold font-15 mb-2">정책 설명</div>
+    <div class="font-12 text-bluegray mb-4">
       <template v-for="(line, idx) in splitLines(description)" :key="idx">
         <span>{{ line }}</span
         ><br v-if="idx !== splitLines(description).length - 1" />
       </template>
     </div>
 
-    <div class="font-bold font-16 mb-2">지원 내용</div>
+    <div class="font-bold font-15 mb-2">지원 내용</div>
     <div class="supportBox">
       <template v-for="(line, idx) in splitLines(supportContent)" :key="idx">
-        <span class="font-12 text-bluegray">{{ line }}</span
+        <span class="font-11 text-bluegray">{{ line }}</span
         ><br v-if="idx !== splitLines(supportContent).length - 1" />
       </template>
     </div>
 
-    <div class="font-16 font-bold mb-2 mt-4">신청 기간</div>
+    <div class="font-15 font-bold mb-2 mt-4">신청 기간</div>
     <div class="periodBox">
       <img
         src="@/assets/images/icons/policy/calendar.png"
@@ -47,7 +47,7 @@ const splitLines = (str) =>
         class="calendarIcon"
       />
       <div class="periodContent">
-        <div class="periodText font-13 font-bold">
+        <div class="periodText font-12 font-bold">
           {{ formatPeriod(applyPeriod) }}
         </div>
         <span v-if="!applyPeriod" class="periodSub font-11">
@@ -62,13 +62,13 @@ const splitLines = (str) =>
 .tabContent {
   background-color: white;
   border-radius: 16px;
-  padding: 20px;
+  padding: 16px;
   margin-bottom: 80px;
 }
 .supportBox {
   background-color: var(--input-bg-2);
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   margin-bottom: 8px;
   min-height: 50px;
 }
@@ -95,14 +95,14 @@ const splitLines = (str) =>
   display: flex;
   align-items: flex-start;
   background-color: var(--input-bg-2);
-  border-radius: 8px;
-  padding: 16px;
-  gap: 12px;
+  border-radius: 6px;
+  padding: 12px;
+  gap: 10px;
 }
 .calendarIcon {
-  width: 20px;
-  height: 20px;
-  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  /* margin-top: 3px; */
   flex-shrink: 0;
 }
 .periodContent {
@@ -111,14 +111,14 @@ const splitLines = (str) =>
   align-items: flex-start;
 }
 .periodText {
-  line-height: 2;
+  /* line-height: 2; */
   color: var(--text-default);
   margin-bottom: 4px;
 }
 .periodSub {
   display: block;
   color: var(--text-bluegray);
-  line-height: 1.6;
+  /* line-height: 1.6; */
   margin-left: 0;
 }
 </style>

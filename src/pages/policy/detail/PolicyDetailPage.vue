@@ -141,22 +141,28 @@ const checkIncompleteApplication = async () => {
 // 💪(상일) 모달 응답 처리
 const handleStatusSubmit = async (status) => {
   if (!currentApplication.value) return;
-  
+
   try {
-    switch(status) {
+    switch (status) {
       case 'applied':
         // 신청 완료 처리
-        await policyInteractionAPI.completeApplication(currentApplication.value.policyId);
+        await policyInteractionAPI.completeApplication(
+          currentApplication.value.policyId
+        );
         break;
-        
+
       case 'notYet':
         // 신청 기록 삭제
-        await policyInteractionAPI.removeApplication(currentApplication.value.policyId);
+        await policyInteractionAPI.removeApplication(
+          currentApplication.value.policyId
+        );
         break;
-        
+
       case 'notEligible':
         // 💪(상일) 조건 미충족으로 신청 불가한 경우 신청 기록 삭제
-        await policyInteractionAPI.removeApplication(currentApplication.value.policyId);
+        await policyInteractionAPI.removeApplication(
+          currentApplication.value.policyId
+        );
         break;
     }
   } catch (error) {
@@ -207,13 +213,17 @@ onMounted(async () => {
     </div>
   </div>
   <div v-else class="noData">정책 정보를 찾을 수 없습니다.</div>
-  
+
   <!-- 💪(상일) 정책신청현황 모달 -->
   <PolicyApplyStatusModal
     v-model="showStatusModal"
     :policyTitle="currentApplication?.title || ''"
     @submit="handleStatusSubmit"
-    @later="() => { showStatusModal = false; }"
+    @later="
+      () => {
+        showStatusModal = false;
+      }
+    "
   />
 </template>
 
@@ -224,13 +234,13 @@ onMounted(async () => {
 
 .contentBox {
   background-color: white;
-  border-radius: 12px;
-  padding: 10px;
-  margin: 26px 0;
+  border-radius: 6px;
+  padding: 5px;
+  margin: 13px 0;
 }
 
 .noData {
-  padding: 40px;
+  padding: 20px;
   text-align: center;
   color: gray;
 }
