@@ -1,7 +1,7 @@
 <template>
   <div class="myPageContainer">
     <!-- 고정 프로필 카드 -->
-    <MypageProfileCard :userInfo="userInfo" @edit="openModal" />
+    <MypageProfileCard :userInfo="userInfo" @edit="openPicker" />
 
     <!-- 하나의 카드 안에 탭 메뉴 + 콘텐츠 -->
     <div class="infoCard">
@@ -18,20 +18,17 @@
       </div>
     </div>
 
-    <!-- 프로필 수정 모달 -->
-    <EditProfileModal
-      v-if="isModalOpen"
-      :name="userInfo.name"
-      :email="userInfo.email"
-      :profileImage="userInfo.profileImage"
-      @close="isModalOpen = false"
-      @update="handleUpdate"
+    <ProfileImagePicker
+      v-if="showPicker"
+      v-model="tempImage"
+      @close="closePicker"
+      @save="saveProfile"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useBookmarkStore } from '@/stores/bookmark';
 import axios from 'axios';
@@ -43,6 +40,8 @@ import ProfileInfoTable from './profile/ProfileInfoTable.vue';
 import EditProfileModal from './profile/EditProfileModal.vue';
 import BookmarkList from './bookmark/BookmarkList.vue';
 import SettingMain from './settings/SettingMain.vue';
+
+import ProfileImagePicker from './profile/ProfileImagePicker.vue';
 
 import imgSprout from '@/assets/images/icons/profile/profile_edit_sprout.png';
 import imgBeard from '@/assets/images/icons/profile/profile_edit_beard.png';
@@ -69,6 +68,25 @@ const userInfo = ref({
   profileImage: avatarMap[avatarKey],
 });
 
+const showPicker = ref(false);
+
+// 초기값
+const tempImage = ref('');
+
+// 열기
+const openPicker = () => {
+  tempImage.value = userInfo.value.profileImage;
+  showPicker.value = true;
+};
+
+// 닫기
+const closePicker = () => (showPicker.value = false);
+
+// 저장(즉시 카드 반영)
+const saveProfile = (img) => {
+  userInfo.value.profileImage = img; // ✅ 바로 반영
+  showPicker.value = false;
+};
 // 💪(상일) 북마크 스토어 연동
 const bookmarkStore = useBookmarkStore();
 const {

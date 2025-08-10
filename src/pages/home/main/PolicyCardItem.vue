@@ -41,13 +41,14 @@ function goDetail() {
 .policyTop3Card {
   background-color: var(--input-bg-2);
   border-radius: 0.5rem;
-  padding: 0.9rem;
+  padding: 0.8rem;
   /* border: 1px solid transparent; */
   display: flex;
   flex-direction: column;
 }
 
 .contentRow {
+  /* padding: 5px; */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -56,9 +57,10 @@ function goDetail() {
 }
 
 .left {
+  margin-left: -5px;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.2rem;
   flex-wrap: nowrap;
 }
 
@@ -71,17 +73,17 @@ function goDetail() {
   text-align: center;
   line-height: 1rem;
   font-size: 0.6rem;
-  margin-right: 0.15rem;
+  margin-right: 0.1rem;
 }
 
 .title {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: bold;
   color: var(--text-login);
   white-space: nowrap;
   overflow: hidden;
-  /* text-overflow: ellipsis; */
-  /* max-width: 9rem; */
+  text-overflow: ellipsis;
+  max-width: 10rem;
   display: block;
 }
 
@@ -89,6 +91,7 @@ function goDetail() {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  margin-right: -3px;
 }
 
 .amount {
@@ -99,8 +102,8 @@ function goDetail() {
 }
 
 .nextIcon {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   object-fit: contain;
 
   margin: 0 1px;
