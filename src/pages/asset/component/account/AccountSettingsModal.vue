@@ -25,129 +25,110 @@
 
       <!-- 설정 옵션들 -->
       <div class="settings-options">
-        <!-- 계좌번호 복사 -->
-        <button class="setting-item" @click="$emit('copy-account')">
-          <div class="setting-icon copy-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <span class="setting-text">계좌번호 복사</span>
-        </button>
-
-        <!-- 계좌 별명 설정 -->
-        <div class="setting-item nickname-setting">
-          <div class="setting-icon edit-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <div class="nickname-container">
-            <span v-if="!isEditingNickname" class="setting-text"
-              >계좌 별명 설정</span
-            >
-            <div v-if="!isEditingNickname" class="current-nickname">
-              {{ account.accountName }}
+        <div class="section-group">
+          <!-- 계좌번호 복사 -->
+          <button class="setting-item" @click="handleCopyAccount">
+            <div class="setting-content">
+              <span class="setting-text">계좌번호 복사</span>
             </div>
+            <img :src="copyIcon" alt="계좌번호 복사" class="setting-icon" />
+          </button>
 
-            <!-- 편집 모드 -->
-            <div v-if="isEditingNickname" class="nickname-edit">
-              <input
-                ref="nicknameInput"
-                v-model="editingNickname"
-                type="text"
-                class="nickname-input"
-                placeholder="계좌 별명을 입력해주세요"
-                maxlength="20"
-                @keyup.enter="saveNickname"
-                @keyup.escape="cancelEdit"
-              />
-              <div class="edit-buttons">
+          <!-- 계좌 별명 설정 (인라인 편집 + 좌측 정렬) -->
+          <div class="setting-item">
+            <div class="setting-content">
+              <span class="setting-text">계좌 별명 설정</span>
+
+              <!-- 보기 모드 -->
+              <div v-if="!isEditingNickname" class="inline-row">
+                <span class="current-value">{{ account.accountName }}</span>
+              </div>
+
+              <!-- 편집 모드 -->
+              <div v-else class="inline-row">
+                <input
+                  ref="nicknameInput"
+                  v-model="editingNickname"
+                  type="text"
+                  class="nickname-inline-input"
+                  placeholder="계좌 별명을 입력해주세요"
+                  maxlength="20"
+                  @keyup.enter="saveNickname"
+                />
+                <button class="chip-btn" @click="cancelEdit">취소</button>
                 <button
-                  class="save-btn"
+                  class="chip-btn primary"
                   @click="saveNickname"
                   :disabled="!editingNickname.trim()"
                 >
-                  저장
+                  확인
                 </button>
-                <button class="cancel-btn" @click="cancelEdit">취소</button>
               </div>
             </div>
+
+            <!-- 편집 시작 아이콘 (보기 모드에서만 노출) -->
+            <button
+              v-if="!isEditingNickname"
+              class="icon-btn"
+              @click="startEdit"
+              aria-label="별명 편집"
+            >
+              <img :src="editIcon" alt="" class="setting-icon" />
+            </button>
           </div>
+
+          <!-- 잔액 숨김 토글 -->
+          <div class="setting-item toggle-item">
+            <span class="setting-text">잔액숨김</span>
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                v-model="hideBalance"
+                @change="$emit('toggle-balance', hideBalance)"
+              />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- 대표계좌 변경 -->
           <button
-            v-if="!isEditingNickname"
-            class="edit-toggle-btn"
-            @click="startEdit"
+            class="setting-item"
+            @click="handleSetMain"
+            :disabled="account.isMain"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <div class="setting-content">
+              <span class="setting-text">대표계좌 변경</span>
+            </div>
+            <svg
+              class="arrow-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
               <path
-                d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
-                fill="currentColor"
+                d="M9 18l6-6-6-6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
               />
             </svg>
           </button>
         </div>
-
-        <!-- 대표 계좌 설정 -->
-        <button
-          v-if="!account.isMain"
-          class="setting-item"
-          @click="$emit('set-main')"
-        >
-          <div class="setting-icon star-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <span class="setting-text">대표 계좌 설정</span>
-        </button>
-
-        <!-- 이미 대표 계좌인 경우 -->
-        <div v-else class="setting-item disabled">
-          <div class="setting-icon star-icon active">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <span class="setting-text">대표 계좌</span>
-        </div>
-
-        <!-- 잔액 숨기기 -->
-        <button class="setting-item" @click="$emit('toggle-balance')">
-          <div class="setting-icon hide-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 7C13.1 7 14 7.9 14 9S13.1 11 12 11 10 10.1 10 9 10.9 7 12 7ZM12 1C5.93 1 1 5.93 1 12S5.93 23 12 23 23 18.07 23 12 18.07 1 12 1ZM12 21C7.03 21 3 16.97 3 12S7.03 3 12 3 21 7.03 21 12 16.97 21 12 21Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <span class="setting-text">잔액 숨기기</span>
-        </button>
       </div>
+
+      <!-- 닫기 버튼 -->
+      <button class="close-button" @click="closeModal">닫기</button>
     </div>
   </div>
-
-  <!-- 별명 설정 모달 삭제 -->
-  <!-- NicknameEditModal 컴포넌트 제거됨 -->
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onUnmounted, watch } from 'vue';
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
+import copyIcon from '@/assets/images/icons/common/copy.png';
+import editIcon from '@/assets/images/icons/mypage/edit.png';
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -160,36 +141,63 @@ const emit = defineEmits([
   'set-nickname',
   'set-main',
   'toggle-balance',
+  'change-background',
+  'change-type',
 ]);
 
 const isEditingNickname = ref(false);
 const editingNickname = ref('');
 const nicknameInput = ref(null);
+const hideBalance = ref(false);
 
-const closeModal = () => {
-  emit('close');
+/* 계좌 정보 변경 감지 */
+watch(
+  () => props.account.hideBalance,
+  (newVal) => {
+    hideBalance.value = newVal || false;
+  },
+  { immediate: true }
+);
+
+/* 모달이 열릴 때 body 스크롤 방지 */
+watch(
+  () => props.visible,
+  (open) => {
+    document.body.classList.toggle('modal-open', !!open);
+  }
+);
+
+onUnmounted(() => {
+  document.body.classList.remove('modal-open');
+});
+
+const closeModal = () => emit('close');
+
+const formatAccountNumber = (number) => {
+  if (!number) return '';
+  return number.replace(/(\d{3})(\d{2,4})(\d{4,6})/, '$1-$2-$3');
 };
 
-const formatAccountNumber = (number) =>
-  number.replace(/(\d{3})(\d{2,3})(\d{4,6})/, '$1-$2-$3');
+const handleCopyAccount = () => emit('copy-account');
 
-// 별명 편집 시작
+const handleSetMain = () => {
+  if (!props.account.isMain) emit('set-main');
+};
+
 const startEdit = async () => {
   isEditingNickname.value = true;
-  editingNickname.value = props.account.accountName;
+  editingNickname.value = props.account.accountName || '';
   await nextTick();
   nicknameInput.value?.focus();
 };
 
-// 별명 저장
 const saveNickname = () => {
-  if (editingNickname.value.trim()) {
-    emit('set-nickname', editingNickname.value.trim());
-    isEditingNickname.value = false;
-  }
+  const name = editingNickname.value.trim();
+  if (!name) return;
+  emit('set-nickname', name);
+  isEditingNickname.value = false;
 };
 
-// 편집 취소
 const cancelEdit = () => {
   isEditingNickname.value = false;
   editingNickname.value = '';
@@ -197,21 +205,17 @@ const cancelEdit = () => {
 </script>
 
 <style scoped>
-/* 모달 배경 */
+/* ===== 오버레이 & 애니메이션 ===== */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
   animation: fadeIn 0.2s ease-out;
 }
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -220,17 +224,6 @@ const cancelEdit = () => {
     opacity: 1;
   }
 }
-
-/* 모달 내용 */
-.modal-content {
-  width: 100%;
-  max-width: 474px;
-  background: white;
-  border-radius: 1.5rem 1.5rem 0 0;
-  padding: 1.5rem;
-  animation: slideUp 0.3s ease-out;
-}
-
 @keyframes slideUp {
   from {
     transform: translateY(100%);
@@ -240,214 +233,236 @@ const cancelEdit = () => {
   }
 }
 
-/* 모달 핸들 */
+/* ===== 바텀시트 컨테이너 (하단 여백 최소화) ===== */
+.modal-content {
+  width: 100%;
+  max-width: 474px;
+  background: #fff;
+  border-radius: 1.25rem 1.25rem 0 0;
+  padding: 1.25rem;
+  animation: slideUp 0.3s ease-out;
+  max-height: 70vh; /* 기존 85vh → 70vh로 축소 */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@supports (padding: max(0px)) {
+  .modal-content {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* 핸들 */
 .modal-handle {
   width: 2.5rem;
   height: 0.25rem;
   background: var(--input-disabled-1);
   border-radius: 0.125rem;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto 1rem;
 }
 
-/* 계좌 정보 헤더 */
+/* ===== 헤더 ===== */
 .account-header {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--input-outline);
 }
-
 .bank-logo {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
   object-fit: contain;
 }
-
 .account-info {
   flex: 1;
 }
-
 .account-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--base-blue-dark);
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.25rem;
 }
-
 .account-number {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--text-lightgray);
   margin: 0;
 }
 
-/* 설정 옵션들 */
+/* ===== 옵션 섹션 ===== */
 .settings-options {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
-
+.section-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--input-bg-1);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
 .setting-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
   background: none;
   border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  border-bottom: 1px solid var(--input-outline);
   text-align: left;
   width: 100%;
+  min-height: 3.25rem;
+  -webkit-tap-highlight-color: transparent;
+}
+.section-group .setting-item:last-child {
+  border-bottom: none;
 }
 
-.setting-item:hover:not(.disabled):not(.nickname-setting) {
-  background: var(--input-bg-1);
-}
-
-.setting-item.disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.setting-item.nickname-setting {
-  cursor: default;
-  align-items: flex-start;
-  padding: 1.25rem 1rem;
-}
-
-.setting-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-darkgray);
-  flex-shrink: 0;
-}
-
-.copy-icon {
-  background: var(--sub-skyblue);
-}
-.edit-icon {
-  background: var(--base-lavender);
-}
-.star-icon {
-  background: var(--sub-mint);
-}
-.star-icon.active {
-  background: var(--text-green);
-  color: white;
-}
-.hide-icon {
-  background: var(--alert-light-2);
-}
-
-.setting-text {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--base-blue-dark);
-}
-
-/* 별명 설정 관련 스타일 */
-.nickname-container {
+.setting-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
-
-.current-nickname {
-  font-size: 0.9rem;
-  color: var(--text-darkgray);
-  background: var(--input-bg-1);
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+.setting-text {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--base-blue-dark);
+  line-height: 1.4;
 }
-
-.nickname-edit {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.nickname-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--input-outline);
-  border-radius: 0.5rem;
-  font-size: 0.9rem;
-  background: var(--input-bg-2);
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-}
-
-.nickname-input:focus {
-  outline: none;
-  border-color: var(--base-blue-dark);
-  background: white;
-}
-
-.edit-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.save-btn,
-.cancel-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.save-btn {
-  background: var(--base-blue-dark);
-  border: 1px solid var(--base-blue-dark);
-  color: white;
-}
-
-.save-btn:hover:not(:disabled) {
-  background: var(--base-lavender);
-  border-color: var(--base-lavender);
-}
-
-.save-btn:disabled {
-  background: var(--input-disabled-1);
-  border-color: var(--input-disabled-1);
+.current-value {
+  font-size: 0.8125rem;
   color: var(--text-lightgray);
-  cursor: not-allowed;
+  line-height: 1.3;
 }
 
-.cancel-btn {
-  background: var(--input-bg-1);
-  border: 1px solid var(--input-outline);
-  color: var(--text-darkgray);
-}
-
-.cancel-btn:hover {
-  background: var(--input-disabled-1);
-}
-
-.edit-toggle-btn {
-  background: none;
+/* 우측 아이콘 버튼 + 이미지 크기 */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
   border: none;
+  background: none;
+}
+.setting-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  opacity: 0.92;
+}
+.arrow-icon {
   color: var(--text-lightgray);
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
-.edit-toggle-btn:hover {
+/* ===== 인라인 편집 ===== */
+.inline-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nickname-inline-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--input-outline);
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  background: var(--input-bg-2);
+}
+.nickname-inline-input:focus {
+  outline: none;
+  border-color: var(--base-blue-dark);
+  background: #fff;
+}
+.chip-btn {
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--input-outline);
   background: var(--input-bg-1);
   color: var(--text-darkgray);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
+.chip-btn.primary {
+  background: var(--base-blue-dark);
+  border-color: var(--base-blue-dark);
+  color: #fff;
+}
+.chip-btn:disabled {
+  background: var(--input-disabled-1);
+  border-color: var(--input-disabled-1);
+  color: var(--text-lightgray);
+}
+
+/* ===== 토글 ===== */
+.toggle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background-color: var(--input-disabled-1);
+  transition: 0.3s;
+  border-radius: 31px;
+}
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  height: 27px;
+  width: 27px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+input:checked + .toggle-slider {
+  background-color: var(--base-blue-dark);
+}
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* ===== 닫기 버튼 ===== */
+.close-button {
+  width: 100%;
+  padding: 0.875rem;
+  margin-top: 1rem;
+  background: var(--base-blue-dark);
+  border: none;
+  border-radius: 0.75rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'NanumSquareNeo', sans-serif;
+  transition: transform 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.close-button:active {
+  background: var(--base-lavender);
+  transform: scale(0.98);
+}
+
+/* ===== 불필요한 모바일 외 CSS 제거됨 =====
+   - 별명 편집 모달(.edit-modal-*) 관련 전부 제거
+   - 과도한 active 배경/트랜지션 제거
+*/
 </style>

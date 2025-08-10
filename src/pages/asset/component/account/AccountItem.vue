@@ -33,7 +33,6 @@
       <p class="balance" v-if="!isBalanceHidden">
         {{ formatWon(account.balance) }}
       </p>
-      <p class="balance hidden" v-else>●●●●●●●원</p>
     </div>
   </div>
 
