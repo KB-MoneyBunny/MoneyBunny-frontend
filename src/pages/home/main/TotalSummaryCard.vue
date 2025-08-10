@@ -3,7 +3,7 @@
     <div class="homeCardSection">
       <div class="labelRow">
         <span class="homeCardLabel">총 자산</span>
-        <span class="homeCardRate">{{ rate }}</span>
+        <!-- <span class="homeCardRate">{{ rate }}</span> -->
       </div>
       <div class="homeCardValue">{{ totalAssetDisplay }}</div>
     </div>
@@ -56,31 +56,36 @@ defineExpose({
 <style scoped>
 .homeCard {
   background-color: var(--base-blue-dark);
-  border-radius: 6px;
-  padding: 18px;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
   color: white;
   margin-bottom: 1rem;
-  height: 145px;
+  height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .homeCardLabel {
-  font-size: 13px;
-  /* font-weight: bold; */
-  letter-spacing: 0.03em;
-  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: var(--base-blue-light);
+  margin-bottom: 0.125rem;
 }
-.homeCardLate {
-  font-size: 15px;
+
+.homeCardRate {
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: var(--text-rate);
+  /* line-height: 1.4; */
 }
+
 .homeCardValue {
-  font-size: 17px;
+  font-size: 1.2rem;
   font-weight: bold;
   color: white;
-  line-height: 1.2;
-  margin-bottom: 0.5rem;
+  /* line-height: 1.2; */
+  margin-bottom: 0.325rem;
   margin-top: 0;
 }
 
@@ -89,13 +94,12 @@ defineExpose({
 }
 
 .homeCardSection {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .labelRow {
   display: flex;
   align-items: baseline;
   gap: 0.375rem;
-  margin-bottom: 0.1rem;
 }
 </style>

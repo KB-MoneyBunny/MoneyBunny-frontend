@@ -1,16 +1,15 @@
 <template>
   <div class="homeContainer">
     <TotalSummaryCard ref="totalSummaryCardRef" />
+
+    <PolicyRecommendationCard
+      ref="policyRecommendationCardRef"
+      class="withGapTop"
+    />
     <AssetCompareCard
       :totalAsset="totalAsset"
       :top3TotalAmount="top3TotalAmount"
     />
-    <!-- <RecommendationSection
-      ref="policyRecommendationCardRef"
-      class="withGapTop"
-    /> -->
-    <!-- <PolicyTop3Carousel class="withGapTop" /> -->
-
     <DailyMessageCard class="tightTopMargin" />
   </div>
 </template>
@@ -19,8 +18,8 @@
 import { ref, watch, nextTick } from 'vue';
 import TotalSummaryCard from '@/pages/home/main/TotalSummaryCard.vue';
 import AssetCompareCard from '@/pages/home/main/AssetCompareCard.vue';
+import PolicyRecommendationCard from '@/pages/home/main/PolicyRecommendationCard.vue';
 import DailyMessageCard from '@/pages/home/main/DailyMessageCard.vue';
-import PolicyTop3Carousel from './main/PolicyTop3Carousel.vue';
 
 const totalSummaryCardRef = ref();
 const policyRecommendationCardRef = ref();
