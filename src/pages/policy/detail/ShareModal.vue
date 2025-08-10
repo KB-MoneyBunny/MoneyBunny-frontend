@@ -1,24 +1,24 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import axios from 'axios';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, computed } from "vue";
+import axios from "axios";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 const policyId = computed(() =>
   Number(route.params.policyId || route.params.id)
 );
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const close = () => {
-  emit('close');
+  emit("close");
 };
 
 const shareInfo = ref({
-  title: '',
-  description: '',
-  amount: '',
-  url: '',
+  title: "",
+  description: "",
+  amount: "",
+  url: "",
 });
 
 // 정책 불러오기
@@ -26,18 +26,20 @@ const shareInfo = ref({
 // helper 함수 추가
 const normalizeUrl = (raw) => {
   if (
-    typeof raw === 'string' &&
-    (raw.startsWith('http') || raw.startsWith('www')) &&
-    !raw.includes('localhost')
+    typeof raw === "string" &&
+    (raw.startsWith("http") || raw.startsWith("www")) &&
+    !raw.includes("localhost")
   ) {
-    return raw.startsWith('www') ? `https://${raw}` : raw;
+    return raw.startsWith("www") ? `https://${raw}` : raw;
   }
   return null;
 };
 
+// 💪(상일) intent URL 및 Android Chrome 감지 제거 - 카카오톡 인앱에서 처리로 변경
+
 const fetchPolicy = async () => {
   try {
-    const savedAuth = localStorage.getItem('auth'); // "auth" 전체 객체 꺼냄
+    const savedAuth = localStorage.getItem("auth"); // "auth" 전체 객체 꺼냄
     const parsed = savedAuth ? JSON.parse(savedAuth) : null;
     const token = parsed?.token;
 
@@ -49,8 +51,11 @@ const fetchPolicy = async () => {
       headers,
     });
 
-    console.log('API 응답 데이터:', response.data);
+    console.log("API 응답 데이터:", response.data);
     const data = response.data;
+
+    // 💪(상일) 공유 URL 생성 - 항상 HTTPS URL 사용, from=share 파라미터 추가
+    const targetUrl = `https://money-bunny-frontend.vercel.app/policy/${policyId.value}?from=share`;
 
     shareInfo.value = {
       title: data.title,
@@ -59,17 +64,14 @@ const fetchPolicy = async () => {
         data.policyBenefitDescription ||
         (data.policyBenefitAmount
           ? `${data.policyBenefitAmount.toLocaleString()}원`
-          : '지원 내용 없음'),
-      url:
-        normalizeUrl(data.applyUrl) ||
-        normalizeUrl(data.refUrl1) ||
-        `https://money-bunny-frontend.vercel.app/policy/${policyId.value}`,
+          : "지원 내용 없음"),
+      url: targetUrl,
     };
 
-    console.log('applyUrl from API:', data.applyUrl);
-    console.log('공유할 정보:', shareInfo);
+    console.log("applyUrl from API:", data.applyUrl);
+    console.log("공유할 정보:", shareInfo);
   } catch (error) {
-    console.error('정책 정보 조회 실패:', error);
+    console.error("정책 정보 조회 실패:", error);
   }
 };
 
@@ -84,8 +86,8 @@ onMounted(() => {
   };
 
   if (!window.Kakao) {
-    const script = document.createElement('script');
-    script.src = 'https://developers.kakao.com/sdk/js/kakao.min.js';
+    const script = document.createElement("script");
+    script.src = "https://developers.kakao.com/sdk/js/kakao.min.js";
     script.onload = initKakao;
     document.head.appendChild(script);
   } else {
@@ -97,23 +99,23 @@ onMounted(() => {
 
 const sendKakao = () => {
   const info = shareInfo.value;
-  console.log('✅ 공유할 정보:', info);
+  console.log("✅ 공유할 정보:", info);
 
   const isInfoReady =
-    typeof info.title === 'string' &&
+    typeof info.title === "string" &&
     info.title.trim().length > 0 &&
-    typeof info.description === 'string' &&
-    typeof info.amount === 'string' &&
-    typeof info.url === 'string' &&
-    info.url.startsWith('http');
+    typeof info.description === "string" &&
+    typeof info.amount === "string" &&
+    typeof info.url === "string" &&
+    info.url.startsWith("http");
 
   if (!isInfoReady) {
-    alert('공유할 정보를 아직 불러오는 중입니다. 잠시만 기다려 주세요.');
+    alert("공유할 정보를 아직 불러오는 중입니다. 잠시만 기다려 주세요.");
     return;
   }
 
   if (!window.Kakao || !window.Kakao.Link) {
-    alert('카카오 SDK가 로드되지 않았습니다.');
+    alert("카카오 SDK가 로드되지 않았습니다.");
     return;
   }
 
