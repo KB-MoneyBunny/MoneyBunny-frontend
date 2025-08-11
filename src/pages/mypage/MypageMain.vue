@@ -69,6 +69,49 @@ const userInfo = ref({
   profileImage: avatarMap[avatarKey],
 });
 
+const showPicker = ref(false);
+
+// 초기값
+const tempImage = ref("");
+
+// 🔐 토큰 헤더 헬퍼 (없으면 빈 헤더)
+const getAuthHeaders = () => {
+  try {
+    const saved = localStorage.getItem("auth");
+    const parsed = saved ? JSON.parse(saved) : {};
+    const token = parsed.token || parsed.accessToken || parsed.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+};
+
+// 열기
+const openPicker = () => {
+  tempImage.value = userInfo.value.profileImage;
+  showPicker.value = true;
+};
+
+// 닫기
+const closePicker = () => (showPicker.value = false);
+
+// 저장: 숫자 imageId 받아서 API 호출 → 성공 시 UI 반영
+const saveProfile = async (imageId) => {
+  try {
+    await axios.patch(`/api/member/profile-image/${imageId}`, null, {
+      headers: getAuthHeaders(),
+    });
+    // DB 반영 성공 → 로컬 상태 동기화
+    userInfo.value.profileImageId = imageId;
+    userInfo.value.profileImage =
+      profileImages[imageId] ?? userInfo.value.profileImage;
+    showPicker.value = false;
+  } catch (e) {
+    console.error("프로필 이미지 변경 실패:", e);
+    alert("프로필 이미지를 변경하지 못했어요! 다시 시도해주세요.");
+  }
+};
+
 // 💪(상일) 북마크 스토어 연동
 const bookmarkStore = useBookmarkStore();
 const {
