@@ -1,7 +1,7 @@
 <template>
   <div class="myPageContainer">
     <!-- 고정 프로필 카드 -->
-    <MypageProfileCard :userInfo="userInfo" @edit="openModal" />
+    <MypageProfileCard :userInfo="userInfo" @edit="openPicker" />
 
     <!-- 하나의 카드 안에 탭 메뉴 + 콘텐츠 -->
     <div class="infoCard">
@@ -9,29 +9,26 @@
 
       <!-- 탭별 콘텐츠 -->
       <div class="tabContent">
-        <ProfileInfoTable
+        <!-- <ProfileInfoTable
           v-if="currentTab === 'profile'"
           :userInfo="userInfo"
-        />
+        /> -->
         <BookmarkList v-if="currentTab === 'bookmark'" :bookmarks="bookmarks" />
         <SettingMain v-if="currentTab === 'settings'" />
       </div>
     </div>
 
-    <!-- 프로필 수정 모달 -->
-    <EditProfileModal
-      v-if="isModalOpen"
-      :name="userInfo.name"
-      :email="userInfo.email"
-      :profileImage="userInfo.profileImage"
-      @close="isModalOpen = false"
-      @update="handleUpdate"
+    <ProfileImagePicker
+      v-if="showPicker"
+      v-model="tempImage"
+      @close="closePicker"
+      @save="saveProfile"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useBookmarkStore } from "@/stores/bookmark";
 import axios from "axios";
@@ -43,6 +40,8 @@ import ProfileInfoTable from "./profile/ProfileInfoTable.vue";
 import EditProfileModal from "./profile/EditProfileModal.vue";
 import BookmarkList from "./bookmark/BookmarkList.vue";
 import SettingMain from "./settings/SettingMain.vue";
+
+import ProfileImagePicker from "./profile/ProfileImagePicker.vue";
 
 import imgSprout from "@/assets/images/icons/profile/profile_edit_sprout.png";
 import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";

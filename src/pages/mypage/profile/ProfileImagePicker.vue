@@ -6,48 +6,29 @@ import imgEyelash from "@/assets/images/icons/profile/profile_edit_eyelash.png";
 import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
 
 const profileImages = [imgSprout, imgBeard, imgEyelash, imgCarrot];
-
-// 부모가 숫자(id) 또는 문자열(src) 둘 다 줄 수 있게 허용
-const props = defineProps({ modelValue: [Number, String] });
+const props = defineProps({ modelValue: String });
 const emit = defineEmits(["close", "update:modelValue", "save"]);
 
-// 부모가 처음 준 타입 기억 (문자열이면 계속 문자열로 v-model 업데이트)
-const initialIsString = typeof props.modelValue === "string";
-
-// 문자열(src) → 숫자(id) 정규화
-const toId = (v) => {
-  if (typeof v === "number") return v;
-  const idx = profileImages.indexOf(v);
-  return idx >= 0 ? idx : 0;
-};
-
-// 선택 상태는 항상 "숫자 ID"
-const selectedId = ref(toId(props.modelValue));
-
-// 부모에서 modelValue 바뀌면 동기화
+const selected = ref(props.modelValue || profileImages[0]);
 watch(
   () => props.modelValue,
   (v) => {
-    selectedId.value = toId(v);
+    if (v) selected.value = v;
   }
 );
 
-// 썸네일 클릭
-const choose = (i) => {
-  selectedId.value = i;
-  // v-model은 부모의 기존 타입 유지
-  emit("update:modelValue", initialIsString ? profileImages[i] : i);
+const choose = (img) => {
+  selected.value = img;
+  emit("update:modelValue", img);
 };
-
-// 저장 클릭 → 항상 숫자 ID를 넘김 (API에 바로 쓰기)
-const onSave = () => emit("save", selectedId.value);
+const onSave = () => emit("save", selected.value);
 </script>
 
 <template>
   <div class="pickerOverlay" @click.self="$emit('close')">
     <div class="pickerContainer">
       <div class="pickerHeader">
-        <span class="font-17 font-bold">프로필 사진 선택</span>
+        <span class="font-16 font-bold">프로필 사진 선택</span>
         <button class="pickerClose" @click="$emit('close')">
           <img
             src="@/assets/images/icons/common/x.png"
@@ -68,7 +49,6 @@ const onSave = () => emit("save", selectedId.value);
           <img :src="img" alt="프로필" />
         </button>
       </div>
-
       <button class="saveBtn" @click="onSave">저장</button>
     </div>
   </div>
@@ -89,10 +69,10 @@ const onSave = () => emit("save", selectedId.value);
 }
 .pickerContainer {
   background: #fff;
-  border-radius: 8px;
-  max-width: 300px;
+  border-radius: 6px;
+  max-width: 280px;
   width: 100%;
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -103,7 +83,7 @@ const onSave = () => emit("save", selectedId.value);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .pickerClose {
@@ -116,8 +96,8 @@ const onSave = () => emit("save", selectedId.value);
 }
 
 .closeImgBtn {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
@@ -125,7 +105,7 @@ const onSave = () => emit("save", selectedId.value);
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px 10px;
+  gap: 15px 5px;
   justify-items: center;
   align-items: center;
 }
@@ -146,5 +126,18 @@ const onSave = () => emit("save", selectedId.value);
 }
 .imageBtn.selected img {
   box-shadow: 0 0 0 2px var(--base-blue-dark);
+}
+
+/* ✅ 저장 버튼 */
+.saveBtn {
+  margin-top: 18px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  background: var(--base-blue-dark);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
 }
 </style>
