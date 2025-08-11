@@ -96,13 +96,14 @@ const showApplyModal = ref(false);
 const selectedPolicy = ref(null);
 const bookmark = ref(false);
 const showModal = ref(false);
-const policyId = props.policy?.id || props.policy?.policyId;
 
 const authStore = useAuthStore();
 const router = useRouter();
 
 // 북마크 상태 조회 (로그인 한 경우에만)
 async function fetchBookmarkStatus() {
+  const policyId = props.policy?.id || props.policy?.policyId;
+  if (!policyId) return;
   try {
     const res = await bookmarkAPI.getBookmarks();
     const list = res.data || [];
@@ -121,6 +122,7 @@ onMounted(() => {
 });
 
 const toggleBookmark = async () => {
+  const policyId = props.policy?.id || props.policy?.policyId;
   if (!policyId) return;
   try {
     if (!bookmark.value) {
@@ -174,11 +176,14 @@ const handleShowStatusModal = (applicationData) => {
 
 // 리뷰 페이지 이동
 const goToReviews = () => {
-  const policyId = policyId.value;
-  if (!policyId) return console.warn('policyId 가 없습니다.');
+  const policyId = props.policy?.id || props.policy?.policyId;
+  if (!policyId) {
+    console.warn('goToReviews: policyId is not available');
+    return;
+  }
   router.push({
-    name: props.reviewRouteName || 'policyReviewPage',
-    params: { id: String(policyId) },
+    name: props.reviewRouteName,
+    params: { policyId: String(policyId) },
   });
 };
 </script>

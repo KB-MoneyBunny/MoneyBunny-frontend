@@ -248,7 +248,7 @@ watch(policyId, (v) => {
       :description="policy.policyBenefitDescription"
       :policy="policy"
       :reviewCount="totalReviews"
-      reviewRouteName="policyReview"
+      reviewRouteName="policyReviewPage"
       @showStatusModal="handleShowStatusModal"
     />
 
