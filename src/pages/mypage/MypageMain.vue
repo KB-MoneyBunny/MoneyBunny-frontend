@@ -28,27 +28,27 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useBookmarkStore } from '@/stores/bookmark';
-import axios from 'axios';
+import { reactive, ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useBookmarkStore } from "@/stores/bookmark";
+import axios from "axios";
 
 // 컴포넌트 import
-import MypageProfileCard from './common/MypageProfileCard.vue';
-import MypageTabMenu from './common/MypageTabMenu.vue';
-import ProfileInfoTable from './profile/ProfileInfoTable.vue';
-import EditProfileModal from './profile/EditProfileModal.vue';
-import BookmarkList from './bookmark/BookmarkList.vue';
-import SettingMain from './settings/SettingMain.vue';
+import MypageProfileCard from "./common/MypageProfileCard.vue";
+import MypageTabMenu from "./common/MypageTabMenu.vue";
+import ProfileInfoTable from "./profile/ProfileInfoTable.vue";
+import EditProfileModal from "./profile/EditProfileModal.vue";
+import BookmarkList from "./bookmark/BookmarkList.vue";
+import SettingMain from "./settings/SettingMain.vue";
 
-import ProfileImagePicker from './profile/ProfileImagePicker.vue';
+import ProfileImagePicker from "./profile/ProfileImagePicker.vue";
 
-import imgSprout from '@/assets/images/icons/profile/profile_edit_sprout.png';
-import imgBeard from '@/assets/images/icons/profile/profile_edit_beard.png';
-import imgEyelash from '@/assets/images/icons/profile/profile_edit_eyelash.png';
-import imgCarrot from '@/assets/images/icons/profile/profile_edit_carrot.png';
+import imgSprout from "@/assets/images/icons/profile/profile_edit_sprout.png";
+import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";
+import imgEyelash from "@/assets/images/icons/profile/profile_edit_eyelash.png";
+import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
 
-const currentTab = ref('profile');
+const currentTab = ref("profile");
 const isModalOpen = ref(false);
 
 // 프사
@@ -60,33 +60,57 @@ const avatarMap = {
   eyelash: imgEyelash,
   carrot: imgCarrot,
 };
-const avatarKey = localStorage.getItem('avatarKey') || 'sprout'; // 기본값: sprout
+const avatarKey = localStorage.getItem("avatarKey") || "sprout"; // 기본값: sprout
 
 const userInfo = ref({
-  name: '',
-  email: '',
+  name: "",
+  email: "",
   profileImage: avatarMap[avatarKey],
 });
 
 const showPicker = ref(false);
 
 // 초기값
-const tempImage = ref('');
+const tempImage = ref(0);
+
+// 🔐 토큰 헤더 헬퍼 (없으면 빈 헤더)
+const getAuthHeaders = () => {
+  try {
+    const saved = localStorage.getItem("auth");
+    const parsed = saved ? JSON.parse(saved) : {};
+    const token = parsed.token || parsed.accessToken || parsed.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+};
 
 // 열기
 const openPicker = () => {
-  tempImage.value = userInfo.value.profileImage;
+  tempImage.value = userInfo.value.profileImageId ?? 0; // 숫자
   showPicker.value = true;
 };
 
 // 닫기
 const closePicker = () => (showPicker.value = false);
 
-// 저장(즉시 카드 반영)
-const saveProfile = (img) => {
-  userInfo.value.profileImage = img; // ✅ 바로 반영
-  showPicker.value = false;
+// 저장: 숫자 imageId 받아서 API 호출 → 성공 시 UI 반영
+const saveProfile = async (imageId) => {
+  try {
+    await axios.patch(`/api/member/profile-image/${imageId}`, null, {
+      headers: getAuthHeaders(),
+    });
+    // DB 반영 성공 → 로컬 상태 동기화
+    userInfo.value.profileImageId = imageId;
+    userInfo.value.profileImage =
+      profileImages[imageId] ?? userInfo.value.profileImage;
+    showPicker.value = false;
+  } catch (e) {
+    console.error("프로필 이미지 변경 실패:", e);
+    alert("프로필 이미지를 변경하지 못했어요! 다시 시도해주세요.");
+  }
 };
+
 // 💪(상일) 북마크 스토어 연동
 const bookmarkStore = useBookmarkStore();
 const {
@@ -104,7 +128,7 @@ const changeTab = (tab) => {
   currentTab.value = tab;
 
   // 💪(상일) 북마크 탭으로 전환 시 데이터 로드
-  if (tab === 'bookmark' && bookmarks.value.length === 0) {
+  if (tab === "bookmark" && bookmarks.value.length === 0) {
     fetchBookmarks();
   }
 };
@@ -117,7 +141,7 @@ const handleUpdate = (data) => {
 // 🎵(유정) 프로필 호출
 onMounted(async () => {
   // auth 토큰 꺼내기 (share 컴포넌트 참고)
-  const savedAuth = localStorage.getItem('auth');
+  const savedAuth = localStorage.getItem("auth");
   const parsed = savedAuth ? JSON.parse(savedAuth) : {};
   const token = parsed.token; // 로그인할 때 저장한 객체에 token 프로퍼티가 있어야 함
 
@@ -126,12 +150,19 @@ onMounted(async () => {
 
   // 프로필 API 호출
   try {
-    const res = await axios.get('/api/member/information', { headers });
+    const res = await axios.get("/api/member/information", { headers });
     console.log(res);
     userInfo.value.name = res.data.name;
     userInfo.value.email = res.data.email;
+
+    // 🔄 DB profileImageId → 이미지 경로
+    const idx = Number(res.data.profileImageId);
+    const safeIdx =
+      Number.isInteger(idx) && idx >= 0 && idx < profileImages.length ? idx : 0;
+    userInfo.value.profileImageId = safeIdx;
+    userInfo.value.profileImage = profileImages[safeIdx];
   } catch (err) {
-    console.error('프로필 불러오기 실패:', err);
+    console.error("프로필 불러오기 실패:", err);
   }
 
   // 북마크 로드
