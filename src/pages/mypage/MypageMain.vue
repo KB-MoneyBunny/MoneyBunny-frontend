@@ -14,6 +14,7 @@
           :userInfo="userInfo"
         /> -->
         <BookmarkList v-if="currentTab === 'bookmark'" :bookmarks="bookmarks" />
+        <ApplicationList v-if="currentTab === 'application'" />
         <SettingMain v-if="currentTab === 'settings'" />
       </div>
     </div>
@@ -31,6 +32,7 @@
 import { reactive, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useBookmarkStore } from "@/stores/bookmark";
+import { useApplicationStore } from "@/stores/application";
 import axios from "axios";
 
 // 컴포넌트 import
@@ -39,6 +41,7 @@ import MypageTabMenu from "./common/MypageTabMenu.vue";
 import ProfileInfoTable from "./profile/ProfileInfoTable.vue";
 import EditProfileModal from "./profile/EditProfileModal.vue";
 import BookmarkList from "./bookmark/BookmarkList.vue";
+import ApplicationList from "./application/ApplicationList.vue";
 import SettingMain from "./settings/SettingMain.vue";
 
 import ProfileImagePicker from "./profile/ProfileImagePicker.vue";
@@ -48,7 +51,7 @@ import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";
 import imgEyelash from "@/assets/images/icons/profile/profile_edit_eyelash.png";
 import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
 
-const currentTab = ref("profile");
+const currentTab = ref("bookmark");
 const isModalOpen = ref(false);
 
 // 프사
@@ -120,6 +123,10 @@ const {
 } = storeToRefs(bookmarkStore);
 const { fetchBookmarks } = bookmarkStore;
 
+// 신청 정책 스토어 연동
+const applicationStore = useApplicationStore();
+const { fetchApplications } = applicationStore;
+
 const openModal = () => {
   isModalOpen.value = true;
 };
@@ -130,6 +137,11 @@ const changeTab = (tab) => {
   // 💪(상일) 북마크 탭으로 전환 시 데이터 로드
   if (tab === "bookmark" && bookmarks.value.length === 0) {
     fetchBookmarks();
+  }
+  
+  // 신청 정책 탭으로 전환 시 데이터 로드
+  if (tab === "application") {
+    fetchApplications();
   }
 };
 
