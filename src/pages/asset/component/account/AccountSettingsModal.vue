@@ -79,40 +79,37 @@
 
           <!-- 잔액 숨김 토글 -->
           <div class="setting-item toggle-item">
-            <span class="setting-text">잔액숨김</span>
+            <span class="setting-text">잔액 숨기기</span>
             <label class="toggle-switch">
               <input
                 type="checkbox"
                 v-model="hideBalance"
-                @change="$emit('toggle-balance', hideBalance)"
+                @change="handleToggleBalance"
               />
               <span class="toggle-slider"></span>
             </label>
           </div>
 
-          <!-- 대표계좌 변경 -->
+          <!-- 대표 계좌 설정 -->
           <button
             class="setting-item"
             @click="handleSetMain"
             :disabled="account.isMain"
           >
             <div class="setting-content">
-              <span class="setting-text">대표계좌 변경</span>
+              <span class="setting-text">대표 계좌 설정</span>
+              <span v-if="account.isMain" class="current-status"
+                >현재 대표 계좌입니다</span
+              >
             </div>
-            <svg
-              class="arrow-icon"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path
-                d="M9 18l6-6-6-6"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
+            <!-- 대표 계좌 여부에 따라 빈 별/색칠된 별 이미지 -->
+            <div class="action-icon">
+              <img
+                :src="account.isMain ? fillStarIcon : emptyStarIcon"
+                :alt="account.isMain ? '대표 계좌' : '대표 계좌 설정'"
+                class="star-icon"
               />
-            </svg>
+            </div>
           </button>
         </div>
       </div>
@@ -129,6 +126,8 @@ import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
 import copyIcon from '@/assets/images/icons/common/copy.png';
 import editIcon from '@/assets/images/icons/mypage/edit.png';
+import emptyStarIcon from '@/assets/images/icons/common/empty_star.png';
+import fillStarIcon from '@/assets/images/icons/common/fill_star.png';
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -141,14 +140,22 @@ const emit = defineEmits([
   'set-nickname',
   'set-main',
   'toggle-balance',
-  'change-background',
-  'change-type',
 ]);
 
 const isEditingNickname = ref(false);
 const editingNickname = ref('');
 const nicknameInput = ref(null);
 const hideBalance = ref(false);
+
+// 계좌 props 변경을 감지하여 모달 상태 유지
+watch(
+  () => props.account,
+  (newAccount) => {
+    // 계좌 데이터가 변경되어도 모달 내부 상태는 유지
+    // Vue의 반응형 시스템이 자동으로 UI 업데이트
+  },
+  { deep: true }
+);
 
 /* 계좌 정보 변경 감지 */
 watch(
@@ -180,8 +187,18 @@ const formatAccountNumber = (number) => {
 
 const handleCopyAccount = () => emit('copy-account');
 
+// 대표 계좌 설정 - 모달 유지
 const handleSetMain = () => {
-  if (!props.account.isMain) emit('set-main');
+  if (!props.account.isMain) {
+    emit('set-main');
+    // 모달은 닫지 않음 - 현재 모달에서 별 색상만 변경
+  }
+};
+
+// 잔액 숨기기 토글 - 모달 유지
+const handleToggleBalance = () => {
+  emit('toggle-balance');
+  // 모달은 닫지 않음
 };
 
 const startEdit = async () => {
@@ -233,7 +250,7 @@ const cancelEdit = () => {
   }
 }
 
-/* ===== 바텀시트 컨테이너 (하단 여백 최소화) ===== */
+/* ===== 바텀시트 컨테이너 ===== */
 .modal-content {
   width: 100%;
   max-width: 474px;
@@ -241,7 +258,7 @@ const cancelEdit = () => {
   border-radius: 1.25rem 1.25rem 0 0;
   padding: 1.25rem;
   animation: slideUp 0.3s ease-out;
-  max-height: 70vh; /* 기존 85vh → 70vh로 축소 */
+  max-height: 70vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -290,7 +307,7 @@ const cancelEdit = () => {
   margin: 0;
 }
 
-/* ===== 옵션 섹션 ===== */
+/* ===== 설정 옵션 섹션 ===== */
 .settings-options {
   display: flex;
   flex-direction: column;
@@ -333,10 +350,52 @@ const cancelEdit = () => {
   color: var(--base-blue-dark);
   line-height: 1.4;
 }
+
+/* 현재 상태 텍스트 */
+.current-status {
+  font-size: 0.8125rem;
+  color: var(--text-green);
+  line-height: 1.3;
+}
+
 .current-value {
   font-size: 0.8125rem;
   color: var(--text-lightgray);
   line-height: 1.3;
+}
+
+/* 액션 아이콘 컨테이너 */
+.action-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-icon {
+  width: 18px;
+  height: 18px;
+  transition: all 0.3s ease;
+  object-fit: contain;
+}
+
+/* 호버/활성화 시 별 아이콘 확대 효과 */
+.setting-item:not(:disabled):active .star-icon {
+  transform: scale(1.1);
+}
+
+/* 대표 계좌인 경우 비활성화 스타일 */
+.setting-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.setting-item:disabled .setting-text {
+  color: var(--text-lightgray);
+}
+
+.setting-item:disabled .current-status {
+  color: var(--text-lightgray);
 }
 
 /* 우측 아이콘 버튼 + 이미지 크기 */
@@ -353,10 +412,6 @@ const cancelEdit = () => {
   height: 18px;
   object-fit: contain;
   opacity: 0.92;
-}
-.arrow-icon {
-  color: var(--text-lightgray);
-  flex-shrink: 0;
 }
 
 /* ===== 인라인 편집 ===== */
@@ -460,9 +515,4 @@ input:checked + .toggle-slider:before {
   background: var(--base-lavender);
   transform: scale(0.98);
 }
-
-/* ===== 불필요한 모바일 외 CSS 제거됨 =====
-   - 별명 편집 모달(.edit-modal-*) 관련 전부 제거
-   - 과도한 active 배경/트랜지션 제거
-*/
 </style>

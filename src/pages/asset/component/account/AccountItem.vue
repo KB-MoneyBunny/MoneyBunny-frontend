@@ -42,7 +42,9 @@
   </DetailModal>
 
   <!-- 설정 모달 (하단에서 올라오는 모달) -->
+  <!-- :key를 사용해 계좌 ID로 모달 식별, 데이터 변경 시에도 모달 유지 -->
   <AccountSettingsModal
+    :key="`account-settings-${account.id}`"
     :visible="showSettingsModal"
     :account="account"
     @close="showSettingsModal = false"
@@ -103,7 +105,7 @@ const setAccountNickname = (newNickname) => {
 // 대표 계좌 설정
 const handleSetMain = () => {
   emit('set-main', props.account);
-  showSettingsModal.value = false;
+  // 모달은 유지하고 props.account가 업데이트되면 자동으로 UI가 반영됨
 };
 
 // 잔액 숨기기 토글 - 모달 닫지 않도록 수정
