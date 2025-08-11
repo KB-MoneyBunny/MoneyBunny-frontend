@@ -71,7 +71,7 @@ const userInfo = ref({
 const showPicker = ref(false);
 
 // 초기값
-const tempImage = ref("");
+const tempImage = ref(0);
 
 // 🔐 토큰 헤더 헬퍼 (없으면 빈 헤더)
 const getAuthHeaders = () => {
@@ -87,7 +87,7 @@ const getAuthHeaders = () => {
 
 // 열기
 const openPicker = () => {
-  tempImage.value = userInfo.value.profileImage;
+  tempImage.value = userInfo.value.profileImageId ?? 0; // 숫자
   showPicker.value = true;
 };
 
@@ -154,6 +154,13 @@ onMounted(async () => {
     console.log(res);
     userInfo.value.name = res.data.name;
     userInfo.value.email = res.data.email;
+
+    // 🔄 DB profileImageId → 이미지 경로
+    const idx = Number(res.data.profileImageId);
+    const safeIdx =
+      Number.isInteger(idx) && idx >= 0 && idx < profileImages.length ? idx : 0;
+    userInfo.value.profileImageId = safeIdx;
+    userInfo.value.profileImage = profileImages[safeIdx];
   } catch (err) {
     console.error("프로필 불러오기 실패:", err);
   }
