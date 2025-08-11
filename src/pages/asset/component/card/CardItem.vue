@@ -11,9 +11,10 @@
     <div class="card-info" @click="openDetail">
       <div class="info-top">
         <div class="name-section">
+          <!-- 원본 카드명 표시 (별명 제거) -->
           <span class="card-name">{{ card.cardName }}</span>
           <!-- 대표 뱃지를 카드명 옆으로 이동 -->
-          <span v-if="card.isRepresentative" class="main-badge">대표</span>
+          <span v-if="isMainCard" class="main-badge">대표</span>
         </div>
         <!-- 설정 버튼을 오른쪽 끝으로 분리 -->
         <button class="settings-btn-inline" @click.stop="openSettingsModal">
@@ -26,10 +27,10 @@
       </div>
 
       <p class="card-number">
-        {{ getCardIssuer(card.issuerCode) }}{{ card.cardMaskedNumber }}
+        {{ getCardIssuer(card.issuerCode) }} {{ card.cardMaskedNumber }}
       </p>
 
-      <!-- 금액 숨기기 - 계좌와 동일한 방식 -->
+      <!-- 금액 숨기기 적용 -->
       <p class="card-amount" v-if="!isAmountHidden">
         {{ formatWon(card.amount || card.thisMonthUsed || 0) }}
       </p>
@@ -38,15 +39,14 @@
 
   <!-- 상세 모달 -->
   <DetailModal :visible="showDetail" @close="showDetail = false">
-    <CardDetail :cardData="card" @close="showDetail = false" />
+    <CardDetail :cardData="enhancedCard" @close="showDetail = false" />
   </DetailModal>
 
   <!-- 설정 모달 (하단에서 올라오는 모달) -->
-  <!-- :key를 사용해 카드 ID로 모달 식별, 데이터 변경 시에도 모달 유지 -->
   <CardSettingsModal
     :key="`card-settings-${card.id}`"
     :visible="showSettingsModal"
-    :card="card"
+    :card="enhancedCard"
     @close="showSettingsModal = false"
     @set-main="handleSetMain"
     @toggle-amount="toggleAmountVisibility"
@@ -54,7 +54,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useAccountSettingsStore } from '@/stores/assetSettings';
 import DetailModal from '../detail/DetailModal.vue';
 import CardDetail from './CardDetail.vue';
 import CardSettingsModal from './CardSettingsModal.vue';
@@ -64,22 +65,34 @@ const props = defineProps({
   card: { type: Object, required: true },
 });
 
-const emit = defineEmits([
-  'set-main',
-  'delete',
-  'update-nickname',
-  'toggle-amount',
-]);
+const emit = defineEmits(['set-main', 'delete', 'toggle-amount']);
+
+// Pinia store 사용
+const assetSettings = useAccountSettingsStore();
 
 const showDetail = ref(false);
 const showSettingsModal = ref(false);
-const isAmountHidden = ref(false); // 카드 금액 숨김 상태 (계좌의 isBalanceHidden과 동일)
+
+// 계산된 속성들 - 별명 제거
+const isMainCard = computed(() => {
+  return assetSettings.isMainCard(props.card.id);
+});
+
+const isAmountHidden = computed(() => {
+  return assetSettings.isCardAmountHidden(props.card.id);
+});
+
+// 설정이 적용된 카드 객체 - 별명 제거
+const enhancedCard = computed(() => ({
+  ...props.card,
+  isRepresentative: isMainCard.value,
+  hideAmount: isAmountHidden.value,
+}));
 
 const openDetail = () => (showDetail.value = true);
 const openSettingsModal = () => (showSettingsModal.value = true);
 
 const formatWon = (value) => {
-  // 안전한 숫자 변환
   const numValue = Number(value) || 0;
   return `${numValue.toLocaleString()}원`;
 };
@@ -89,17 +102,20 @@ const getCardIssuer = (issuerCode) => {
   return cardCodeMap[issuerCode] || '알 수 없음';
 };
 
-// 대표 카드 설정
+// 대표 카드 설정 - store 사용
 const handleSetMain = () => {
-  emit('set-main', props.card);
-  // 모달은 유지하고 props.card가 업데이트되면 자동으로 UI가 반영됨
+  if (!isMainCard.value) {
+    assetSettings.setMainCard(props.card.id);
+    emit('set-main', props.card);
+  }
+  // 모달은 유지하고 UI만 업데이트됨
 };
 
-// 금액 숨기기 토글 - 계좌의 toggleBalanceVisibility와 동일한 방식
+// 금액 숨기기 토글 - store 사용
 const toggleAmountVisibility = () => {
-  isAmountHidden.value = !isAmountHidden.value;
+  assetSettings.toggleCardAmountVisibility(props.card.id);
   emit('toggle-amount', props.card.id, isAmountHidden.value);
-  // showSettingsModal.value = false; // 모달 닫지 않음 - 토글과 대표 설정 모두 일관되게 유지
+  // 모달은 닫지 않음
 };
 </script>
 
@@ -152,19 +168,13 @@ const toggleAmountVisibility = () => {
   flex: 1;
 }
 
-.card-issuer {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--base-blue-dark);
-}
-
 .card-name {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-darkgray);
 }
 
-/* 대표 뱃지 - 라벤더 색상 */
+/* 대표 뱃지 - 라벤더 색상으로 변경 */
 .main-badge {
   background: var(--base-lavender);
   color: white;

@@ -7,8 +7,7 @@
       :card="card"
       @delete="$emit('delete-card', card)"
       @set-main="setMainItem"
-      @update-nickname="updateCardNickname"
-      @toggle-amount="handleToggleAmount"
+      @toggle-amount="toggleCardAmount"
     />
 
     <!-- 전체보기 버튼: 3개 이상인 경우에만 -->
@@ -35,7 +34,8 @@
 </template>
 
 <script setup>
-import { ref, computed, toRef } from 'vue';
+import { ref, computed, toRef, onMounted } from 'vue';
+import { useAccountSettingsStore } from '@/stores/assetSettings';
 import CardItem from './CardItem.vue';
 import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
 import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
@@ -47,17 +47,34 @@ const props = defineProps({
 
 const emit = defineEmits(['delete-card', 'update-cards']);
 
+// Pinia store 사용
+const assetSettings = useAccountSettingsStore();
+
 const showAll = ref(false);
 const isCardModalOpen = ref(false);
 
-// 각 카드의 금액 숨김 상태를 관리하는 Map
-const hiddenAmountCards = ref(new Map());
+// 컴포넌트 마운트 시 로컬스토리지에서 설정 불러오기
+onMounted(() => {
+  assetSettings.loadFromLocalStorage();
+});
 
-// 대표 카드 관리 composable 사용
+// 설정이 적용된 카드 목록
+const processedCardsWithSettings = computed(() => {
+  return assetSettings.applySettingsToCards(props.cards);
+});
+
+// 대표 카드 관리 composable 사용 (설정이 적용된 카드 목록 사용)
 const { processedItems: processedCards, setMainItem } = useMainItem({
   type: 'card',
-  items: toRef(props, 'cards'),
-  onUpdate: (reorderedCards) => emit('update-cards', reorderedCards),
+  items: processedCardsWithSettings,
+  onUpdate: (reorderedCards) => {
+    // 대표 카드 변경 시 store에도 반영
+    const mainCard = reorderedCards.find((card) => card.isRepresentative);
+    if (mainCard) {
+      assetSettings.setMainCard(mainCard.id);
+    }
+    emit('update-cards', reorderedCards);
+  },
 });
 
 // 보여질 카드 목록
@@ -65,29 +82,10 @@ const visibleCards = computed(() =>
   showAll.value ? processedCards.value : processedCards.value.slice(0, 3)
 );
 
-// 카드 별명 업데이트
-const updateCardNickname = (updatedCard) => {
-  const updatedCards = props.cards.map((card) =>
-    card.id === updatedCard.id
-      ? { ...card, cardName: updatedCard.cardName }
-      : card
-  );
-  emit('update-cards', updatedCards);
-};
-
-// 금액 숨기기 토글 - 실제 동작하는 함수
-const handleToggleAmount = (cardId, isHidden) => {
-  console.log(`카드 ${cardId} 금액 숨기기: ${isHidden}`);
-
-  // 상태 저장
-  if (isHidden) {
-    hiddenAmountCards.value.set(cardId, true);
-  } else {
-    hiddenAmountCards.value.delete(cardId);
-  }
-
-  // 선택적으로 부모 컴포넌트에도 알림
-  // emit('card-amount-toggled', { cardId, isHidden });
+// 금액 숨기기 토글 (store를 통해 이미 처리됨)
+const toggleCardAmount = (cardId, isHidden) => {
+  console.log(`카드 ${cardId} 금액 숨기기: ${isHidden} (store에서 처리됨)`);
+  // store에서 이미 처리되었으므로 추가 작업 불필요
 };
 
 // 카드 추가

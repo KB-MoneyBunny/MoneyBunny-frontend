@@ -1,17 +1,27 @@
-// stores/accountSettings.js
+// stores/assetSettings.js
 import { defineStore } from 'pinia';
 
 export const useAccountSettingsStore = defineStore('accountSettings', {
   state: () => ({
+    // === 계좌 설정 ===
     // 계좌 숨김 상태 관리 (계좌 ID별)
     hiddenBalances: {},
     // 계좌 별명 관리 (계좌 ID별)
     nicknames: {},
     // 대표 계좌 ID
     mainAccountId: null,
+
+    // === 카드 설정 ===
+    // 카드 금액 숨김 상태 관리 (카드 ID별)
+    hiddenCardAmounts: {},
+    // 카드 별명 관리 (카드 ID별)
+    cardNicknames: {},
+    // 대표 카드 ID
+    mainCardId: null,
   }),
 
   getters: {
+    // === 계좌 관련 Getters ===
     /**
      * 특정 계좌의 잔액 숨김 상태 확인
      * @param {string} accountId - 계좌 ID
@@ -38,9 +48,38 @@ export const useAccountSettingsStore = defineStore('accountSettings', {
     isMainAccount: (state) => (accountId) => {
       return state.mainAccountId === accountId;
     },
+
+    // === 카드 관련 Getters ===
+    /**
+     * 특정 카드의 금액 숨김 상태 확인
+     * @param {string} cardId - 카드 ID
+     * @returns {boolean} - 숨김 여부
+     */
+    isCardAmountHidden: (state) => (cardId) => {
+      return state.hiddenCardAmounts[cardId] || false;
+    },
+
+    /**
+     * 특정 카드의 별명 가져오기
+     * @param {string} cardId - 카드 ID
+     * @returns {string|null} - 설정된 별명 또는 null
+     */
+    getCardNickname: (state) => (cardId) => {
+      return state.cardNicknames[cardId] || null;
+    },
+
+    /**
+     * 대표 카드 여부 확인
+     * @param {string} cardId - 카드 ID
+     * @returns {boolean} - 대표 카드 여부
+     */
+    isMainCard: (state) => (cardId) => {
+      return state.mainCardId === cardId;
+    },
   },
 
   actions: {
+    // === 계좌 관련 Actions ===
     /**
      * 잔액 숨김 상태 토글
      * @param {string} accountId - 계좌 ID
@@ -108,19 +147,93 @@ export const useAccountSettingsStore = defineStore('accountSettings', {
       }));
     },
 
+    // === 카드 관련 Actions ===
+    /**
+     * 카드 금액 숨김 상태 토글
+     * @param {string} cardId - 카드 ID
+     * @param {boolean} isHidden - 숨김 여부 (선택적)
+     */
+    toggleCardAmountVisibility(cardId, isHidden = null) {
+      if (isHidden === null) {
+        this.hiddenCardAmounts[cardId] = !this.hiddenCardAmounts[cardId];
+      } else {
+        this.hiddenCardAmounts[cardId] = isHidden;
+      }
+      this.saveToLocalStorage();
+    },
+
+    /**
+     * 카드 별명 설정
+     * @param {string} cardId - 카드 ID
+     * @param {string} nickname - 설정할 별명
+     */
+    setCardNickname(cardId, nickname) {
+      if (nickname && nickname.trim()) {
+        this.cardNicknames[cardId] = nickname.trim();
+      } else {
+        delete this.cardNicknames[cardId];
+      }
+      this.saveToLocalStorage();
+    },
+
+    /**
+     * 대표 카드 설정
+     * @param {string} cardId - 카드 ID
+     */
+    setMainCard(cardId) {
+      this.mainCardId = cardId;
+      this.saveToLocalStorage();
+    },
+
+    /**
+     * 카드 삭제 시 관련 설정 정리
+     * @param {string} cardId - 삭제할 카드 ID
+     */
+    removeCardSettings(cardId) {
+      delete this.hiddenCardAmounts[cardId];
+      delete this.cardNicknames[cardId];
+
+      // 대표 카드였다면 해제
+      if (this.mainCardId === cardId) {
+        this.mainCardId = null;
+      }
+
+      this.saveToLocalStorage();
+    },
+
+    /**
+     * 카드 목록에 설정 적용
+     * @param {Array} cards - 원본 카드 목록
+     * @returns {Array} - 설정이 적용된 카드 목록
+     */
+    applySettingsToCards(cards) {
+      return cards.map((card) => ({
+        ...card,
+        cardName: this.getCardNickname(card.id) || card.cardName,
+        isRepresentative: this.isMainCard(card.id),
+        hideAmount: this.isCardAmountHidden(card.id),
+      }));
+    },
+
+    // === 공통 Actions ===
     /**
      * 로컬스토리지에 설정 저장
      */
     saveToLocalStorage() {
       try {
         const settings = {
+          // 계좌 설정
           hiddenBalances: this.hiddenBalances,
           nicknames: this.nicknames,
           mainAccountId: this.mainAccountId,
+          // 카드 설정
+          hiddenCardAmounts: this.hiddenCardAmounts,
+          cardNicknames: this.cardNicknames,
+          mainCardId: this.mainCardId,
         };
-        localStorage.setItem('accountSettings', JSON.stringify(settings));
+        localStorage.setItem('assetSettings', JSON.stringify(settings));
       } catch (error) {
-        console.error('계좌 설정 저장 실패:', error);
+        console.error('자산 설정 저장 실패:', error);
       }
     },
 
@@ -129,15 +242,20 @@ export const useAccountSettingsStore = defineStore('accountSettings', {
      */
     loadFromLocalStorage() {
       try {
-        const saved = localStorage.getItem('accountSettings');
+        const saved = localStorage.getItem('assetSettings');
         if (saved) {
           const settings = JSON.parse(saved);
+          // 계좌 설정
           this.hiddenBalances = settings.hiddenBalances || {};
           this.nicknames = settings.nicknames || {};
           this.mainAccountId = settings.mainAccountId || null;
+          // 카드 설정
+          this.hiddenCardAmounts = settings.hiddenCardAmounts || {};
+          this.cardNicknames = settings.cardNicknames || {};
+          this.mainCardId = settings.mainCardId || null;
         }
       } catch (error) {
-        console.error('계좌 설정 불러오기 실패:', error);
+        console.error('자산 설정 불러오기 실패:', error);
       }
     },
 
@@ -145,10 +263,16 @@ export const useAccountSettingsStore = defineStore('accountSettings', {
      * 모든 설정 초기화
      */
     resetAllSettings() {
+      // 계좌 설정 초기화
       this.hiddenBalances = {};
       this.nicknames = {};
       this.mainAccountId = null;
-      localStorage.removeItem('accountSettings');
+      // 카드 설정 초기화
+      this.hiddenCardAmounts = {};
+      this.cardNicknames = {};
+      this.mainCardId = null;
+
+      localStorage.removeItem('assetSettings');
     },
   },
 });

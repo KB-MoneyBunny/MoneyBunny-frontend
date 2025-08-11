@@ -30,7 +30,7 @@
             <label class="toggle-switch">
               <input
                 type="checkbox"
-                v-model="amountHidden"
+                v-model="hideAmount"
                 @change="handleToggleAmount"
               />
               <span class="toggle-slider"></span>
@@ -49,25 +49,13 @@
                 >현재 대표 카드입니다</span
               >
             </div>
-            <!-- 대표 카드 여부에 따라 빈 별/색칠된 별 아이콘 -->
+            <!-- 대표 카드 여부에 따라 빈 별/색칠된 별 이미지 -->
             <div class="action-icon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
+              <img
+                :src="card.isRepresentative ? fillStarIcon : emptyStarIcon"
+                :alt="card.isRepresentative ? '대표 카드' : '대표 카드 설정'"
                 class="star-icon"
-                :class="{ filled: card.isRepresentative }"
-              >
-                <path
-                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                  stroke="var(--base-blue-dark)"
-                  stroke-width="1.5"
-                  :fill="
-                    card.isRepresentative ? 'var(--base-blue-dark)' : 'none'
-                  "
-                />
-              </svg>
+              />
             </div>
           </button>
         </div>
@@ -80,8 +68,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
 import cardCodeMap from '@/assets/utils/cardCodeMap.js';
+import emptyStarIcon from '@/assets/images/icons/common/empty_star.png';
+import fillStarIcon from '@/assets/images/icons/common/fill_star.png';
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -90,7 +80,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'set-main', 'toggle-amount']);
 
-const amountHidden = ref(false);
+const hideAmount = ref(false);
 
 // 카드 props 변경을 감지하여 모달 상태 유지
 watch(
@@ -102,20 +92,41 @@ watch(
   { deep: true }
 );
 
-// 모달 닫기 함수
+/* 카드 정보 변경 감지 */
+watch(
+  () => props.card.hideAmount,
+  (newVal) => {
+    hideAmount.value = newVal || false;
+  },
+  { immediate: true }
+);
+
+/* 모달이 열릴 때 body 스크롤 방지 */
+watch(
+  () => props.visible,
+  (open) => {
+    document.body.classList.toggle('modal-open', !!open);
+  }
+);
+
+onUnmounted(() => {
+  document.body.classList.remove('modal-open');
+});
+
 const closeModal = () => emit('close');
 
-// 금액 숨기기 토글 처리 함수 - 계좌와 동일한 방식
+// 금액 숨기기 토글 처리 함수
 const handleToggleAmount = () => {
-  // 부모 컴포넌트(CardItem)의 toggleAmountVisibility 함수를 호출
-  // 매개변수 없이 emit하면 부모에서 토글 상태를 직접 관리
   emit('toggle-amount');
+  // 모달은 닫지 않음
 };
 
 // 대표 카드 설정 처리 함수
 const handleSetMain = () => {
-  emit('set-main');
-  // 모달 닫지 않음 - 현재 모달에서 별 색상만 변경
+  if (!props.card.isRepresentative) {
+    emit('set-main');
+    // 모달은 유지하고 UI만 업데이트됨
+  }
 };
 
 const getCardIssuer = (issuerCode) => cardCodeMap[issuerCode] || '알 수 없음';
