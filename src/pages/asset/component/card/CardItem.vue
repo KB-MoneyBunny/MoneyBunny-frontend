@@ -29,7 +29,7 @@
         {{ getCardIssuer(card.issuerCode) }}{{ card.cardMaskedNumber }}
       </p>
 
-      <!-- 금액 표시 - 숨김 상태에 따라 다르게 표시 -->
+      <!-- 금액 숨기기 - 계좌와 동일한 방식 -->
       <p class="card-amount" v-if="!isAmountHidden">
         {{ formatWon(card.amount || card.thisMonthUsed || 0) }}
       </p>
@@ -42,12 +42,14 @@
   </DetailModal>
 
   <!-- 설정 모달 (하단에서 올라오는 모달) -->
+  <!-- :key를 사용해 카드 ID로 모달 식별, 데이터 변경 시에도 모달 유지 -->
   <CardSettingsModal
+    :key="`card-settings-${card.id}`"
     :visible="showSettingsModal"
     :card="card"
     @close="showSettingsModal = false"
     @set-main="handleSetMain"
-    @toggle-amount="handleToggleAmount"
+    @toggle-amount="toggleAmountVisibility"
   />
 </template>
 
@@ -62,11 +64,16 @@ const props = defineProps({
   card: { type: Object, required: true },
 });
 
-const emit = defineEmits(['set-main', 'delete', 'toggle-amount']);
+const emit = defineEmits([
+  'set-main',
+  'delete',
+  'update-nickname',
+  'toggle-amount',
+]);
 
 const showDetail = ref(false);
 const showSettingsModal = ref(false);
-const isAmountHidden = ref(false); // 금액 숨김 상태
+const isAmountHidden = ref(false); // 카드 금액 숨김 상태 (계좌의 isBalanceHidden과 동일)
 
 const openDetail = () => (showDetail.value = true);
 const openSettingsModal = () => (showSettingsModal.value = true);
@@ -85,14 +92,14 @@ const getCardIssuer = (issuerCode) => {
 // 대표 카드 설정
 const handleSetMain = () => {
   emit('set-main', props.card);
-  showSettingsModal.value = false;
+  // 모달은 유지하고 props.card가 업데이트되면 자동으로 UI가 반영됨
 };
 
-// 금액 숨기기 토글
-const handleToggleAmount = (cardId, isHidden) => {
-  isAmountHidden.value = isHidden;
-  emit('toggle-amount', cardId, isHidden);
-  // 모달은 닫지 않음 - 사용자가 직접 닫기 버튼으로 닫도록
+// 금액 숨기기 토글 - 계좌의 toggleBalanceVisibility와 동일한 방식
+const toggleAmountVisibility = () => {
+  isAmountHidden.value = !isAmountHidden.value;
+  emit('toggle-amount', props.card.id, isAmountHidden.value);
+  // showSettingsModal.value = false; // 모달 닫지 않음 - 토글과 대표 설정 모두 일관되게 유지
 };
 </script>
 
@@ -203,19 +210,12 @@ const handleToggleAmount = (cardId, isHidden) => {
   margin: 0.25rem 0;
 }
 
+/* 카드 금액 스타일 */
 .card-amount {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--base-blue-dark);
   margin: 0;
   transition: all 0.2s ease;
-}
-
-/* 금액 숨김 상태 스타일 */
-.card-amount.hidden {
-  color: var(--text-lightgray);
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.2rem;
 }
 </style>

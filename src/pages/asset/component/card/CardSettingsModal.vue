@@ -45,21 +45,30 @@
           >
             <div class="setting-content">
               <span class="setting-text">대표 카드 설정</span>
+              <span v-if="card.isRepresentative" class="current-status"
+                >현재 대표 카드입니다</span
+              >
             </div>
-            <svg
-              class="arrow-icon"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path
-                d="M9 18l6-6-6-6"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
+            <!-- 대표 카드 여부에 따라 빈 별/색칠된 별 아이콘 -->
+            <div class="action-icon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                class="star-icon"
+                :class="{ filled: card.isRepresentative }"
+              >
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                  stroke="var(--base-blue-dark)"
+                  stroke-width="1.5"
+                  :fill="
+                    card.isRepresentative ? 'var(--base-blue-dark)' : 'none'
+                  "
+                />
+              </svg>
+            </div>
           </button>
         </div>
       </div>
@@ -71,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import cardCodeMap from '@/assets/utils/cardCodeMap.js';
 
 const props = defineProps({
@@ -83,18 +92,30 @@ const emit = defineEmits(['close', 'set-main', 'toggle-amount']);
 
 const amountHidden = ref(false);
 
+// 카드 props 변경을 감지하여 모달 상태 유지
+watch(
+  () => props.card,
+  (newCard) => {
+    // 카드 데이터가 변경되어도 모달 내부 상태는 유지
+    // Vue의 반응형 시스템이 자동으로 UI 업데이트
+  },
+  { deep: true }
+);
+
 // 모달 닫기 함수
 const closeModal = () => emit('close');
 
-// 금액 숨기기 토글 처리 함수 - 카드 ID와 상태를 함께 전달
+// 금액 숨기기 토글 처리 함수 - 계좌와 동일한 방식
 const handleToggleAmount = () => {
-  emit('toggle-amount', props.card.id, amountHidden.value);
+  // 부모 컴포넌트(CardItem)의 toggleAmountVisibility 함수를 호출
+  // 매개변수 없이 emit하면 부모에서 토글 상태를 직접 관리
+  emit('toggle-amount');
 };
 
 // 대표 카드 설정 처리 함수
 const handleSetMain = () => {
   emit('set-main');
-  closeModal(); // 대표 카드 설정 후 모달 닫기
+  // 모달 닫지 않음 - 현재 모달에서 별 색상만 변경
 };
 
 const getCardIssuer = (issuerCode) => cardCodeMap[issuerCode] || '알 수 없음';
@@ -241,9 +262,31 @@ const getCardIssuer = (issuerCode) => cardCodeMap[issuerCode] || '알 수 없음
   line-height: 1.4;
 }
 
-.arrow-icon {
-  color: var(--text-lightgray);
+/* 현재 상태 텍스트 */
+.current-status {
+  font-size: 0.8125rem;
+  color: var(--text-green);
+  line-height: 1.3;
+}
+
+/* 액션 아이콘 컨테이너 */
+.action-icon {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-icon {
+  width: 18px;
+  height: 18px;
+  transition: all 0.3s ease;
+  object-fit: contain;
+}
+
+/* 호버/활성화 시 별 아이콘 확대 효과 */
+.setting-item:not(:disabled):active .star-icon {
+  transform: scale(1.1);
 }
 
 /* 대표 카드인 경우 비활성화 스타일 */
@@ -256,8 +299,8 @@ const getCardIssuer = (issuerCode) => cardCodeMap[issuerCode] || '알 수 없음
   color: var(--text-lightgray);
 }
 
-.setting-item:disabled .arrow-icon {
-  color: var(--input-disabled-1);
+.setting-item:disabled .current-status {
+  color: var(--text-lightgray);
 }
 
 /* ===== 토글 스위치 ===== */
