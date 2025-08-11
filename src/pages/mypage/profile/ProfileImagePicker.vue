@@ -1,19 +1,34 @@
 <script setup>
+import { ref, watch } from 'vue';
 import imgSprout from '@/assets/images/icons/profile/profile_edit_sprout.png';
 import imgBeard from '@/assets/images/icons/profile/profile_edit_beard.png';
 import imgEyelash from '@/assets/images/icons/profile/profile_edit_eyelash.png';
 import imgCarrot from '@/assets/images/icons/profile/profile_edit_carrot.png';
 
 const profileImages = [imgSprout, imgBeard, imgEyelash, imgCarrot];
-defineProps({ modelValue: String });
-defineEmits(['close', 'select']);
+const props = defineProps({ modelValue: String });
+const emit = defineEmits(['close', 'update:modelValue', 'save']);
+
+const selected = ref(props.modelValue || profileImages[0]);
+watch(
+  () => props.modelValue,
+  (v) => {
+    if (v) selected.value = v;
+  }
+);
+
+const choose = (img) => {
+  selected.value = img;
+  emit('update:modelValue', img);
+};
+const onSave = () => emit('save', selected.value);
 </script>
 
 <template>
   <div class="pickerOverlay" @click.self="$emit('close')">
     <div class="pickerContainer">
       <div class="pickerHeader">
-        <span class="font-17 font-bold">프로필 사진 선택</span>
+        <span class="font-16 font-bold">프로필 사진 선택</span>
         <button class="pickerClose" @click="$emit('close')">
           <img
             src="@/assets/images/icons/common/x.png"
@@ -28,11 +43,13 @@ defineEmits(['close', 'select']);
           :key="img"
           class="imageBtn"
           :class="{ selected: img === modelValue }"
-          @click="$emit('select', img)"
+          @click="choose(img)"
         >
           <img :src="img" alt="프로필" />
         </button>
       </div>
+      <!-- ✅ 저장 버튼만 추가 -->
+      <button class="saveBtn" @click="onSave">저장</button>
     </div>
   </div>
 </template>
@@ -52,10 +69,10 @@ defineEmits(['close', 'select']);
 }
 .pickerContainer {
   background: #fff;
-  border-radius: 8px;
-  max-width: 300px;
+  border-radius: 6px;
+  max-width: 280px;
   width: 100%;
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -66,7 +83,7 @@ defineEmits(['close', 'select']);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .pickerClose {
@@ -79,8 +96,8 @@ defineEmits(['close', 'select']);
 }
 
 .closeImgBtn {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
@@ -88,7 +105,7 @@ defineEmits(['close', 'select']);
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px 10px;
+  gap: 15px 5px;
   justify-items: center;
   align-items: center;
 }
@@ -109,5 +126,18 @@ defineEmits(['close', 'select']);
 }
 .imageBtn.selected img {
   box-shadow: 0 0 0 2px var(--base-blue-dark);
+}
+
+/* ✅ 저장 버튼 */
+.saveBtn {
+  margin-top: 18px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  background: var(--base-blue-dark);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
 }
 </style>
