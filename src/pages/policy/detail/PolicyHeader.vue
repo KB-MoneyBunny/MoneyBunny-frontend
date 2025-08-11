@@ -14,7 +14,14 @@
     <p class="desc font-12">
       {{ description || policy.description }}
     </p>
-
+    <!-- 리뷰 안내 (추가) -->
+    <div class="reviewRow">
+      <span class="stars" aria-label="평점 별">★★★★★</span>
+      <span class="rating">{{ Number(rating).toFixed(1) }}</span>
+      <button class="reviewLink font-12" @click="goToReviews">
+        리뷰 {{ reviewCount }}개 보기
+      </button>
+    </div>
     <!-- <div class="tags">
       <span v-for="(tag, i) in policy.tags" :key="i" class="tag">{{
         tag
@@ -53,6 +60,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { bookmarkAPI } from '@/api/policyInteraction';
 
@@ -75,6 +83,10 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  // 리뷰 값 전달받기 (추가)
+  rating: { type: [Number, String], default: 0 },
+  reviewCount: { type: Number, default: 0 },
+  reviewRouteName: { type: String, default: 'policyReview' },
 });
 
 // 💪(상일) 부모 컴포넌트로 이벤트 전달용
@@ -88,6 +100,7 @@ const showModal = ref(false);
 const policyId = props.policy?.id || props.policy?.policyId;
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 // 북마크 상태 조회 (로그인 한 경우에만)
 async function fetchBookmarkStatus() {
@@ -158,6 +171,14 @@ const handleShowStatusModal = (applicationData) => {
 
   // 부모 컴포넌트(PolicyDetailPage)로 이벤트 전달
   emit('showStatusModal', applicationData);
+};
+
+// 리뷰 페이지 이동
+const goToReviews = () => {
+  router.push({
+    name: props.reviewRouteName,
+    params: { id: policyId },
+  });
 };
 </script>
 
@@ -234,5 +255,31 @@ const handleShowStatusModal = (applicationData) => {
 .shareIcon {
   width: 16px;
   height: 16px;
+}
+
+/* 리뷰 안내 (추가) */
+.reviewRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 10px;
+}
+.stars {
+  letter-spacing: 2px;
+  /* 별 색상 */
+  color: #f5c518;
+  font-size: 14px;
+}
+.rating {
+  color: var(--text-bluegray);
+  font-size: 14px;
+}
+.reviewLink {
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+  color: var(--text-bluegray);
 }
 </style>

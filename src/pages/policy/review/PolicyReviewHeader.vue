@@ -1,32 +1,29 @@
 <template>
-  <header class="policyDetailHeader">
+  <header class="reviewHeader">
     <button class="backBtn" @click="$router.back()">
       <img src="@/assets/images/icons/common/arrow-left.png" alt="뒤로가기" />
     </button>
+
     <img
       src="@/assets/images/icons/policy/policy_detail_header.png"
+      alt="header bunny"
       class="bunny"
     />
-    <div>
-      <div class="headerTitle font-bold font-15">정책 상세</div>
-      <div class="headerSubtitle font-12">
-        {{ policyTitle }}
-      </div>
+    <div class="titleWrap">
+      <div class="pageTitle font-15 font-bold">이용자 리뷰</div>
+      <div class="pageSub font-12">{{ policyTitle }}</div>
     </div>
   </header>
 </template>
 
 <script setup>
-defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
+const props = defineProps({
+  policyTitle: { type: String, default: '' },
 });
 </script>
 
 <style scoped>
-.policyDetailHeader {
+.reviewHeader {
   position: fixed;
   top: 0;
   left: 0;
@@ -41,24 +38,7 @@ defineProps({
   align-items: center;
   z-index: 1000;
 }
-.bunny {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
-}
-.headerTitle {
-  color: var(--text-login);
-  line-height: 1.1;
-}
-.headerSubtitle {
-  color: var(--text-bluegray);
-  font-weight: 400;
-  margin-top: 2px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 220px;
-}
+
 .backBtn {
   background: none;
   border: none;
@@ -69,5 +49,29 @@ defineProps({
 .backBtn img {
   width: 28px;
   height: 28px;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+.pageTitle {
+  color: var(--text-login);
+  line-height: 1.1;
+}
+.pageSub {
+  color: var(--text-bluegray);
+  font-weight: 400;
+  margin-top: 2px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 220px;
+}
+.bunny {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
 }
 </style>
