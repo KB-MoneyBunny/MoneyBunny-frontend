@@ -1,7 +1,7 @@
 <template>
   <div class="myPageContainer">
     <!-- 고정 프로필 카드 -->
-    <MypageProfileCard :userInfo="userInfo" @edit="openModal" />
+    <MypageProfileCard :userInfo="userInfo" @edit="openPicker" />
 
     <!-- 하나의 카드 안에 탭 메뉴 + 콘텐츠 -->
     <div class="infoCard">
@@ -9,29 +9,26 @@
 
       <!-- 탭별 콘텐츠 -->
       <div class="tabContent">
-        <ProfileInfoTable
+        <!-- <ProfileInfoTable
           v-if="currentTab === 'profile'"
           :userInfo="userInfo"
-        />
+        /> -->
         <BookmarkList v-if="currentTab === 'bookmark'" :bookmarks="bookmarks" />
         <SettingMain v-if="currentTab === 'settings'" />
       </div>
     </div>
 
-    <!-- 프로필 수정 모달 -->
-    <EditProfileModal
-      v-if="isModalOpen"
-      :name="userInfo.name"
-      :email="userInfo.email"
-      :profileImage="userInfo.profileImage"
-      @close="isModalOpen = false"
-      @update="handleUpdate"
+    <ProfileImagePicker
+      v-if="showPicker"
+      v-model="tempImage"
+      @close="closePicker"
+      @save="saveProfile"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useBookmarkStore } from "@/stores/bookmark";
 import axios from "axios";
@@ -43,6 +40,8 @@ import ProfileInfoTable from "./profile/ProfileInfoTable.vue";
 import EditProfileModal from "./profile/EditProfileModal.vue";
 import BookmarkList from "./bookmark/BookmarkList.vue";
 import SettingMain from "./settings/SettingMain.vue";
+
+import ProfileImagePicker from "./profile/ProfileImagePicker.vue";
 
 import imgSprout from "@/assets/images/icons/profile/profile_edit_sprout.png";
 import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";
@@ -68,6 +67,49 @@ const userInfo = ref({
   email: "",
   profileImage: avatarMap[avatarKey],
 });
+
+const showPicker = ref(false);
+
+// 초기값
+const tempImage = ref(0);
+
+// 🔐 토큰 헤더 헬퍼 (없으면 빈 헤더)
+const getAuthHeaders = () => {
+  try {
+    const saved = localStorage.getItem("auth");
+    const parsed = saved ? JSON.parse(saved) : {};
+    const token = parsed.token || parsed.accessToken || parsed.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+};
+
+// 열기
+const openPicker = () => {
+  tempImage.value = userInfo.value.profileImageId ?? 0; // 숫자
+  showPicker.value = true;
+};
+
+// 닫기
+const closePicker = () => (showPicker.value = false);
+
+// 저장: 숫자 imageId 받아서 API 호출 → 성공 시 UI 반영
+const saveProfile = async (imageId) => {
+  try {
+    await axios.patch(`/api/member/profile-image/${imageId}`, null, {
+      headers: getAuthHeaders(),
+    });
+    // DB 반영 성공 → 로컬 상태 동기화
+    userInfo.value.profileImageId = imageId;
+    userInfo.value.profileImage =
+      profileImages[imageId] ?? userInfo.value.profileImage;
+    showPicker.value = false;
+  } catch (e) {
+    console.error("프로필 이미지 변경 실패:", e);
+    alert("프로필 이미지를 변경하지 못했어요! 다시 시도해주세요.");
+  }
+};
 
 // 💪(상일) 북마크 스토어 연동
 const bookmarkStore = useBookmarkStore();
@@ -112,6 +154,13 @@ onMounted(async () => {
     console.log(res);
     userInfo.value.name = res.data.name;
     userInfo.value.email = res.data.email;
+
+    // 🔄 DB profileImageId → 이미지 경로
+    const idx = Number(res.data.profileImageId);
+    const safeIdx =
+      Number.isInteger(idx) && idx >= 0 && idx < profileImages.length ? idx : 0;
+    userInfo.value.profileImageId = safeIdx;
+    userInfo.value.profileImage = profileImages[safeIdx];
   } catch (err) {
     console.error("프로필 불러오기 실패:", err);
   }

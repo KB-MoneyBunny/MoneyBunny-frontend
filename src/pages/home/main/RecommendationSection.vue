@@ -1,25 +1,27 @@
 <template>
-  <div class="recommendation-section">
-    <template v-if="policyList.length > 0">
+  <div class="recommendationSection">
+    <template v-if="policyList.length">
       <div class="header">
-        <div>맞춤정책 추천 TOP3</div>
-        <span class="more" @click="goToPolicy">더보기</span>
+        <div class="titleWrap">
+          <div class="title">맞춤정책 추천 TOP3</div>
+        </div>
+        <button class="moreBtn" @click="goToPolicy">더보기</button>
       </div>
-      <div class="card-list">
+
+      <div class="cardList">
         <PolicyCardItem
           v-for="(item, i) in policyList"
-          :key="i"
+          :key="item.policyId"
           :rank="i + 1"
           :title="item.title"
           :description="item.description"
           :amount="item.amount"
-          :highlighted="i === 1"
+          :total="top3TotalAmount"
           :policyId="item.policyId"
         />
       </div>
     </template>
 
-    <!-- 정책이 없을 경우 -->
     <NoPolicyCard v-else @start-quiz="goToQuiz" />
   </div>
 </template>
@@ -32,79 +34,74 @@ import PolicyCardItem from './PolicyCardItem.vue';
 import NoPolicyCard from './NoPolicyCard.vue';
 
 const router = useRouter();
-
-const goToPolicy = () => {
-  router.push('/policy');
-};
-
-const goToQuiz = () => {
-  router.push('/policy/taps/PolicyMainTab');
-};
-
 const policyList = ref([]);
 const top3TotalAmount = ref(0);
+
+const goToPolicy = () => router.push('/policy');
+const goToQuiz = () => router.push('/policy/taps/PolicyMainTab');
+
+const asCurrency = (v) =>
+  new Intl.NumberFormat('ko-KR', {
+    style: 'currency',
+    currency: 'KRW',
+    maximumFractionDigits: 0,
+  }).format(v || 0);
 
 onMounted(async () => {
   try {
     const res = await policyAPI.getUserPolicySearch();
     const top3 = (res.data || []).slice(0, 3).map((item) => ({
-      policyId: String(item.policyId), // policyId를 String으로 변환
+      policyId: String(item.policyId),
       title: item.title,
       description: item.policyBenefitDescription,
-      amount: item.policyBenefitAmount,
+      amount: Number(item.policyBenefitAmount) || 0,
     }));
     policyList.value = top3;
-    // 혜택금액 총합 저장
-    top3TotalAmount.value = top3.reduce(
-      (sum, item) => sum + (typeof item.amount === 'number' ? item.amount : 0),
-      0
-    );
-    // 필요하다면 console.log(top3TotalAmount.value);
-  } catch (e) {
+    top3TotalAmount.value = top3.reduce((sum, i) => sum + i.amount, 0);
+  } catch {
     policyList.value = [];
     top3TotalAmount.value = 0;
   }
 });
-
-// expose top3TotalAmount to parent
-defineExpose({
-  top3TotalAmount,
-});
 </script>
 
 <style scoped>
-.recommendation-section {
-  background-color: white;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem;
+.recommendationSection {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: var(--text-login);
-  margin: 0;
-  /* padding-left: 0.25rem; */
 }
 
-.more {
-  font-size: 0.65rem;
+.titleWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.title {
+  font-size: 14px;
   font-weight: bold;
-  margin-right: 0.35rem;
+  color: var(--base-blue-dark);
+}
+
+.moreBtn {
+  font-size: 10px;
   color: var(--text-lightgray);
+  background: transparent;
+  border: 0;
   cursor: pointer;
 }
 
-.card-list {
+.cardList {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 12px;
+  margin-top: 12px;
 }
 </style>
