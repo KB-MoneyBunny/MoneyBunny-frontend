@@ -29,8 +29,8 @@
         {{ getCardIssuer(card.issuerCode) }}{{ card.cardMaskedNumber }}
       </p>
 
-      <!-- 안전한 금액 표시 -->
-      <p class="card-amount">
+      <!-- 금액 표시 - 숨김 상태에 따라 다르게 표시 -->
+      <p class="card-amount" v-if="!isAmountHidden">
         {{ formatWon(card.amount || card.thisMonthUsed || 0) }}
       </p>
     </div>
@@ -46,9 +46,8 @@
     :visible="showSettingsModal"
     :card="card"
     @close="showSettingsModal = false"
-    @set-nickname="setCardNickname"
     @set-main="handleSetMain"
-    @toggle-amount="toggleAmountVisibility"
+    @toggle-amount="handleToggleAmount"
   />
 </template>
 
@@ -63,16 +62,11 @@ const props = defineProps({
   card: { type: Object, required: true },
 });
 
-const emit = defineEmits([
-  'set-main',
-  'delete',
-  'update-nickname',
-  'toggle-amount',
-]);
+const emit = defineEmits(['set-main', 'delete', 'toggle-amount']);
 
 const showDetail = ref(false);
 const showSettingsModal = ref(false);
-const isAmountHidden = ref(false);
+const isAmountHidden = ref(false); // 금액 숨김 상태
 
 const openDetail = () => (showDetail.value = true);
 const openSettingsModal = () => (showSettingsModal.value = true);
@@ -88,12 +82,6 @@ const getCardIssuer = (issuerCode) => {
   return cardCodeMap[issuerCode] || '알 수 없음';
 };
 
-// 카드 별명 설정
-const setCardNickname = (newNickname) => {
-  emit('update-nickname', { ...props.card, cardName: newNickname });
-  showSettingsModal.value = false;
-};
-
 // 대표 카드 설정
 const handleSetMain = () => {
   emit('set-main', props.card);
@@ -101,10 +89,10 @@ const handleSetMain = () => {
 };
 
 // 금액 숨기기 토글
-const toggleAmountVisibility = () => {
-  isAmountHidden.value = !isAmountHidden.value;
-  emit('toggle-amount', props.card.id, isAmountHidden.value);
-  showSettingsModal.value = false;
+const handleToggleAmount = (cardId, isHidden) => {
+  isAmountHidden.value = isHidden;
+  emit('toggle-amount', cardId, isHidden);
+  // 모달은 닫지 않음 - 사용자가 직접 닫기 버튼으로 닫도록
 };
 </script>
 
@@ -220,10 +208,14 @@ const toggleAmountVisibility = () => {
   font-weight: 600;
   color: var(--base-blue-dark);
   margin: 0;
+  transition: all 0.2s ease;
 }
 
+/* 금액 숨김 상태 스타일 */
 .card-amount.hidden {
   color: var(--text-lightgray);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.2rem;
 }
 </style>

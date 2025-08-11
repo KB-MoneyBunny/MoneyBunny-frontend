@@ -8,7 +8,7 @@
       @delete="$emit('delete-card', card)"
       @set-main="setMainItem"
       @update-nickname="updateCardNickname"
-      @toggle-amount="toggleCardAmount"
+      @toggle-amount="handleToggleAmount"
     />
 
     <!-- 전체보기 버튼: 3개 이상인 경우에만 -->
@@ -50,6 +50,9 @@ const emit = defineEmits(['delete-card', 'update-cards']);
 const showAll = ref(false);
 const isCardModalOpen = ref(false);
 
+// 각 카드의 금액 숨김 상태를 관리하는 Map
+const hiddenAmountCards = ref(new Map());
+
 // 대표 카드 관리 composable 사용
 const { processedItems: processedCards, setMainItem } = useMainItem({
   type: 'card',
@@ -72,9 +75,19 @@ const updateCardNickname = (updatedCard) => {
   emit('update-cards', updatedCards);
 };
 
-// 금액 숨기기 토글
-const toggleCardAmount = (cardId, isHidden) => {
+// 금액 숨기기 토글 - 실제 동작하는 함수
+const handleToggleAmount = (cardId, isHidden) => {
   console.log(`카드 ${cardId} 금액 숨기기: ${isHidden}`);
+
+  // 상태 저장
+  if (isHidden) {
+    hiddenAmountCards.value.set(cardId, true);
+  } else {
+    hiddenAmountCards.value.delete(cardId);
+  }
+
+  // 선택적으로 부모 컴포넌트에도 알림
+  // emit('card-amount-toggled', { cardId, isHidden });
 };
 
 // 카드 추가

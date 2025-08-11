@@ -6,7 +6,7 @@
       <!-- 모달 핸들 -->
       <div class="modal-handle"></div>
 
-      <!-- 카드 정보 헤더 (AccountSettingsModal과 동일 톤) -->
+      <!-- 카드 정보 헤더 -->
       <div class="card-header">
         <img
           :src="card.cardImage"
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <!-- 설정 옵션들 (AccountSettingsModal 섹션 레이아웃 재사용) -->
+      <!-- 설정 옵션들 -->
       <div class="settings-options">
         <div class="section-group">
           <!-- 금액 숨기기 토글 -->
@@ -31,7 +31,7 @@
               <input
                 type="checkbox"
                 v-model="amountHidden"
-                @change="$emit('toggle-amount')"
+                @change="handleToggleAmount"
               />
               <span class="toggle-slider"></span>
             </label>
@@ -40,7 +40,7 @@
           <!-- 대표 카드 설정 -->
           <button
             class="setting-item"
-            @click="$emit('set-main')"
+            @click="handleSetMain"
             :disabled="card.isRepresentative"
           >
             <div class="setting-content">
@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref } from 'vue';
 import cardCodeMap from '@/assets/utils/cardCodeMap.js';
 
 const props = defineProps({
@@ -79,36 +79,29 @@ const props = defineProps({
   card: { type: Object, required: true },
 });
 
-const emit = defineEmits([
-  'close',
-  'set-nickname',
-  'set-main',
-  'toggle-amount',
-]);
+const emit = defineEmits(['close', 'set-main', 'toggle-amount']);
 
-const isEditingNickname = ref(false);
-const editingNickname = ref('');
-const nicknameInput = ref(null);
 const amountHidden = ref(false);
+
+// 모달 닫기 함수
 const closeModal = () => emit('close');
 
+// 금액 숨기기 토글 처리 함수 - 카드 ID와 상태를 함께 전달
+const handleToggleAmount = () => {
+  emit('toggle-amount', props.card.id, amountHidden.value);
+};
+
+// 대표 카드 설정 처리 함수
+const handleSetMain = () => {
+  emit('set-main');
+  closeModal(); // 대표 카드 설정 후 모달 닫기
+};
+
 const getCardIssuer = (issuerCode) => cardCodeMap[issuerCode] || '알 수 없음';
-
-const startEdit = async () => {
-  isEditingNickname.value = true;
-  editingNickname.value = props.card.cardName || '';
-  await nextTick();
-  nicknameInput.value?.focus();
-};
-
-const cancelEdit = () => {
-  isEditingNickname.value = false;
-  editingNickname.value = '';
-};
 </script>
 
 <style scoped>
-/* ===== 오버레이 & 애니메이션 (AccountSettingsModal과 동일) ===== */
+/* ===== 오버레이 & 애니메이션 ===== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -119,6 +112,7 @@ const cancelEdit = () => {
   z-index: 9999;
   animation: fadeIn 0.2s ease-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -127,6 +121,7 @@ const cancelEdit = () => {
     opacity: 1;
   }
 }
+
 @keyframes slideUp {
   from {
     transform: translateY(100%);
@@ -144,10 +139,11 @@ const cancelEdit = () => {
   border-radius: 1.25rem 1.25rem 0 0;
   padding: 1.25rem;
   animation: slideUp 0.3s ease-out;
-  max-height: 70vh; /* 동일 비율 */
+  max-height: 70vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
 @supports (padding: max(0px)) {
   .modal-content {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
@@ -163,7 +159,7 @@ const cancelEdit = () => {
   margin: 0 auto 1rem;
 }
 
-/* ===== 헤더 ===== */
+/* ===== 카드 정보 헤더 ===== */
 .card-header {
   display: flex;
   align-items: center;
@@ -172,33 +168,38 @@ const cancelEdit = () => {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--input-outline);
 }
+
 .card-logo {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.5rem;
   object-fit: contain;
 }
+
 .card-info {
   flex: 1;
 }
+
 .card-title {
   font-size: 1rem;
   font-weight: 600;
   color: var(--base-blue-dark);
   margin: 0 0 0.25rem;
 }
+
 .card-number {
   font-size: 0.875rem;
   color: var(--text-lightgray);
   margin: 0;
 }
 
-/* ===== 옵션 섹션 ===== */
+/* ===== 설정 옵션 섹션 ===== */
 .settings-options {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+
 .section-group {
   display: flex;
   flex-direction: column;
@@ -207,6 +208,7 @@ const cancelEdit = () => {
   border-radius: 0.75rem;
   overflow: hidden;
 }
+
 .setting-item {
   display: flex;
   align-items: center;
@@ -220,6 +222,7 @@ const cancelEdit = () => {
   min-height: 3.25rem;
   -webkit-tap-highlight-color: transparent;
 }
+
 .section-group .setting-item:last-child {
   border-bottom: none;
 }
@@ -230,95 +233,53 @@ const cancelEdit = () => {
   flex-direction: column;
   gap: 0.25rem;
 }
+
 .setting-text {
   font-size: 0.9375rem;
   font-weight: 500;
   color: var(--base-blue-dark);
   line-height: 1.4;
 }
-.current-value {
-  font-size: 0.8125rem;
-  color: var(--text-lightgray);
-  line-height: 1.3;
-}
 
-/* 우측 아이콘 버튼 + 이미지 크기 */
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.375rem;
-  border: none;
-  background: none;
-}
-.setting-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  opacity: 0.92;
-}
 .arrow-icon {
   color: var(--text-lightgray);
   flex-shrink: 0;
 }
 
-/* ===== 인라인 편집 ===== */
-.inline-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+/* 대표 카드인 경우 비활성화 스타일 */
+.setting-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-.nickname-inline-input {
-  flex: 1;
-  min-width: 0;
-  padding: 0.5rem 0.625rem;
-  border: 1px solid var(--input-outline);
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
-  background: var(--input-bg-2);
-}
-.nickname-inline-input:focus {
-  outline: none;
-  border-color: var(--base-blue-dark);
-  background: #fff;
-}
-.chip-btn {
-  padding: 0.45rem 0.6rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--input-outline);
-  background: var(--input-bg-1);
-  color: var(--text-darkgray);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-.chip-btn.primary {
-  background: var(--base-blue-dark);
-  border-color: var(--base-blue-dark);
-  color: #fff;
-}
-.chip-btn:disabled {
-  background: var(--input-disabled-1);
-  border-color: var(--input-disabled-1);
+
+.setting-item:disabled .setting-text {
   color: var(--text-lightgray);
 }
 
-/* ===== 토글 ===== */
+.setting-item:disabled .arrow-icon {
+  color: var(--input-disabled-1);
+}
+
+/* ===== 토글 스위치 ===== */
 .toggle-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .toggle-switch {
   position: relative;
   display: inline-block;
   width: 51px;
   height: 31px;
 }
+
 .toggle-switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
+
 .toggle-slider {
   position: absolute;
   inset: 0;
@@ -326,6 +287,7 @@ const cancelEdit = () => {
   transition: 0.3s;
   border-radius: 31px;
 }
+
 .toggle-slider:before {
   content: '';
   position: absolute;
@@ -337,9 +299,11 @@ const cancelEdit = () => {
   transition: 0.3s;
   border-radius: 50%;
 }
+
 input:checked + .toggle-slider {
   background-color: var(--base-blue-dark);
 }
+
 input:checked + .toggle-slider:before {
   transform: translateX(20px);
 }
@@ -359,6 +323,7 @@ input:checked + .toggle-slider:before {
   transition: transform 0.2s ease, background 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
+
 .close-button:active {
   background: var(--base-lavender);
   transform: scale(0.98);
