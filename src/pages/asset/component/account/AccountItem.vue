@@ -11,9 +11,10 @@
     <div class="account-info" @click="openDetail">
       <div class="info-top">
         <div class="name-section">
-          <span class="account-name">{{ account.accountName }}</span>
+          <!-- store에서 별명 적용된 이름 표시 -->
+          <span class="account-name">{{ displayAccountName }}</span>
           <!-- 대표 뱃지를 계좌명 옆으로 이동 -->
-          <span v-if="account.isMain" class="main-badge">대표</span>
+          <span v-if="isMainAccount" class="main-badge">대표</span>
         </div>
         <!-- 설정 버튼을 오른쪽 끝으로 분리 -->
         <button class="settings-btn-inline" @click.stop="openSettingsModal">
@@ -29,7 +30,7 @@
         {{ getBankName(account.bankCode) }}
         {{ formatAccountNumber(account.accountNumber) }}
       </p>
-      <!-- 잔액 숨기기-->
+      <!-- 잔액 숨기기 적용 -->
       <p class="balance" v-if="!isBalanceHidden">
         {{ formatWon(account.balance) }}
       </p>
@@ -38,15 +39,14 @@
 
   <!-- 상세 모달 -->
   <DetailModal :visible="showDetail" @close="showDetail = false">
-    <AccountDetail :accountData="account" @close="showDetail = false" />
+    <AccountDetail :accountData="enhancedAccount" @close="showDetail = false" />
   </DetailModal>
 
   <!-- 설정 모달 (하단에서 올라오는 모달) -->
-  <!-- :key를 사용해 계좌 ID로 모달 식별, 데이터 변경 시에도 모달 유지 -->
   <AccountSettingsModal
     :key="`account-settings-${account.id}`"
     :visible="showSettingsModal"
-    :account="account"
+    :account="enhancedAccount"
     @close="showSettingsModal = false"
     @copy-account="copyAccountNumber"
     @set-nickname="setAccountNickname"
@@ -56,7 +56,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useAccountSettingsStore } from '@/stores/assetSettings';
 import DetailModal from '../detail/DetailModal.vue';
 import AccountDetail from './AccountDetail.vue';
 import AccountSettingsModal from './AccountSettingsModal.vue';
@@ -66,6 +67,7 @@ import { getBankName } from '@/assets/utils/bankCodeMap.js';
 const props = defineProps({
   account: { type: Object, required: true },
 });
+
 const emit = defineEmits([
   'set-main',
   'delete',
@@ -73,9 +75,35 @@ const emit = defineEmits([
   'toggle-balance',
 ]);
 
+// Pinia store 사용
+const accountSettings = useAccountSettingsStore();
+
 const showDetail = ref(false);
 const showSettingsModal = ref(false);
-const isBalanceHidden = ref(false);
+
+// 계산된 속성들
+const displayAccountName = computed(() => {
+  return (
+    accountSettings.getAccountNickname(props.account.id) ||
+    props.account.accountName
+  );
+});
+
+const isMainAccount = computed(() => {
+  return accountSettings.isMainAccount(props.account.id);
+});
+
+const isBalanceHidden = computed(() => {
+  return accountSettings.isBalanceHidden(props.account.id);
+});
+
+// 설정이 적용된 계좌 객체
+const enhancedAccount = computed(() => ({
+  ...props.account,
+  accountName: displayAccountName.value,
+  isMain: isMainAccount.value,
+  hideBalance: isBalanceHidden.value,
+}));
 
 const openDetail = () => (showDetail.value = true);
 const openSettingsModal = () => (showSettingsModal.value = true);
@@ -96,23 +124,28 @@ const copyAccountNumber = async () => {
   showSettingsModal.value = false;
 };
 
-// 계좌 별명 설정
+// 계좌 별명 설정 - store 사용
 const setAccountNickname = (newNickname) => {
+  accountSettings.setAccountNickname(props.account.id, newNickname);
+  // 부모 컴포넌트에도 알림 (필요한 경우)
   emit('update-nickname', { ...props.account, accountName: newNickname });
   showSettingsModal.value = false;
 };
 
-// 대표 계좌 설정
+// 대표 계좌 설정 - store 사용
 const handleSetMain = () => {
-  emit('set-main', props.account);
-  // 모달은 유지하고 props.account가 업데이트되면 자동으로 UI가 반영됨
+  if (!isMainAccount.value) {
+    accountSettings.setMainAccount(props.account.id);
+    emit('set-main', props.account);
+  }
+  // 모달은 유지하고 UI만 업데이트됨
 };
 
-// 잔액 숨기기 토글 - 모달 닫지 않도록 수정
+// 잔액 숨기기 토글 - store 사용
 const toggleBalanceVisibility = () => {
-  isBalanceHidden.value = !isBalanceHidden.value;
+  accountSettings.toggleBalanceVisibility(props.account.id);
   emit('toggle-balance', props.account.id, isBalanceHidden.value);
-  // showSettingsModal.value = false; // 모달 닫지 않음 - 카드와 동일하게 수정
+  // 모달은 닫지 않음
 };
 </script>
 
@@ -209,8 +242,8 @@ const toggleBalanceVisibility = () => {
   height: 0.75rem;
   opacity: 0.5;
   transition: opacity 0.2s ease;
-  object-fit: contain; /* 이미지 비율 유지하면서 크기 맞춤 */
-  object-position: center; /* 중앙 정렬 */
+  object-fit: contain;
+  object-position: center;
 }
 
 .settings-btn-inline:hover .setting-icon-inline {
@@ -233,5 +266,6 @@ const toggleBalanceVisibility = () => {
 .balance.hidden {
   color: var(--text-lightgray);
   font-size: 0.9rem;
+  font-style: italic;
 }
 </style>

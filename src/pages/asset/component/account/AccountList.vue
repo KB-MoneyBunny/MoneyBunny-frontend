@@ -34,7 +34,8 @@
 </template>
 
 <script setup>
-import { ref, computed, toRef } from 'vue';
+import { ref, computed, toRef, onMounted } from 'vue';
+import { useAccountSettingsStore } from '@/stores/assetSettings';
 import AccountItem from './AccountItem.vue';
 import AddItemButton from '@/pages/asset/component/common/AddItemButton.vue';
 import AddItemModal from '@/pages/asset/component/common/AddItemModal.vue';
@@ -46,14 +47,34 @@ const props = defineProps({
 
 const emit = defineEmits(['delete-account', 'update-accounts']);
 
+// Pinia store 사용
+const accountSettings = useAccountSettingsStore();
+
 const showAll = ref(false);
 const isAccountModalOpen = ref(false);
 
-// 대표 계좌 관리 composable 사용
+// 컴포넌트 마운트 시 로컬스토리지에서 설정 불러오기
+onMounted(() => {
+  accountSettings.loadFromLocalStorage();
+});
+
+// 설정이 적용된 계좌 목록
+const processedAccountsWithSettings = computed(() => {
+  return accountSettings.applySettingsToAccounts(props.accounts);
+});
+
+// 대표 계좌 관리 composable 사용 (설정이 적용된 계좌 목록 사용)
 const { processedItems: processedAccounts, setMainItem } = useMainItem({
   type: 'account',
-  items: toRef(props, 'accounts'),
-  onUpdate: (reorderedAccounts) => emit('update-accounts', reorderedAccounts),
+  items: processedAccountsWithSettings,
+  onUpdate: (reorderedAccounts) => {
+    // 대표 계좌 변경 시 store에도 반영
+    const mainAccount = reorderedAccounts.find((acc) => acc.isMain);
+    if (mainAccount) {
+      accountSettings.setMainAccount(mainAccount.id);
+    }
+    emit('update-accounts', reorderedAccounts);
+  },
 });
 
 // 보여질 계좌 목록
@@ -61,8 +82,9 @@ const visibleAccounts = computed(() =>
   showAll.value ? processedAccounts.value : processedAccounts.value.slice(0, 3)
 );
 
-// 계좌 별명 업데이트
+// 계좌 별명 업데이트 (store를 통해 이미 처리되므로 부모에게만 알림)
 const updateAccountNickname = (updatedAccount) => {
+  // store에서 이미 처리되었으므로 부모 컴포넌트에만 알림
   const updatedAccounts = props.accounts.map((acc) =>
     acc.id === updatedAccount.id
       ? { ...acc, accountName: updatedAccount.accountName }
@@ -71,9 +93,10 @@ const updateAccountNickname = (updatedAccount) => {
   emit('update-accounts', updatedAccounts);
 };
 
-// 잔액 숨기기 토글
+// 잔액 숨기기 토글 (store를 통해 이미 처리됨)
 const toggleAccountBalance = (accountId, isHidden) => {
-  console.log(`계좌 ${accountId} 잔액 숨기기: ${isHidden}`);
+  console.log(`계좌 ${accountId} 잔액 숨기기: ${isHidden} (store에서 처리됨)`);
+  // store에서 이미 처리되었으므로 추가 작업 불필요
 };
 </script>
 
