@@ -14,12 +14,12 @@
     <p class="desc font-12">
       {{ description || policy.description }}
     </p>
-    <!-- 리뷰 안내 (추가) -->
+
     <div class="reviewRow">
-      <span class="stars" aria-label="평점 별">★★★★★</span>
-      <span class="rating">{{ Number(rating).toFixed(1) }}</span>
-      <button class="reviewLink font-12" @click="goToReviews">
-        리뷰 {{ reviewCount }}개 보기
+      <!-- <span class="stars" aria-label="평점 별">★★★★★</span> -->
+      <!-- <span class="rating">{{ Number(rating).toFixed(1) }}</span> -->
+      <button class="reviewLink font-11" @click="goToReviews">
+        리뷰<span v-if="reviewCount"> {{ reviewCount }}개</span> 보기
       </button>
     </div>
     <!-- <div class="tags">
@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { bookmarkAPI } from '@/api/policyInteraction';
@@ -69,6 +69,7 @@ import PolicyApplyModal from '../component/PolicyApplyModal.vue';
 import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
 import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
 import shareIcon from '@/assets/images/icons/policy/share.png';
+import PolicyReviewPage from '../review/PolicyReviewPage.vue';
 
 const props = defineProps({
   policy: {
@@ -84,9 +85,8 @@ const props = defineProps({
     required: false,
   },
   // 리뷰 값 전달받기 (추가)
-  rating: { type: [Number, String], default: 0 },
   reviewCount: { type: Number, default: 0 },
-  reviewRouteName: { type: String, default: 'policyReview' },
+  reviewRouteName: { type: String, default: 'policyReviewPage' },
 });
 
 // 💪(상일) 부모 컴포넌트로 이벤트 전달용
@@ -96,7 +96,6 @@ const showApplyModal = ref(false);
 const selectedPolicy = ref(null);
 const bookmark = ref(false);
 const showModal = ref(false);
-
 const policyId = props.policy?.id || props.policy?.policyId;
 
 const authStore = useAuthStore();
@@ -175,9 +174,11 @@ const handleShowStatusModal = (applicationData) => {
 
 // 리뷰 페이지 이동
 const goToReviews = () => {
+  const policyId = policyId.value;
+  if (!policyId) return console.warn('policyId 가 없습니다.');
   router.push({
-    name: props.reviewRouteName,
-    params: { id: policyId },
+    name: props.reviewRouteName || 'policyReviewPage',
+    params: { id: String(policyId) },
   });
 };
 </script>
@@ -264,16 +265,7 @@ const goToReviews = () => {
   gap: 10px;
   margin: 6px 0 10px;
 }
-.stars {
-  letter-spacing: 2px;
-  /* 별 색상 */
-  color: #f5c518;
-  font-size: 14px;
-}
-.rating {
-  color: var(--text-bluegray);
-  font-size: 14px;
-}
+
 .reviewLink {
   background: transparent;
   border: none;

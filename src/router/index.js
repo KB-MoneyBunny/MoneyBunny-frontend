@@ -49,7 +49,7 @@ import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vu
 import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
 import PolicySearchPage from '@/pages/policy/search/PolicySearchPage.vue';
 import PolicySearchResult from '@/pages/policy/search/PolicySearchResult.vue';
-import PolicyReview from '@/pages/policy/review/PolicyReview.vue';
+import PolicyReviewPage from '@/pages/policy/review/PolicyReviewPage.vue';
 
 const routes = [
   //
@@ -193,9 +193,9 @@ const routes = [
         props: true,
       },
       {
-        path: '/policy/:id/reviews',
-        name: 'policyReview',
-        component: PolicyReview,
+        path: '/policy/:policyId/reviews',
+        name: 'policyReviewPage',
+        component: PolicyReviewPage,
       },
       {
         path: 'policy/search',
