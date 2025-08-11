@@ -26,10 +26,10 @@
       </div>
 
       <p class="account-number">
-        {{ getBankName(account.bankCode) }} •
+        {{ getBankName(account.bankCode) }}
         {{ formatAccountNumber(account.accountNumber) }}
       </p>
-
+      <!-- 잔액 숨기기-->
       <p class="balance" v-if="!isBalanceHidden">
         {{ formatWon(account.balance) }}
       </p>
@@ -106,11 +106,11 @@ const handleSetMain = () => {
   showSettingsModal.value = false;
 };
 
-// 잔액 숨기기 토글
+// 잔액 숨기기 토글 - 모달 닫지 않도록 수정
 const toggleBalanceVisibility = () => {
   isBalanceHidden.value = !isBalanceHidden.value;
   emit('toggle-balance', props.account.id, isBalanceHidden.value);
-  showSettingsModal.value = false;
+  // showSettingsModal.value = false; // 모달 닫지 않음 - 카드와 동일하게 수정
 };
 </script>
 
