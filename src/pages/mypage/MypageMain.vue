@@ -20,6 +20,7 @@
     </div>
 
     <ProfileImagePicker
+      ref="pickerRef"
       v-if="showPicker"
       v-model="tempImage"
       @close="closePicker"
@@ -73,6 +74,8 @@ const userInfo = ref({
 
 const showPicker = ref(false);
 
+const pickerRef = ref(null);
+
 // 초기값
 const tempImage = ref(0);
 
@@ -97,7 +100,23 @@ const openPicker = () => {
 // 닫기
 const closePicker = () => (showPicker.value = false);
 
-// 저장: 숫자 imageId 받아서 API 호출 → 성공 시 UI 반영
+// 토스트 상태
+const showToast = ref(false);
+const toastMessage = ref("");
+
+// 토스트 띄우기 헬퍼(2초)
+const showToastOnce = (
+  msg = "프로필 이미지가 변경되었습니다!",
+  duration = 1000
+) => {
+  toastMessage.value = msg;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, duration);
+};
+
+// 저장: 숫자 imageId 받아서 API 호출 -> 성공 시 UI 반영 + 토스트
 const saveProfile = async (imageId) => {
   try {
     await axios.patch(`/api/member/profile-image/${imageId}`, null, {
@@ -107,7 +126,9 @@ const saveProfile = async (imageId) => {
     userInfo.value.profileImageId = imageId;
     userInfo.value.profileImage =
       profileImages[imageId] ?? userInfo.value.profileImage;
-    showPicker.value = false;
+
+    // 팝업 안에서 토스트 띄우고, 잠시 후 자동 닫기(픽커가 close emit)
+    pickerRef.value?.showSavedToast("프로필 이미지가 변경되었습니다!");
   } catch (e) {
     console.error("프로필 이미지 변경 실패:", e);
     alert("프로필 이미지를 변경하지 못했어요! 다시 시도해주세요.");
@@ -194,6 +215,7 @@ onMounted(async () => {
   background-color: white;
   border-radius: 10px;
   padding: 20px;
+  position: relative; /* 토스트  */
 }
 
 .userCard {
@@ -239,12 +261,6 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-.infoCard {
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-}
-
 .tabHeader {
   display: flex;
   justify-content: space-around;
@@ -276,5 +292,35 @@ onMounted(async () => {
 
 .infoValue {
   color: var(--text-login);
+}
+
+/* 토스트 */
+.toastMsg {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: var(--base-blue-dark);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 250px;
+  max-width: 350px;
+  pointer-events: none;
+  text-align: center;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* 이미 있으니 유지해도 OK */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

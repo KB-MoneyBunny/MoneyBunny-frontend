@@ -89,9 +89,16 @@ const filteredTransactions = computed(() => {
   // 거래 유형 필터 (고급 필터의 거래 유형)
   if (advFilters.transactionType !== '전체') {
     if (props.type === 'account') {
-      if (advFilters.transactionType === '입금만') {
+      // 🔥 수정: '입금만'/'출금만' → '입금'/'출금'으로 매칭 추가
+      if (
+        advFilters.transactionType === '입금만' ||
+        advFilters.transactionType === '입금'
+      ) {
         filtered = filtered.filter((tx) => tx.type === '입금');
-      } else if (advFilters.transactionType === '출금만') {
+      } else if (
+        advFilters.transactionType === '출금만' ||
+        advFilters.transactionType === '출금'
+      ) {
         filtered = filtered.filter((tx) => tx.type === '출금');
       }
     } else if (props.type === 'card') {
@@ -220,9 +227,13 @@ async function loadMore() {
       const advTransactionType = props.advancedFilters.transactionType;
       let typeParam = null;
 
-      if (advTransactionType === '입금만') {
+      // 🔥 수정: '입금만'/'출금만' + '입금'/'출금' 둘 다 체크
+      if (advTransactionType === '입금만' || advTransactionType === '입금') {
         typeParam = 'income';
-      } else if (advTransactionType === '출금만') {
+      } else if (
+        advTransactionType === '출금만' ||
+        advTransactionType === '출금'
+      ) {
         typeParam = 'expense';
       } else if (props.filter === '입금') {
         typeParam = 'income';
@@ -330,22 +341,22 @@ onUnmounted(() => {
 
 <style scoped>
 .transaction-list {
-  background: #fff; /* 화이트 카드 스타일 */
+  background: #fff;
   border-radius: 0.75rem;
   margin: 1rem;
   padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0; /* 간격 대신 border로 구분 */
-  max-height: 460px; /* 적당히! 모바일이면 60~80vh로도 가능 */
+  gap: 0;
+  height: calc(100vh - 120px); /* 헤더(60px) + 푸터(60px) 제외 */
   overflow-y: auto;
-  scrollbar-width: none; /* 파이어폭스 */
-}
-.transaction-list::-webkit-scrollbar {
-  display: none; /* 크롬, 사파리 */
+  scrollbar-width: none;
 }
 
-/* 거래 내역 아이템 간 구분선 */
+.transaction-list::-webkit-scrollbar {
+  display: none;
+}
+
 .transaction-list > :deep(.transaction-item):not(:last-child) {
   border-bottom: 1px solid var(--input-bg-3);
   padding-bottom: 0.75rem;
