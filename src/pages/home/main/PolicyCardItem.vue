@@ -75,7 +75,7 @@ function goDetail() {
   flex: 0 0 17px;
 }
 .title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   color: var(--text-login);
   white-space: nowrap;
@@ -94,7 +94,7 @@ function goDetail() {
 .desc {
   flex: 1 1 auto;
   min-width: 64px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-bluegray);
   line-height: 1.35;
   white-space: nowrap;

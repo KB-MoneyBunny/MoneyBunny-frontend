@@ -93,9 +93,22 @@ function onCtaClick() {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 128px;
+  min-height: 138px;
   width: 100%;
   isolation: isolate;
+
+  /* box-sizing: border-box; */
+  /* border: 1.5px solid rgba(44, 62, 80, 0.06); */
+}
+
+/* ✅ 가짜 보더로 잘림 방지 */
+.policyBanner::after {
+  content: '';
+  position: absolute;
+  inset: 0.5px; /* 테두리 안쪽으로 0.5px */
+  border: 1.5px solid rgba(44, 62, 80, 0.06);
+  border-radius: 6px;
+  pointer-events: none;
 }
 
 .left {
