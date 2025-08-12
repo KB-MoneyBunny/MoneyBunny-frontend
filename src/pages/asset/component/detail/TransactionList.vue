@@ -330,22 +330,22 @@ onUnmounted(() => {
 
 <style scoped>
 .transaction-list {
-  background: #fff; /* 화이트 카드 스타일 */
+  background: #fff;
   border-radius: 0.75rem;
   margin: 1rem;
   padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0; /* 간격 대신 border로 구분 */
-  max-height: 460px; /* 적당히! 모바일이면 60~80vh로도 가능 */
+  gap: 0;
+  height: calc(100vh - 120px); /* 헤더(60px) + 푸터(60px) 제외 */
   overflow-y: auto;
-  scrollbar-width: none; /* 파이어폭스 */
-}
-.transaction-list::-webkit-scrollbar {
-  display: none; /* 크롬, 사파리 */
+  scrollbar-width: none;
 }
 
-/* 거래 내역 아이템 간 구분선 */
+.transaction-list::-webkit-scrollbar {
+  display: none;
+}
+
 .transaction-list > :deep(.transaction-item):not(:last-child) {
   border-bottom: 1px solid var(--input-bg-3);
   padding-bottom: 0.75rem;
