@@ -154,15 +154,18 @@ const toggleBalanceVisibility = () => {
   position: relative;
   background: white;
   border-radius: 1rem;
-  padding: 1.25rem;
+  padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--input-outline);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .account-item:active {
@@ -171,8 +174,8 @@ const toggleBalanceVisibility = () => {
 
 /* 은행 로고 */
 .bank-logo {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 50%;
   object-fit: contain;
   flex-shrink: 0;
@@ -182,6 +185,7 @@ const toggleBalanceVisibility = () => {
 .account-info {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .info-top {
@@ -189,6 +193,7 @@ const toggleBalanceVisibility = () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.25rem;
+  width: 100%;
 }
 
 .name-section {
@@ -196,6 +201,8 @@ const toggleBalanceVisibility = () => {
   align-items: center;
   gap: 0.5rem;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .bank-name {
@@ -208,6 +215,11 @@ const toggleBalanceVisibility = () => {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-darkgray);
+  /* 긴 계좌명 말줄임표 처리 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* 대표 뱃지 - 라벤더 색상으로 변경 */
@@ -218,7 +230,6 @@ const toggleBalanceVisibility = () => {
   font-weight: 600;
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
-  margin-left: 0.25rem;
   flex-shrink: 0;
 }
 
@@ -254,10 +265,15 @@ const toggleBalanceVisibility = () => {
   font-size: 0.75rem;
   color: var(--text-lightgray);
   margin: 0.25rem 0;
+  /* 긴 계좌번호 말줄임표 처리 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .balance {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--base-blue-dark);
   margin: 0;
