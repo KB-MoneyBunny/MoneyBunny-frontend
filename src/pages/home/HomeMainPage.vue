@@ -1,5 +1,10 @@
 <template>
   <div class="homeContainer">
+    <!-- 비로그인 -->
+    <!-- <HomeGuestPanel v-if="!isAuthed" /> -->
+
+    <!-- 로그인 후 -->
+    <!-- <template v-else> -->
     <HomeSummaryCard :top3-total-amount="top3TotalAmount" />
     <!-- <TotalSummaryCard ref="totalSummaryCardRef" /> -->
 
@@ -14,11 +19,13 @@
     <!-- <DailyMessageCard class="tightTopMargin" /> -->
 
     <PolicyBannerCarousel :items="top3Banners" :interval="5000" />
+    <!-- </template> -->
   </div>
 </template>
 
 <script setup>
 import { ref, watch, nextTick } from 'vue';
+import HomeGuestPanel from './HomeGuestPanel.vue';
 import HomeSummaryCard from './main/HomeSummaryCard.vue';
 import TotalSummaryCard from '@/pages/home/main/TotalSummaryCard.vue';
 import AssetCompareCard from '@/pages/home/main/AssetCompareCard.vue';
@@ -41,6 +48,15 @@ const top3TotalAmount = ref(0);
 // 캐러셀 데이터 (TOP3)
 const top3Banners = [
   {
+    policyId: null,
+    title: '인기 정책 TOP3',
+    description: '이번 주 가장 많이 보는 지원금',
+    tag: '',
+    deadline: null,
+    amount: null,
+    image: banner5,
+  },
+  {
     policyId: 42,
     title: '청년월세 한시 특별지원',
     description: '월 최대 20만원을 최대 12개월 지원합니다.',
@@ -54,7 +70,7 @@ const top3Banners = [
     title: '제대군인 전직지원금',
     description: '전직 준비를 위한 체계적 지원 프로그램.',
     amount: 486000,
-    tag: '추천',
+    tag: '인기',
     deadline: 30, // D-30
     image: banner2,
   },
@@ -63,7 +79,7 @@ const top3Banners = [
     title: '해외취업정착지원금',
     description: '취업 후 정착을 위한 현금 지원.',
     amount: 500000,
-    tag: 'HOT',
+    tag: '인기',
     image: banner3,
   },
 ];

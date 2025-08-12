@@ -93,27 +93,17 @@ function onCtaClick() {
   display: flex;
   align-items: center;
   gap: 12px;
-
   min-height: 128px;
+  width: 100%;
   isolation: isolate;
 }
 
 .left {
-  /* flex: 1 1 auto; */
   min-width: 0;
-
-  /* ✅ 토끼 자리 확보: 96(토끼) + 12(우측 여백) */
   width: 210px;
 }
 
-/* ✅ 토끼를 카드 오른쪽에 ‘절대 고정’ */
 .right {
-  /* position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%); */
-  /* position: absolute; */
-  /* right: 8px; */
   width: 96px;
   height: 96px;
   pointer-events: none;

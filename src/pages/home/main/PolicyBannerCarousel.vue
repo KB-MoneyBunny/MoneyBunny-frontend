@@ -137,6 +137,7 @@ const trackStyle = computed(() => {
   width: 100%;
   overflow: hidden;
   border-radius: 6px;
+  border: 1.5px solid rgba(44, 62, 80, 0.06);
 }
 .track {
   display: flex;
