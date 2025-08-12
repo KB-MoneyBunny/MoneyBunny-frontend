@@ -14,6 +14,8 @@ import PolicyApplyTab from './PolicyApplyTab.vue';
 import PolicyApplyStatusModal from '../component/PolicyApplyStatusModal.vue';
 // 💪(상일) Safari 안내 모달
 import SafariGuideModal from './SafariGuideModal.vue';
+// 💪(상일) 조건 미충족 시 리뷰 작성용 모달
+import ReviewModal from '@/pages/mypage/application/ReviewModal.vue';
 
 // 실제 데이터(예시)
 const ALL_POLICIES = [
@@ -89,6 +91,9 @@ const totalReviews = ref(0);
 // 💪(상일) 미완료 신청 체크용
 const currentApplication = ref(null);
 const showStatusModal = ref(false);
+// 💪(상일) 리뷰 모달 상태
+const showReviewModal = ref(false);
+const reviewPolicyInfo = ref(null);
 
 // 정책 상세 API 호출
 async function fetchPolicyDetail(id) {
@@ -165,10 +170,17 @@ const handleStatusSubmit = async (status) => {
         break;
 
       case 'notEligible':
-        // 💪(상일) 조건 미충족으로 신청 불가한 경우 신청 기록 삭제
+        // 💪(상일) 조건 미충족으로 신청 불가한 경우 신청 기록 삭제 후 리뷰 작성
         await policyInteractionAPI.removeApplication(
           currentApplication.value.policyId
         );
+        // 💪(상일) 즉시 리뷰 모달 표시
+        reviewPolicyInfo.value = {
+          policyId: currentApplication.value.policyId,
+          policyTitle: currentApplication.value.title,
+          benefitStatus: 'NOT_ELIGIBLE'
+        };
+        showReviewModal.value = true;
         break;
     }
   } catch (error) {
@@ -235,6 +247,19 @@ onMounted(async () => {
   if (policyId.value) await fetchReviewCount();
 });
 
+// 💪(상일) 리뷰 저장 처리
+const handleReviewSave = async (reviewData) => {
+  try {
+    await policyInteractionAPI.addReview(reviewPolicyInfo.value.policyId, reviewData);
+    alert('후기 작성이 완료되었습니다!');
+    showReviewModal.value = false;
+    reviewPolicyInfo.value = null;
+  } catch (error) {
+    console.error('리뷰 저장 실패:', error);
+    alert('후기 작성에 실패했습니다. 다시 시도해주세요.');
+  }
+};
+
 // ✅ 정책이 바뀌면 다시 카운트 가져오기
 watch(policyId, (v) => {
   if (v) fetchReviewCount();
@@ -284,6 +309,17 @@ watch(policyId, (v) => {
         showStatusModal = false;
       }
     "
+  />
+  
+  <!-- 💪(상일) 조건 미충족 시 리뷰 작성 모달 -->
+  <ReviewModal
+    v-if="showReviewModal"
+    :policy-id="reviewPolicyInfo?.policyId"
+    :policy-title="reviewPolicyInfo?.policyTitle"
+    :benefit-status="reviewPolicyInfo?.benefitStatus"
+    :is-edit="false"
+    @close="showReviewModal = false"
+    @save="handleReviewSave"
   />
 </template>
 
