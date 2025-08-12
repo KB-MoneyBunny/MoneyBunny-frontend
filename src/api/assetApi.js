@@ -31,6 +31,13 @@ export async function fetchCardTransactions(
   return axios.get(`/api/asset/cards/${cardId}/transactions`, { params });
 }
 
+/**
+ * 카드 교통비 내역 전체 조회 (파라미터 없음)
+ */
+export async function fetchCardTransportationFees() {
+  return axios.get('/api/asset/cards/transportation-fees');
+}
+
 // **CODEF 연동만 codefInstance로**
 export async function connectAccount({ organization, loginId, password }) {
   return codefInstance.post('/api/codef/connect-account', {
