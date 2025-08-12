@@ -64,14 +64,14 @@
               @click="openTransactionDetail(t)"
             >
               <div class="transaction-info">
-                <p class="transaction-meta">
+                <p class="transaction-date">
                   {{ formatTransactionDate(t.date) }}
                 </p>
                 <p class="transaction-title">
                   {{ getTransactionTitle(t) }}
                 </p>
                 <!-- 메모가 있으면 표시 -->
-                <p v-if="t.memo" class="transaction-meta">
+                <p v-if="t.memo" class="transaction-memo">
                   {{ t.memo }}
                 </p>
               </div>
@@ -404,18 +404,24 @@ const formatTransactionDate = (d) => {
   color: var(--text-bluegray);
 }
 
-/* 목록 */
+/* 거래내역 아이템 */
 .transaction-item {
   display: flex;
   align-items: center;
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--input-bg-3);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent; /* iOS 터치 하이라이트 제거 */
+  user-select: none; /* 텍스트 선택 방지 */
 }
+
+/* 터치/클릭 시 색상 변화 (모바일 앱 스타일) */
 .transaction-item:active {
   background-color: var(--input-bg-1);
+  border-radius: 0.5rem;
+  margin: 0 -0.75rem;
+  padding: 0.75rem;
 }
+
 .transaction-item:last-child {
   border-bottom: none;
 }
@@ -423,6 +429,15 @@ const formatTransactionDate = (d) => {
 .transaction-info {
   flex: 1;
 }
+
+/* 거래 날짜 (상단) */
+.transaction-date {
+  font-size: 0.75rem;
+  color: var(--text-bluegray);
+  margin: 0 0 0.375rem 0; /* 날짜와 제목 사이 간격 조정 */
+}
+
+/* 거래 제목 (중간) */
 .transaction-title {
   font-size: 0.875rem;
   font-weight: 600;
@@ -430,13 +445,17 @@ const formatTransactionDate = (d) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.25rem 0; /* 제목과 메모 사이 간격 */
 }
-.transaction-meta {
+
+/* 거래 메모 (하단) */
+.transaction-memo {
   font-size: 0.75rem;
   color: var(--text-bluegray);
   margin: 0;
 }
+
+/* 거래 금액 */
 .transaction-amount .amount-text {
   font-size: 0.875rem;
   font-weight: 600;

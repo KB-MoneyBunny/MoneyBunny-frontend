@@ -46,7 +46,7 @@
             <div class="detail-item" v-if="localTx.category">
               <span class="detail-label">카테고리</span>
               <div class="category-edit-section">
-                <span class="category-tag">{{ localTx.category }}</span>
+                <span class="category-tag-inline">{{ localTx.category }}</span>
                 <button
                   class="edit-category-btn"
                   @click="openCategoryEditModal"
@@ -385,30 +385,46 @@ const handleCategorySave = (updatedCategory) => {
 .memo-save:active {
   transform: scale(0.98);
 }
+
+/* 카테고리 편집 섹션 - 나란히 한 줄 배치 */
 .category-edit-section {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 0.5rem;
 }
+
+/* 인라인 카테고리 태그 (작은 버전) */
+.category-tag-inline {
+  background: var(--base-blue-light);
+  color: var(--base-blue-dark);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/* 편집 버튼 */
 .edit-category-btn {
   background: none;
   border: none;
   padding: 0.25rem;
-  cursor: pointer;
   border-radius: 0.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 .edit-category-btn:active {
   background: var(--input-bg-1);
   transform: scale(0.95);
 }
+
+/* 편집 아이콘 */
 .edit-icon {
   width: 1rem;
   height: 1rem;
 }
+
 .confirm-btn {
   background: var(--base-blue-dark);
   color: white;
