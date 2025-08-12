@@ -78,3 +78,24 @@ export function updateAccountTransactionMemo(transactionId, memo) {
 export function updateCardTransactionMemo(transactionId, memo) {
   return axios.post(`/api/asset/cards/${transactionId}/memo`, { memo });
 }
+
+// 지출 개요
+export async function fetchSpendingOverview({ year, month, trendMonths = 6 }) {
+  return axios.get('/api/asset/spending/overview', {
+    params: { year, month, trendMonths },
+  });
+}
+
+// 카테고리별 거래 전체 조회
+export async function fetchCategoryTransactions({ categoryId, year, month }) {
+  return axios.get(`/api/asset/spending/category/${categoryId}`, {
+    params: { year, month },
+  });
+}
+
+// 카테고리 변경
+export function updateTransactionCategory(transactionId, categoryId) {
+  return axios.patch(`/api/asset/transactions/${transactionId}/category`, {
+    categoryId,
+  });
+}
