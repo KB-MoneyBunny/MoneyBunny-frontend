@@ -44,9 +44,9 @@
 import { ref } from 'vue';
 
 import DetailHeader from '../detail/DetailHeader.vue';
-import DetailInfoCard from '../detail/DetailInfoCard.vue';
+import DetailInfoCard from '../detail/DetailSummaryCard.vue';
 // 🥕 변경: SearchFilterHeader import 추가, AccountFilterModal import 추가
-import SearchFilterHeader from '../common/SearchFilterHeader.vue';
+import SearchFilterHeader from '../detail/SearchFilterHeader.vue';
 import AccountFilterModal from '../account/AccountFilterModal.vue';
 import TransactionList from '../detail/TransactionList.vue';
 import TransactionDetailModal from '../detail/TransactionDetailModal.vue';
