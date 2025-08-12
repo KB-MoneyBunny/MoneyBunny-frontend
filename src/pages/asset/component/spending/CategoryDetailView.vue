@@ -101,7 +101,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import DetailHeader from '../detail/DetailHeader.vue';
-import DetailInfoCard from '../detail/DetailInfoCard.vue';
+import DetailInfoCard from '../detail/DetailSummaryCard.vue';
 import TransactionFilter from '../detail/TransactionFilter.vue';
 import CategoryTransactionDetailModal from '../detail/CategoryTransactionDetailModal.vue';
 
