@@ -58,18 +58,47 @@ export const policyInteractionAPI = {
       params: { benefitStatus }
     }),
   
-  // 내 리뷰 조회
-  getMyReview: (policyId, benefitStatus) => 
-    axios.get(`/api/policy-interaction/review/${policyId}/my`, {
-      params: { benefitStatus }
-    }),
+  // 💪(상일) 내 리뷰 조회 (404 에러 조용히 처리)
+  getMyReview: async (policyId, benefitStatus) => {
+    try {
+      return await axios.get(`/api/policy-interaction/review/${policyId}/my`, {
+        params: { benefitStatus }
+      });
+    } catch (error) {
+      // 404는 리뷰가 없는 정상 상황이므로 조용히 처리
+      if (error.response?.status === 404) {
+        return { data: null };
+      }
+      throw error; // 다른 에러는 그대로 throw
+    }
+  },
   
   // 정책별 리뷰 목록 조회
   getPolicyReviews: (policyId) => 
     axios.get(`/api/policy-interaction/review/${policyId}/list`),
   
+  // 💪(상일) 정책별 리뷰 목록 조회 (좋아요 상태 포함)
+  getPolicyReviewsWithLikeStatus: (policyId) => 
+    axios.get(`/api/policy-interaction/review/${policyId}/list/with-like-status`),
+  
   // 내가 작성한 모든 리뷰 조회
-  getMyReviews: () => axios.get('/api/policy-interaction/review/my-list')
+  getMyReviews: () => axios.get('/api/policy-interaction/review/my-list'),
+
+  // ────────────────────────────────────────
+  // 📌 좋아요 관련 API (Redis 기반)
+  // ────────────────────────────────────────
+  
+  // 리뷰 좋아요 추가
+  addReviewLike: (reviewId) => 
+    axios.post(`/api/policy-interaction/review/${reviewId}/like`),
+  
+  // 리뷰 좋아요 취소
+  removeReviewLike: (reviewId) => 
+    axios.delete(`/api/policy-interaction/review/${reviewId}/like`),
+  
+  // 리뷰 좋아요 수 조회
+  getReviewLikeCount: (reviewId) => 
+    axios.get(`/api/policy-interaction/review/${reviewId}/like/count`)
 };
 
 // 💪(상일) 기존 bookmarkAPI 호환성 유지를 위한 export
