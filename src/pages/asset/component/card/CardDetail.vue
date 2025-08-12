@@ -1,7 +1,7 @@
 <template>
   <div class="card-detail">
     <DetailHeader title="카드 상세" @back="onClose" />
-    <DetailInfoCard type="card" :data="cardData" />
+    <DetailSummaryCard type="card" :data="cardData" />
 
     <!-- 🥕 변경: TransactionFilter → SearchFilterHeader -->
     <SearchFilterHeader
@@ -45,7 +45,7 @@
 import { ref } from 'vue';
 
 import DetailHeader from '../detail/DetailHeader.vue';
-import DetailInfoCard from '../detail/DetailSummaryCard.vue';
+import DetailSummaryCard from '../detail/DetailSummaryCard.vue';
 // 🥕 변경: TransactionFilter → SearchFilterHeader, CardFilterModal import 추가
 import SearchFilterHeader from '../detail/SearchFilterHeader.vue';
 import CardFilterModal from '../card/CardFilterModal.vue';

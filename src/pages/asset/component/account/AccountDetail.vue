@@ -1,7 +1,7 @@
 <template>
   <div class="account-detail">
     <DetailHeader title="계좌 상세" @back="onClose" />
-    <DetailInfoCard type="account" :data="accountData" />
+    <DetailSummaryCard type="account" :data="accountData" />
 
     <!-- 🥕 변경: AccountTransactionFilter → SearchFilterHeader -->
     <SearchFilterHeader
@@ -44,7 +44,7 @@
 import { ref } from 'vue';
 
 import DetailHeader from '../detail/DetailHeader.vue';
-import DetailInfoCard from '../detail/DetailSummaryCard.vue';
+import DetailSummaryCard from '../detail/DetailSummaryCard.vue';
 // 🥕 변경: SearchFilterHeader import 추가, AccountFilterModal import 추가
 import SearchFilterHeader from '../detail/SearchFilterHeader.vue';
 import AccountFilterModal from '../account/AccountFilterModal.vue';
@@ -129,9 +129,9 @@ const onFilterApply = (appliedFilters) => {
   advancedFilters.value = { ...appliedFilters };
 
   // 기본 필터 업데이트
-  if (appliedFilters.transactionType === '입금만') {
+  if (appliedFilters.transactionType === '입금') {
     filter.value = '입금';
-  } else if (appliedFilters.transactionType === '출금만') {
+  } else if (appliedFilters.transactionType === '출금') {
     filter.value = '출금';
   } else {
     filter.value = '전체';
