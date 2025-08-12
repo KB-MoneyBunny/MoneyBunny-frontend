@@ -52,9 +52,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useAuthStore } from "@/stores/auth";
-import { bookmarkAPI } from "@/api/policyInteraction";
+import { ref, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { bookmarkAPI } from '@/api/policyInteraction';
 
 import ShareModal from './ShareModal.vue';
 import PolicyApplyModal from '../component/PolicyApplyModal.vue';
@@ -135,13 +135,17 @@ const normalizeUrl = (url) => {
   return url;
 };
 
+// 바로 신청하기 버튼 클릭 시 신청 URL 우선순위(refUrl1 → refUrl2 → applyUrl)
 function openApplyModal(policy) {
-  // applyUrl 이 www.xxx 로 시작하면 프로토콜 붙이고, 아니면 그대로
-  const fixedUrl = normalizeUrl(policy.applyUrl);
-  selectedPolicy.value = { 
-    ...policy, 
+  let url = policy.applyUrl;
+  if (!url) {
+    url = policy.refUrl1 || policy.refUrl2 || '';
+  }
+  const fixedUrl = normalizeUrl(url);
+  selectedPolicy.value = {
+    ...policy,
     applyUrl: fixedUrl,
-    policyId: policy.policyId || policy.id // 💪(상일) policyId 확실히 전달
+    policyId: policy.policyId || policy.id, // 💪(상일) policyId 확실히 전달
   };
   showApplyModal.value = true;
 }
@@ -155,7 +159,7 @@ const handleShowStatusModal = (applicationData) => {
   // 신청 모달 닫기
   showApplyModal.value = false;
   selectedPolicy.value = null;
-  
+
   // 부모 컴포넌트(PolicyDetailPage)로 이벤트 전달
   emit('showStatusModal', applicationData);
 };
