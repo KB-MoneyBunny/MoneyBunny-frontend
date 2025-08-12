@@ -4,16 +4,8 @@
     <!-- 헤더 -->
     <DetailHeader :title="headerTitle" @back="$emit('back')" />
 
-    <!-- 필터 + 월 선택 -->
-    <TransactionFilter
-      v-model="currentFilter"
-      :current-month="selectedMonth"
-      type="category"
-      @month-change="handleMonthChange"
-    />
-
     <!-- 카테고리 정보 + 거래내역 카드 -->
-    <DetailInfoCard>
+    <DetailSummaryCard>
       <!-- 카테고리 아이콘 -->
       <template #custom-icon>
         <div
@@ -39,9 +31,20 @@
       <!-- 거래내역 리스트 -->
       <template #additional>
         <div class="transaction-section">
+          <!-- 섹션 헤더: 제목 + 건수 + 월 선택 -->
           <div class="section-header">
-            <h4 class="section-title">거래 내역</h4>
-            <span class="transaction-count"> {{ transactions.length }}건 </span>
+            <div class="header-left">
+              <h4 class="section-title">거래 내역</h4>
+              <span class="transaction-count">
+                {{ transactions.length }}건
+              </span>
+            </div>
+
+            <!-- 월 선택 드롭다운 -->
+            <CategoryMonthSelector
+              :current-month="selectedMonth"
+              @month-change="handleMonthChange"
+            />
           </div>
 
           <!-- 로딩 -->
@@ -67,7 +70,7 @@
                 <p class="transaction-title">
                   {{ getTransactionTitle(t) }}
                 </p>
-                <!-- ✅ 메모는 텍스트로 노출 (이전 코드의 날짜포맷 버그 수정) -->
+                <!-- 메모가 있으면 표시 -->
                 <p v-if="t.memo" class="transaction-meta">
                   {{ t.memo }}
                 </p>
@@ -90,7 +93,7 @@
           </div>
         </div>
       </template>
-    </DetailInfoCard>
+    </DetailSummaryCard>
 
     <!-- 거래 상세 모달 -->
     <CategoryTransactionDetailModal
@@ -106,8 +109,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import DetailHeader from '../detail/DetailHeader.vue';
-import DetailInfoCard from '../detail/DetailSummaryCard.vue';
-import TransactionFilter from '../detail/TransactionFilter.vue';
+import DetailSummaryCard from '../detail/DetailSummaryCard.vue';
+import CategoryMonthSelector from '../detail/CategoryMonthSelector.vue';
 import CategoryTransactionDetailModal from '../detail/CategoryTransactionDetailModal.vue';
 import {
   fetchCategoryTransactions,
@@ -117,7 +120,7 @@ import {
 import { categoryMap } from '@/constants/categoryMap';
 
 const props = defineProps({
-  // AssetMain에서 { id, name, color, transactions? } 형태로 전달해줘야 합니다.
+  // AssetMain에서 { id, name, color, transactions? } 형태로 전달
   categoryData: {
     type: Object,
     required: true,
@@ -134,7 +137,6 @@ const emit = defineEmits(['back']);
 
 const currentDate = ref(new Date(props.selectedDate));
 const selectedMonth = ref(currentDate.value.toISOString().slice(0, 7)); // YYYY-MM
-const currentFilter = ref('전체');
 
 const loading = ref(false);
 const transactions = ref([]); // 내부 운용 목록
@@ -152,10 +154,10 @@ const nameToId = Object.fromEntries(
   Object.entries(categoryMap || {}).map(([id, name]) => [name, Number(id)])
 );
 
-// ✅ 유틸: 트랜잭션 ID 추출
+// 유틸: 트랜잭션 ID 추출
 const getTxId = (tx) => tx?.transactionId ?? tx?.id;
 
-// ✅ 유틸: 리스트에서 특정 거래 패치
+// 유틸: 리스트에서 특정 거래 패치
 const patchTxInList = (transactionId, patch) => {
   const idx = transactions.value.findIndex((t) => getTxId(t) === transactionId);
   if (idx !== -1) {
@@ -170,7 +172,7 @@ const patchTxInList = (transactionId, patch) => {
   }
 };
 
-// ✅ 유틸: 리스트에서 특정 거래 제거
+// 유틸: 리스트에서 특정 거래 제거
 const removeTxFromList = (transactionId) => {
   const idx = transactions.value.findIndex((t) => getTxId(t) === transactionId);
   if (idx !== -1) {
@@ -279,9 +281,7 @@ const closeTransactionDetail = () => {
   selectedTransaction.value = {};
 };
 
-// =============================
-// ✅ 메모 업데이트 (자식 emit → API → 목록/모달 반영)
-// =============================
+// 메모 업데이트 (자식 emit → API → 목록/모달 반영)
 const onMemoUpdated = async ({ transactionId, memo }) => {
   try {
     await updateCardTransactionMemo(transactionId, memo);
@@ -292,9 +292,7 @@ const onMemoUpdated = async ({ transactionId, memo }) => {
   }
 };
 
-// =============================
-// ✅ 카테고리 변경 (자식 emit → API → 목록/합계 반영)
-// =============================
+// 카테고리 변경 (자식 emit → API → 목록/합계 반영)
 const onCategoryUpdated = async ({ transactionId, category }) => {
   try {
     const newCategoryId = nameToId[category];
@@ -386,6 +384,12 @@ const formatTransactionDate = (d) => {
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--input-bg-3);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .section-title {
