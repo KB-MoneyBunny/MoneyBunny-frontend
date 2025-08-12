@@ -86,7 +86,9 @@ const etcNotes = computed(() => props.policy?.etcNotes || '');
     <!-- 기타 정보 -->
     <div v-if="etcNotes" class="font-15 font-bold mt-3 mb-2">기타 정보</div>
     <div v-if="etcNotes" class="etcBox font-11">
-      {{ etcNotes }}
+      <div v-for="(note, idx) in splitLines(etcNotes)" :key="idx">
+        {{ note }}
+      </div>
     </div>
   </div>
 </template>

@@ -7,8 +7,8 @@ import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
 
 const profileImages = [imgSprout, imgBeard, imgEyelash, imgCarrot];
 
-// ❗ 숫자 ID만 주고받자
-const props = defineProps({ modelValue: Number });
+// 숫자 ID만 주고받자
+const props = defineProps({ modelValue: { type: Number, default: 0 } });
 const emit = defineEmits(["close", "update:modelValue", "save"]);
 
 // 선택된 ID (0~3)
@@ -32,6 +32,22 @@ const choose = (i) => {
 
 // 저장 -> 숫자 ID로 save 이벤트
 const onSave = () => emit("save", selectedId.value);
+
+// 픽커 내부 토스트
+const showToast = ref(false);
+const toastMessage = ref("");
+
+// 부모가 호출할 공개 함수
+function showSavedToast(msg = "프로필 이미지가 변경되었습니다!") {
+  toastMessage.value = msg;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+    emit("close"); // 잠깐 보여주고 팝업 닫기
+  }, 1200);
+}
+
+defineExpose({ showSavedToast });
 </script>
 
 <template>
@@ -47,6 +63,11 @@ const onSave = () => emit("save", selectedId.value);
           />
         </button>
       </div>
+
+      <!-- 픽커 내부 토스트 -->
+      <transition name="fade">
+        <div v-if="showToast" class="pickerToast">{{ toastMessage }}</div>
+      </transition>
 
       <div class="imageGrid">
         <button
@@ -79,6 +100,7 @@ const onSave = () => emit("save", selectedId.value);
   z-index: 10000;
 }
 .pickerContainer {
+  position: relative; /* 토스트 위치 기준 */
   background: #fff;
   border-radius: 6px;
   max-width: 280px;
@@ -96,7 +118,21 @@ const onSave = () => emit("save", selectedId.value);
   align-items: center;
   margin-bottom: 20px;
 }
-
+/* 픽커 내부 토스트 */
+.pickerToast {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  background: var(--base-blue-dark);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+  z-index: 10001;
+  pointer-events: none;
+}
 .pickerClose {
   background: none;
   border: none;
@@ -139,7 +175,7 @@ const onSave = () => emit("save", selectedId.value);
   box-shadow: 0 0 0 2px var(--base-blue-dark);
 }
 
-/* ✅ 저장 버튼 */
+/* 저장 버튼 */
 .saveBtn {
   margin-top: 18px;
   width: 100%;
@@ -150,5 +186,13 @@ const onSave = () => emit("save", selectedId.value);
   color: #fff;
   font-size: 13px;
   cursor: pointer;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
