@@ -6,11 +6,11 @@
       <div class="modal-header">
         <h2>필터</h2>
         <button class="close-btn" @click="closeModal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-            />
-          </svg>
+          <img
+            src="@/assets/images/icons/common/x.png"
+            alt="닫기"
+            class="close-icon"
+          />
         </button>
       </div>
 
@@ -62,15 +62,15 @@
           <h3>유형선택</h3>
           <div class="type-buttons">
             <button
-              v-for="type in transactionTypes"
-              :key="type"
+              v-for="transactionType in transactionTypes"
+              :key="transactionType"
               :class="[
                 'type-btn',
-                { active: localFilters.transactionType === type },
+                { active: localFilters.transactionType === transactionType },
               ]"
-              @click="localFilters.transactionType = type"
+              @click="localFilters.transactionType = transactionType"
             >
-              {{ type }}
+              {{ transactionType }}
             </button>
           </div>
         </div>
@@ -106,6 +106,11 @@ import { useTransactionFilterStore } from '@/stores/transactionFilter';
 
 const props = defineProps({
   show: { type: Boolean, required: true },
+  type: {
+    type: String,
+    required: true,
+    validator: (value) => ['account', 'card'].includes(value),
+  },
 });
 
 const emit = defineEmits(['close', 'apply']);
@@ -115,7 +120,14 @@ const filterStore = useTransactionFilterStore();
 
 // 옵션들
 const periodOptions = ['1개월', '3개월', '6개월', '직접설정'];
-const transactionTypes = ['전체', '입금', '출금'];
+
+// 타입에 따른 거래 유형 옵션
+const transactionTypes = computed(() => {
+  return props.type === 'card'
+    ? ['전체', '지출', '환불'] // 카드: 지출/환불
+    : ['전체', '입금', '출금']; // 계좌: 입금/출금
+});
+
 const sortOptions = ['최신순', '과거순'];
 
 // 로컬 필터 상태 (모달 내에서만 사용, 확인 버튼 클릭 시 store에 반영)
@@ -177,7 +189,7 @@ function setPeriod(period) {
     localFilters.value.dateRange.startDate = dateRange.startDate;
     localFilters.value.dateRange.endDate = dateRange.endDate;
   } else {
-    // 직접설정인 경우 기존 날짜 유지하거나 빈 값
+    // 직접설정인 경우 기존 날짜 유지하거나 기본값 설정
     if (!localFilters.value.dateRange.startDate) {
       const defaultRange = calculateDateRange('3개월');
       localFilters.value.dateRange.startDate = defaultRange.startDate;
@@ -205,14 +217,18 @@ function resetFilters() {
 
 // 필터 적용
 function applyFilters() {
-  // Store에 필터 상태 저장
-  filterStore.setSearchKeyword('account', localFilters.value.searchKeyword);
-  filterStore.setDateRange('account', localFilters.value.dateRange);
-  filterStore.setTransactionType('account', localFilters.value.transactionType);
-  filterStore.setSortBy('account', localFilters.value.sortBy);
+  // Store에 필터 상태 저장 (type에 따라 분기)
+  filterStore.setSearchKeyword(props.type, localFilters.value.searchKeyword);
+  filterStore.setDateRange(props.type, localFilters.value.dateRange);
+  filterStore.setTransactionType(
+    props.type,
+    localFilters.value.transactionType
+  );
+  filterStore.setSortBy(props.type, localFilters.value.sortBy);
 
   // 부모에게 적용 이벤트 전달
   emit('apply', localFilters.value);
+  closeModal();
 }
 
 // 모달 닫기
@@ -225,7 +241,7 @@ watch(
   () => props.show,
   (newShow) => {
     if (newShow) {
-      const currentState = filterStore.getFilterState('account');
+      const currentState = filterStore.getFilterState(props.type);
       localFilters.value = {
         searchKeyword: currentState.searchKeyword || '',
         dateRange: {
@@ -262,6 +278,8 @@ watch(
   justify-content: center;
   align-items: flex-end;
   z-index: 2000;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 /* 모달 컨테이너 */
@@ -273,6 +291,15 @@ watch(
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  transform: translateY(100%);
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+/* 슬라이드 업 애니메이션 */
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+  }
 }
 
 /* 모달 헤더 */
@@ -282,6 +309,8 @@ watch(
   align-items: center;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--input-bg-3);
+  background: white;
+  border-radius: 1rem 1rem 0 0;
 }
 
 .modal-header h2 {
@@ -296,7 +325,21 @@ watch(
   border: none;
   color: var(--text-darkgray);
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:active {
+  background-color: var(--input-bg-1);
+}
+
+.close-icon {
+  width: 20px;
+  height: 20px;
 }
 
 /* 모달 내용 */
@@ -304,6 +347,7 @@ watch(
   flex: 1;
   padding: 1.25rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 필터 섹션 */
@@ -326,6 +370,7 @@ watch(
   border-radius: 0.5rem;
   font-size: 0.875rem;
   box-sizing: border-box;
+  transition: border-color 0.2s ease;
 }
 
 .search-input:focus {
@@ -342,7 +387,7 @@ watch(
 }
 
 .period-tab {
-  padding: 0.6rem 0.5rem;
+  padding: 0.75rem 0.5rem;
   border: 1px solid var(--input-bg-3);
   border-radius: 0.5rem;
   background: white;
@@ -350,6 +395,14 @@ watch(
   color: var(--text-darkgray);
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px; /* 터치 친화적 최소 높이 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.period-tab:active {
+  transform: scale(0.98);
 }
 
 .period-tab.active {
@@ -374,15 +427,17 @@ watch(
   font-size: 0.8rem;
   color: var(--text-darkgray);
   margin-bottom: 0.25rem;
+  font-weight: 500;
 }
 
 .date-input {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.75rem;
   border: 1px solid var(--input-bg-3);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   box-sizing: border-box;
+  transition: border-color 0.2s ease;
 }
 
 .date-input:focus {
@@ -398,7 +453,7 @@ watch(
 }
 
 .type-btn {
-  padding: 0.6rem 0.5rem;
+  padding: 0.75rem 0.5rem;
   border: 1px solid var(--input-bg-3);
   border-radius: 0.5rem;
   background: white;
@@ -406,6 +461,14 @@ watch(
   color: var(--text-darkgray);
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px; /* 터치 친화적 최소 높이 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.type-btn:active {
+  transform: scale(0.98);
 }
 
 .type-btn.active {
@@ -422,7 +485,7 @@ watch(
 }
 
 .sort-btn {
-  padding: 0.6rem 0.5rem;
+  padding: 0.75rem 0.5rem;
   border: 1px solid var(--input-bg-3);
   border-radius: 0.5rem;
   background: white;
@@ -430,6 +493,14 @@ watch(
   color: var(--text-darkgray);
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px; /* 터치 친화적 최소 높이 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sort-btn:active {
+  transform: scale(0.98);
 }
 
 .sort-btn.active {
@@ -444,6 +515,7 @@ watch(
   gap: 0.75rem;
   padding: 1rem 1.25rem;
   border-top: 1px solid var(--input-bg-3);
+  background: white;
 }
 
 .reset-btn {
@@ -456,6 +528,8 @@ watch(
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 48px; /* 터치 친화적 최소 높이 */
 }
 
 .confirm-btn {
@@ -468,10 +542,29 @@ watch(
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 48px; /* 터치 친화적 최소 높이 */
 }
 
 .reset-btn:active,
 .confirm-btn:active {
   transform: scale(0.98);
+}
+
+.confirm-btn:active {
+  background: var(--base-lavender);
+}
+
+/* 터치 디바이스에서 더 나은 스크롤링 */
+@media (max-width: 768px) {
+  .modal-content {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* iOS Safari의 바운스 효과 방지 */
+  .modal-overlay {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
 }
 </style>
