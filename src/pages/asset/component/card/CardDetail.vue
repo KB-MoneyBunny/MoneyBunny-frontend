@@ -12,9 +12,10 @@
       @filter-modal-open="openFilterModal"
     />
 
-    <!-- 🥕 추가: CardFilterModal -->
-    <CardFilterModal
+    <!-- 🥕 수정: 통합된 TransactionFilterModal 사용 -->
+    <TransactionFilterModal
       :show="showFilterModal"
+      type="card"
       @close="closeFilterModal"
       @apply="onFilterApply"
     />
@@ -46,9 +47,9 @@ import { ref } from 'vue';
 
 import DetailHeader from '../detail/DetailHeader.vue';
 import DetailSummaryCard from '../detail/DetailSummaryCard.vue';
-// 🥕 변경: TransactionFilter → SearchFilterHeader, CardFilterModal import 추가
+// 🥕 변경: 통합된 TransactionFilterModal import
 import SearchFilterHeader from '../detail/SearchFilterHeader.vue';
-import CardFilterModal from '../card/CardFilterModal.vue';
+import TransactionFilterModal from '../detail/TransactionFilterModal.vue';
 import TransactionList from '../detail/TransactionList.vue';
 import TransactionDetailModal from '../detail/TransactionDetailModal.vue';
 
@@ -115,7 +116,7 @@ const onSearchInput = (keyword) => {
   // TransactionList가 자동으로 새로운 검색어로 필터링할 것임
 };
 
-// 🥕 추가: 필터 모달에서 필터 적용
+// 🥕 수정: 필터 모달에서 필터 적용 (통합 모달 대응)
 const onFilterApply = (appliedFilters) => {
   console.log('카드 필터 적용됨:', appliedFilters);
 
@@ -140,8 +141,7 @@ const onFilterApply = (appliedFilters) => {
   const sort = appliedFilters.sortBy === '최신순' ? '최신' : '과거순';
   currentFilterText.value = `${period}·${type}·${sort}`;
 
-  // 모달 닫기
-  closeFilterModal();
+  // 모달은 통합 컴포넌트에서 자동으로 닫힘
 };
 
 // 👇 메모 업데이트 핸들러 (기존 유지)
