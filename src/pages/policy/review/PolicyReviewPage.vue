@@ -73,33 +73,33 @@ const goBack = () => router.back();
 
 async function fetchReviews({ page, size }) {
   const ALL = [
-    // {
-    //   id: 1,
-    //   nickname: '취업성공자123',
-    //   date: '2024.01.15',
-    //   content:
-    //     '정말 좋은 정책이에요! 덕분에 안정적으로 취업할 수 있었고, 회사에서도 적극적으로 지원해줘서 수월하게 진행할 수 있었어요.',
-    //   helpCount: 12,
-    //   helped: false,
-    // },
-    // {
-    //   id: 2,
-    //   nickname: '청년직장인',
-    //   date: '2024.01.10',
-    //   content:
-    //     '신청 과정이 생각보다 복잡하지 않았고 안내가 친절했어요. 2년 근무 조건이 있지만 그만한 가치가 있다고 생각해요.',
-    //   helpCount: 12,
-    //   helped: false,
-    // },
-    // {
-    //   id: 3,
-    //   nickname: '새출발화이팅',
-    //   date: '2024.01.08',
-    //   content:
-    //     '처음엔 반신반의했는데 실제로 지원금을 받고 나니 도움이 많이 됐어요. 회사도 안정적이고 좋습니다.',
-    //   helpCount: 0,
-    //   helped: false,
-    // },
+    {
+      id: 1,
+      nickname: '취업성공자123',
+      date: '2024.01.15',
+      content:
+        '정말 좋은 정책이에요! 덕분에 안정적으로 취업할 수 있었고, 회사에서도 적극적으로 지원해줘서 수월하게 진행할 수 있었어요.',
+      helpCount: 12,
+      helped: false,
+    },
+    {
+      id: 2,
+      nickname: '청년직장인',
+      date: '2024.01.10',
+      content:
+        '신청 과정이 생각보다 복잡하지 않았고 안내가 친절했어요. 2년 근무 조건이 있지만 그만한 가치가 있다고 생각해요.',
+      helpCount: 12,
+      helped: false,
+    },
+    {
+      id: 3,
+      nickname: '새출발화이팅',
+      date: '2024.01.08',
+      content:
+        '처음엔 반신반의했는데 실제로 지원금을 받고 나니 도움이 많이 됐어요. 회사도 안정적이고 좋습니다.',
+      helpCount: 0,
+      helped: false,
+    },
   ];
   const start = (page - 1) * size;
   const end = start + size;

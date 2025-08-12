@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import reviewBunny from '@/assets/images/icons/policy/reviewbunny.png'; // ✅ 추가
+import reviewBunny from '@/assets/images/icons/policy/reviewbunny.png';
 
 defineProps({
   policyTitle: { type: String, default: '' },
@@ -41,10 +41,6 @@ defineEmits(['write']);
 </script>
 
 <style scoped>
-.emptyBlock {
-  /* 그룹 래퍼 (여백/정렬용) */
-}
-
 .card {
   background: #fff;
   border-radius: 6px;
