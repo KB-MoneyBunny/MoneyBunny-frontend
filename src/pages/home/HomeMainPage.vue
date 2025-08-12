@@ -10,7 +10,7 @@
       :totalAsset="totalAsset"
       :top3TotalAmount="top3TotalAmount"
     />
-    <DailyMessageCard class="tightTopMargin" />
+    <!-- <DailyMessageCard class="tightTopMargin" /> -->
   </div>
 </template>
 
@@ -19,7 +19,7 @@ import { ref, watch, nextTick } from 'vue';
 import TotalSummaryCard from '@/pages/home/main/TotalSummaryCard.vue';
 import AssetCompareCard from '@/pages/home/main/AssetCompareCard.vue';
 import PolicyRecommendationCard from '@/pages/home/main/PolicyRecommendationCard.vue';
-import DailyMessageCard from '@/pages/home/main/DailyMessageCard.vue';
+// import DailyMessageCard from '@/pages/home/main/DailyMessageCard.vue';
 
 const totalSummaryCardRef = ref();
 const policyRecommendationCardRef = ref();

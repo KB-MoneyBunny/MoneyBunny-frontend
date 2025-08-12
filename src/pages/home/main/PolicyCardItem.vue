@@ -7,11 +7,11 @@
       </div>
       <div class="right">
         <div class="amount">+{{ amount.toLocaleString() }}원</div>
-        <img
+        <!-- <img
           class="nextIcon"
           src="@/assets/images/icons/home/next.png"
           alt="다음"
-        />
+        /> -->
       </div>
     </div>
   </div>
@@ -101,7 +101,7 @@ function goDetail() {
   white-space: nowrap;
 }
 
-.nextIcon {
+/* .nextIcon {
   width: 13px;
   height: 13px;
   object-fit: contain;
@@ -109,5 +109,5 @@ function goDetail() {
   margin: 0 1px;
   cursor: pointer;
   display: inline-block;
-}
+} */
 </style>
