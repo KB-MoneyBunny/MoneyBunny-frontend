@@ -1,27 +1,37 @@
 <script setup>
-import { ref, watch } from 'vue';
-import imgSprout from '@/assets/images/icons/profile/profile_edit_sprout.png';
-import imgBeard from '@/assets/images/icons/profile/profile_edit_beard.png';
-import imgEyelash from '@/assets/images/icons/profile/profile_edit_eyelash.png';
-import imgCarrot from '@/assets/images/icons/profile/profile_edit_carrot.png';
+import { ref, watch } from "vue";
+import imgSprout from "@/assets/images/icons/profile/profile_edit_sprout.png";
+import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";
+import imgEyelash from "@/assets/images/icons/profile/profile_edit_eyelash.png";
+import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
 
 const profileImages = [imgSprout, imgBeard, imgEyelash, imgCarrot];
-const props = defineProps({ modelValue: String });
-const emit = defineEmits(['close', 'update:modelValue', 'save']);
 
-const selected = ref(props.modelValue || profileImages[0]);
+// ❗ 숫자 ID만 주고받자
+const props = defineProps({ modelValue: Number });
+const emit = defineEmits(["close", "update:modelValue", "save"]);
+
+// 선택된 ID (0~3)
+const selectedId = ref(
+  Number.isInteger(props.modelValue) ? props.modelValue : 0
+);
+
+// 부모 변경 반영
 watch(
   () => props.modelValue,
   (v) => {
-    if (v) selected.value = v;
+    if (Number.isInteger(v)) selectedId.value = v;
   }
 );
 
-const choose = (img) => {
-  selected.value = img;
-  emit('update:modelValue', img);
+// 썸네일 클릭 -> 숫자 ID로 v-model 업데이트
+const choose = (i) => {
+  selectedId.value = i;
+  emit("update:modelValue", i);
 };
-const onSave = () => emit('save', selected.value);
+
+// 저장 -> 숫자 ID로 save 이벤트
+const onSave = () => emit("save", selectedId.value);
 </script>
 
 <template>
@@ -37,18 +47,19 @@ const onSave = () => emit('save', selected.value);
           />
         </button>
       </div>
+
       <div class="imageGrid">
         <button
           v-for="(img, i) in profileImages"
-          :key="img"
+          :key="i"
           class="imageBtn"
-          :class="{ selected: img === modelValue }"
-          @click="choose(img)"
+          :class="{ selected: i === selectedId }"
+          @click="choose(i)"
         >
           <img :src="img" alt="프로필" />
         </button>
       </div>
-      <!-- ✅ 저장 버튼만 추가 -->
+
       <button class="saveBtn" @click="onSave">저장</button>
     </div>
   </div>
