@@ -1,57 +1,78 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
-const props = defineProps({ 
+const props = defineProps({
   policyId: Number,
   policyTitle: String,
   benefitStatus: String,
   isEdit: {
     type: Boolean,
-    default: false
+    default: false,
   },
   existingContent: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(["close", "save", "delete"]);
 
-const reviewContent = ref(props.existingContent || '');
+const reviewContent = ref(props.existingContent || "");
 
 const modalTitle = computed(() => {
-  return props.isEdit ? '후기 수정' : '후기 작성';
+  return props.isEdit ? "후기 수정" : "후기 작성";
 });
 
 const buttonText = computed(() => {
-  return props.isEdit ? '수정' : '작성';
+  return props.isEdit ? "수정" : "작성";
 });
 
 const benefitStatusText = computed(() => {
   const statusMap = {
-    'PENDING': '처리 중',
-    'RECEIVED': '수령 완료', 
-    'NOT_ELIGIBLE': '수령 불가'
+    PENDING: "처리 중",
+    RECEIVED: "수령 완료",
+    NOT_ELIGIBLE: "수령 불가",
   };
   return statusMap[props.benefitStatus] || props.benefitStatus;
 });
 
-const close = () => emit('close');
+// 💪(상일) 혜택 상태별 플레이스홀더 메시지
+const placeholderText = computed(() => {
+  const placeholderMap = {
+    RECEIVED:
+      "예: 신청하고 1주 후 지원금을 받았습니다. 절차가 간단해서 좋았어요!",
+    PENDING:
+      "예: 신청을 완료하고 결과를 기다리고 있습니다. 상담 과정이 친절했어요.",
+    NOT_ELIGIBLE: "예: 소득 분위 조건에 걸려서 신청할 수 없었어요.",
+  };
+  return (
+    placeholderMap[props.benefitStatus] ||
+    "후기 작성을 통해 추천 정확도를 높여보세요!"
+  );
+});
+
+const close = () => emit("close");
 
 const save = () => {
   if (!reviewContent.value.trim()) {
-    alert('후기 내용을 입력해주세요.');
+    alert("후기 내용을 입력해주세요.");
     return;
   }
-  
+
   const reviewData = {
     benefitStatus: props.benefitStatus,
-    content: reviewContent.value.trim()
+    content: reviewContent.value.trim(),
   };
-  
-  emit('save', reviewData);
+
+  emit("save", reviewData);
 };
 
+// 💪(상일) 리뷰 삭제 처리
+const deleteReview = () => {
+  if (confirm("후기를 삭제하시겠습니까?")) {
+    emit("delete");
+  }
+};
 </script>
 
 <template>
@@ -63,27 +84,36 @@ const save = () => {
           <img src="@/assets/images/icons/common/x.png" alt="닫기" />
         </button>
       </header>
-      
+
       <div class="modalContent">
         <div class="policyInfo">
           <div class="policyTitle">{{ policyTitle }}</div>
-          <div class="benefitStatus" :class="`status-${benefitStatus?.toLowerCase()}`">
+          <div
+            class="benefitStatus"
+            :class="`status-${benefitStatus?.toLowerCase()}`"
+          >
             {{ benefitStatusText }}
           </div>
         </div>
-        
+
         <div class="reviewSection">
-          <label class="reviewLabel">후기 내용</label>
-          <textarea 
+          <div class="reviewHeader">
+            <label class="reviewLabel">후기 내용</label>
+            <!-- 💪(상일) 수정 모드일 때만 삭제 버튼 표시 -->
+            <button v-if="isEdit" class="deleteSmallBtn" @click="deleteReview">
+              삭제
+            </button>
+          </div>
+          <textarea
             v-model="reviewContent"
             class="reviewTextarea"
-            placeholder="이 정책에 대한 후기를 작성해주세요..."
+            :placeholder="placeholderText"
             rows="6"
           ></textarea>
           <div class="charCount">{{ reviewContent.length }}/500자</div>
         </div>
       </div>
-      
+
       <div class="modalFooter">
         <button class="cancelBtn" @click="close">취소</button>
         <button class="applyBtn" @click="save">{{ buttonText }}</button>
@@ -181,10 +211,34 @@ const save = () => {
   gap: 8px;
 }
 
+/* 💪(상일) 후기 헤더 - 라벨과 삭제 버튼 */
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .reviewLabel {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-login);
+}
+
+/* 💪(상일) 작은 삭제 버튼 스타일 */
+.deleteSmallBtn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.deleteSmallBtn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 .reviewTextarea {
@@ -234,7 +288,7 @@ const save = () => {
   cursor: pointer;
 }
 
-
+/* 💪(상일) 모달 버튼은 작성/수정 관계없이 동일한 색상 */
 .applyBtn {
   flex: 2;
   padding: 10px 0;
