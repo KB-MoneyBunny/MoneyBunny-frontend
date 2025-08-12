@@ -3,12 +3,10 @@ import { ref, computed } from "vue";
 import { policyInteractionAPI } from "@/api/policyInteraction";
 
 export const useApplicationStore = defineStore("application", () => {
-  // 💪(상일) 신청 정책 관련 상태 관리 및 캐싱
+  // 신청 정책 관련 상태 관리
   const applications = ref([]);
   const loading = ref(false);
   const error = ref(null);
-  const lastFetchTime = ref(null);
-  const CACHE_DURATION = 5 * 60 * 1000; // 5분 캐시
 
   // 계산된 속성들
   const applicationCount = computed(() => applications.value.length);
@@ -68,15 +66,8 @@ export const useApplicationStore = defineStore("application", () => {
     return originalValue;
   };
 
-  // 💪(상일) 신청 정책 목록 조회 (캐싱 적용)
-  const fetchApplications = async (forceRefresh = false) => {
-    // 캐시 체크: 강제 새로고침이 아니고, 캐시가 유효하면 스킵
-    const now = Date.now();
-    if (!forceRefresh && lastFetchTime.value && (now - lastFetchTime.value < CACHE_DURATION)) {
-      console.log('💪(상일) 캐시된 신청정책 데이터 사용');
-      return;
-    }
-    
+  // 신청 정책 목록 조회
+  const fetchApplications = async () => {
     loading.value = true;
     error.value = null;
     try {
@@ -103,8 +94,6 @@ export const useApplicationStore = defineStore("application", () => {
       });
 
       applications.value = transformedData;
-      // 💪(상일) 캐시 시간 업데이트
-      lastFetchTime.value = Date.now();
     } catch (err) {
       error.value = err.message;
       console.error("신청 정책 조회 실패:", err);
@@ -113,13 +102,12 @@ export const useApplicationStore = defineStore("application", () => {
     }
   };
 
-  // 💪(상일) 정책 신청 등록 (캐시 무효화)
+  // 정책 신청 등록
   const addApplication = async (policyId) => {
     try {
       await policyInteractionAPI.addApplication(policyId);
-      // 성공 시 캐시 무효화하고 목록 새로고침
-      lastFetchTime.value = null;
-      await fetchApplications(true);
+      // 성공 시 목록 새로고침
+      await fetchApplications();
       return true;
     } catch (err) {
       console.error("정책 신청 등록 실패:", err);
@@ -147,12 +135,12 @@ export const useApplicationStore = defineStore("application", () => {
     }
   };
 
-  // 💪(상일) 신청 기록 삭제 (캐시는 유지, 로컬 상태만 업데이트)
+  // 신청 기록 삭제
   const removeApplication = async (policyId) => {
     try {
       await policyInteractionAPI.removeApplication(policyId);
 
-      // 즉시 로컬 상태에서 제거 (캐시는 유지)
+      // 즉시 로컬 상태에서 제거
       applications.value = applications.value.filter(
         (application) => application.policyId !== policyId
       );

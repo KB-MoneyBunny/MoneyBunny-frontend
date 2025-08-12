@@ -3,12 +3,10 @@ import { ref, computed } from "vue";
 import { bookmarkAPI } from "@/api/policyInteraction";
 
 export const useBookmarkStore = defineStore("bookmark", () => {
-  // 💪(상일) 북마크 관련 상태 관리 및 캐싱
+  // 💪(상일) 북마크 관련 상태 관리
   const bookmarks = ref([]);
   const loading = ref(false);
   const error = ref(null);
-  const lastFetchTime = ref(null);
-  const CACHE_DURATION = 5 * 60 * 1000; // 5분 캐시
 
   // 💪(상일) 계산된 속성들 - 실제 북마크된 항목 수만 계산
   const bookmarkCount = computed(() => filteredBookmarks.value.length);
@@ -106,15 +104,8 @@ export const useBookmarkStore = defineStore("bookmark", () => {
     return originalValue;
   };
 
-  // 💪(상일) 북마크 목록 조회 (캐싱 적용)
-  const fetchBookmarks = async (forceRefresh = false) => {
-    // 캐시 체크: 강제 새로고침이 아니고, 캐시가 유효하면 스킵
-    const now = Date.now();
-    if (!forceRefresh && lastFetchTime.value && (now - lastFetchTime.value < CACHE_DURATION)) {
-      console.log('💪(상일) 캐시된 북마크 데이터 사용');
-      return;
-    }
-    
+  // 💪(상일) 북마크 목록 조회
+  const fetchBookmarks = async () => {
     loading.value = true;
     error.value = null;
     try {
@@ -147,8 +138,6 @@ export const useBookmarkStore = defineStore("bookmark", () => {
       });
 
       bookmarks.value = transformedData;
-      // 💪(상일) 캐시 시간 업데이트
-      lastFetchTime.value = Date.now();
     } catch (err) {
       error.value = err.message;
       console.error("북마크 조회 실패:", err);
@@ -157,13 +146,12 @@ export const useBookmarkStore = defineStore("bookmark", () => {
     }
   };
 
-  // 💪(상일) 북마크 추가 (캐시 무효화)
+  // 💪(상일) 북마크 추가
   const addBookmark = async (policyId) => {
     try {
       await bookmarkAPI.addBookmark(policyId);
-      // 성공 시 캐시 무효화하고 목록 새로고침
-      lastFetchTime.value = null;
-      await fetchBookmarks(true);
+      // 성공 시 목록 새로고침
+      await fetchBookmarks();
       return true;
     } catch (err) {
       console.error("북마크 추가 실패:", err);
@@ -172,12 +160,12 @@ export const useBookmarkStore = defineStore("bookmark", () => {
     }
   };
 
-  // 💪(상일) 북마크 제거 (캐시는 유지, 로컬 상태만 업데이트)
+  // 💪(상일) 북마크 제거
   const removeBookmark = async (policyId) => {
     try {
       await bookmarkAPI.removeBookmark(policyId);
 
-      // 💪(상일) 즉시 로컬 상태 업데이트 (캐시는 유지)
+      // 💪(상일) 즉시 로컬 상태 업데이트
       bookmarks.value = bookmarks.value.filter(
         (bookmark) => bookmark.policyId !== policyId
       );
