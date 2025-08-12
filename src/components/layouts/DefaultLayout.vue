@@ -20,6 +20,7 @@ import NavBar from '@/components/layouts/NavBar.vue';
 import NotificationHeader from '@/pages/notification/common/NotificationHeader.vue';
 import PolicySearchHeader from '@/pages/policy/search/PolicySearchHeader.vue';
 import PolicyDetailHeader from '@/pages/policy/detail/PolicyDetailHeader.vue';
+import PolicyReviewHeader from '@/pages/policy/review/PolicyReviewHeader.vue';
 
 //현재 라우트 정보 가져오기
 const route = useRoute();
@@ -42,11 +43,17 @@ const isPolicyDetailPage = computed(
   () => route.name === 'policyDetail' // name이 정확히 'policyDetail'인 경우만
 );
 
+//  리뷰 페이지 여부
+const isPolicyReviewPage = computed(
+  () => route.name === 'policyReview' || route.path.includes('/reviews')
+);
+
 const activeHeader = computed(() => {
   if (isNotificationPage.value) return NotificationHeader;
   if (isSearchPage.value) return PolicySearchHeader;
   // 정책 상세일 때만 PolicyHeader 사용!
   if (isPolicyDetailPage.value) return PolicyDetailHeader;
+  if (isPolicyReviewPage.value) return PolicyReviewHeader;
   return Header;
 });
 </script>
@@ -60,7 +67,8 @@ const activeHeader = computed(() => {
   position: relative;
 }
 .main {
-  padding-top: 70px;
+  /* 💪(상일) 헤더 높이 + 상태바 영역 고려 */
+  padding-top: calc(70px + env(safe-area-inset-top));
   position: relative;
 }
 </style>

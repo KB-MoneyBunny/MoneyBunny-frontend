@@ -33,10 +33,11 @@ import PolicyRetestPage from '@/pages/mypage/settings/PolicyRetestPage.vue';
 import HomeMainPage from '@/pages/home/HomeMainPage.vue'; // 홈메인
 import AssetMain from '@/pages/asset/AssetMain.vue'; //🥕성빈: 자산 메인탭
 import PolicyMainTab from '@/pages/policy/PolicyMainTab.vue';
-// import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
+import NotificationCenter from '@/pages/notification/NotificationCenter.vue';
 
 //
 // ─── 정책 추천 흐름 ────────────────────────────────────
+import PolicyTypeIntro from '@/pages/policy/recommend/PolicyTypeIntro.vue';
 import PolicyIntroForm from '@/pages/policy/recommend/PolicyIntroForm.vue';
 import PolicyQuizStep1 from '@/pages/policy/recommend/PolicyQuizStep1.vue';
 import PolicyQuizStep2 from '@/pages/policy/recommend/PolicyQuizStep2.vue';
@@ -48,6 +49,7 @@ import PolicyResultSummary from '@/pages/policy/recommend/PolicyResultSummary.vu
 import PolicyDetailPage from '@/pages/policy/detail/PolicyDetailPage.vue';
 import PolicySearchPage from '@/pages/policy/search/PolicySearchPage.vue';
 import PolicySearchResult from '@/pages/policy/search/PolicySearchResult.vue';
+import PolicyReviewPage from '@/pages/policy/review/PolicyReviewPage.vue';
 
 const routes = [
   //
@@ -139,15 +141,19 @@ const routes = [
         name: 'myPageSettingsPolicy',
         component: PolicyRetestPage,
       },
-      // 💪(상일) 알림 설정 라우트 추가
-      // 💪(상일) 알림 설정은 모달로 변경되어 라우트 제거
-      // {
-      //   path: "notification",
-      //   name: "notification",
-      //   component: NotificationCenter,
-      // },
+      // 💪(상일) 알림 센터 라우트
+      {
+        path: 'notification',
+        name: 'notification',
+        component: NotificationCenter,
+      },
 
       // 정책 추천 플로우
+      {
+        path: 'policy/intro',
+        name: 'policyTypeIntro',
+        component: PolicyTypeIntro,
+      },
       { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
       { path: 'policy/main', name: 'policyMain', component: PolicyMainTab },
       {
@@ -187,6 +193,11 @@ const routes = [
         props: true,
       },
       {
+        path: '/policy/:policyId/reviews',
+        name: 'policyReviewPage',
+        component: PolicyReviewPage,
+      },
+      {
         path: 'policy/search',
         name: 'policySearch',
         component: PolicySearchPage,
@@ -205,21 +216,28 @@ const router = createRouter({
   routes,
   // 💪(상일) 라우터 이동 시 스크롤 위치 제어
   scrollBehavior(to, from, savedPosition) {
-    // 뒤로가기(브라우저 버튼)인 경우 이전 스크롤 위치 복원
-    if (savedPosition) {
-      return savedPosition;
+    // #app 요소의 스크롤을 직접 제어
+    const app = document.querySelector('#app');
+
+    if (savedPosition && app) {
+      // 뒤로가기 시 저장된 위치로 복원
+      app.scrollTop = savedPosition.top || 0;
+      return;
     }
 
-    // 해시(앵커) 링크가 있는 경우 해당 위치로 이동
     if (to.hash) {
-      return {
-        el: to.hash,
-        behavior: 'smooth',
-      };
+      // 해시 링크가 있는 경우
+      const element = document.querySelector(to.hash);
+      if (element && app) {
+        app.scrollTop = element.offsetTop;
+      }
+      return;
     }
 
-    // 기본적으로 모든 새로운 페이지 이동 시 최상단으로 이동
-    return { top: 0 };
+    // 새로운 페이지로 이동 시 최상단으로
+    if (app) {
+      app.scrollTop = 0;
+    }
   },
 });
 

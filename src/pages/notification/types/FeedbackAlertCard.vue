@@ -1,14 +1,14 @@
 <template>
-  <NotificationItem :is-read="item.read" @delete="handleDelete">
+  <NotificationItem
+    :is-read="item.read"
+    :notification-type="item.type"
+    @delete="handleDelete"
+  >
     <h3 class="title">{{ item.title }}</h3>
     <p class="message">{{ item.description || item.message }}</p>
     <div class="bottom">
       <small class="date">{{ formatDate(item.created_at || item.date) }}</small>
-      <button 
-        v-if="item.targetUrl" 
-        class="action-btn"
-        @click="handleButtonClick"
-      >
+      <button class="action-btn" @click="handleButtonClick">
         {{ getButtonText(item.type) }}
       </button>
     </div>
@@ -34,11 +34,16 @@ const formatDate = (iso) => {
 // 💪(상일) 타입별 버튼 텍스트 결정
 const getButtonText = (type) => {
   switch (type) {
-    case 'BOOKMARK': return '신청하기';
-    case 'NEW_POLICY': return '보러가기';
-    case 'TOP3': return '이동하기';
-    case 'FEEDBACK': return '확인하기';
-    default: return '보기';
+    case 'BOOKMARK':
+      return '신청하기';
+    case 'NEW_POLICY':
+      return '보러가기';
+    case 'TOP3':
+      return '이동하기';
+    case 'FEEDBACK':
+      return '확인하기';
+    default:
+      return '보기';
   }
 };
 
@@ -51,7 +56,7 @@ const getRoutePath = (type, targetUrl) => {
     case 'TOP3':
       return '/policy';
     case 'FEEDBACK':
-      return '/asset';
+      return '/asset?tab=지출';
     default:
       return targetUrl || '/';
   }
@@ -75,10 +80,8 @@ const handleButtonClick = async () => {
 // 💪(상일) 알림 삭제 처리
 const handleDelete = async () => {
   try {
-    if (confirm('이 알림을 삭제하시겠습니까?')) {
-      await notificationStore.deleteNotification(props.item.id);
-      console.log('✅ 알림 삭제 완료');
-    }
+    await notificationStore.deleteNotification(props.item.id);
+    console.log('✅ 알림 삭제 완료');
   } catch (error) {
     console.error('❌ 알림 삭제 실패:', error);
     alert('알림 삭제에 실패했습니다.');
@@ -91,7 +94,6 @@ const handleDelete = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0; /* 💪(상일) 바디 메시지와 하단 영역 사이 공간 제거 */
 }
 
 .action-btn {
@@ -100,8 +102,9 @@ const handleDelete = async () => {
   border: none;
   padding: 6px 12px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
+  flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
+  min-width: 60px; /* 최소 너비 보장 */
 }
-
 </style>

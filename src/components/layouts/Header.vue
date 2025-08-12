@@ -38,9 +38,11 @@ const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 
 // 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회 - 특정 라우트에서만
 onMounted(async () => {
-  // 미읽은 알림 개수가 필요한 페이지만 체크
-  const targetRoutes = ['/home', '/asset', '/policy', '/mypage'];
-  if (targetRoutes.some((routePath) => route.path.startsWith(routePath))) {
+  // 💪(상일) 미읽은 알림 개수가 필요한 페이지만 체크 (policy 메인만 포함)
+  const targetRoutes = ['/home', '/asset', '/mypage'];
+  const exactRoutes = ['/policy', '/policy/main'];
+  if (targetRoutes.some((routePath) => route.path.startsWith(routePath)) || 
+      exactRoutes.includes(route.path)) {
     try {
       await notificationStore.fetchUnreadCount();
       console.log(
@@ -55,7 +57,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* NavBar의 bottom-nav와 동일하게 상단 고정 + 너비 제한 */
+/* 💪(상일) 헤더 화면 고정 + 상태바 영역 처리 */
 .top-header {
   position: fixed;
   top: 0;
@@ -64,7 +66,8 @@ onMounted(async () => {
   width: 100%;
   max-width: 390px;
   margin: 0 auto;
-  height: 60px;
+  height: calc(60px + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
   border-bottom: 1px solid var(--base-lavender);
   background: white;
   display: flex;
