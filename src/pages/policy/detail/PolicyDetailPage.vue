@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watchEffect, onMounted } from 'vue';
+import { ref, computed, watchEffect, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { policyAPI } from '@/api/policy'; // 변경: policyAPI import
 // 💪(상일) 정책 신청 기능
@@ -84,6 +84,8 @@ const policyId = computed(() =>
 // API에서 받아온 정책 데이터 저장
 const policyData = ref(null);
 
+const totalReviews = ref(0);
+
 // 💪(상일) 미완료 신청 체크용
 const currentApplication = ref(null);
 const showStatusModal = ref(false);
@@ -93,6 +95,8 @@ async function fetchPolicyDetail(id) {
   try {
     const res = await policyAPI.getPolicyDetail(id); // 변경: policyAPI 사용
     policyData.value = res.data;
+    if (res.data?.reviewCount != null)
+      totalReviews.value = res.data.reviewCount;
   } catch (e) {
     policyData.value = null;
   }
@@ -185,6 +189,25 @@ const handleShowStatusModal = (applicationData) => {
 // 💪(상일) iOS 카카오톡 인앱 Safari 안내 표시 상태
 const showSafariGuide = ref(false);
 
+async function fetchReviewCount() {
+  try {
+    // 1) 총합만 주는 API가 있다면:
+    // const { data } = await reviewAPI.getSummary(policyId.value); // { total: number }
+    // totalReviews.value = data?.total ?? 0;
+
+    // 2) 리스트 메타 total을 쓰는 방식:
+    const { data } = await reviewAPI.list({
+      policyId: policyId.value,
+      page: 1,
+      size: 1,
+    });
+    // 백엔드 응답 구조에 맞춰 조정
+    totalReviews.value = data?.total ?? data?.meta?.total ?? 0;
+  } catch (e) {
+    totalReviews.value = 0;
+  }
+}
+
 // 💪(상일) 컴포넌트 마운트 시 카카오톡 인앱 브라우저 감지 및 처리
 onMounted(async () => {
   // 💪(상일) 공유 링크로 진입 + 카카오톡 인앱 브라우저인 경우
@@ -209,6 +232,12 @@ onMounted(async () => {
 
   // 기존 로직 - 미완료 신청 체크
   await checkIncompleteApplication();
+  if (policyId.value) await fetchReviewCount();
+});
+
+// ✅ 정책이 바뀌면 다시 카운트 가져오기
+watch(policyId, (v) => {
+  if (v) fetchReviewCount();
 });
 </script>
 
@@ -218,6 +247,8 @@ onMounted(async () => {
       :title="policy.title"
       :description="policy.policyBenefitDescription"
       :policy="policy"
+      :reviewCount="totalReviews"
+      reviewRouteName="policyReviewPage"
       @showStatusModal="handleShowStatusModal"
     />
 

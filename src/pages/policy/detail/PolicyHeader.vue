@@ -15,6 +15,13 @@
       {{ description || policy.description }}
     </p>
 
+    <div class="reviewRow">
+      <!-- <span class="stars" aria-label="평점 별">★★★★★</span> -->
+      <!-- <span class="rating">{{ Number(rating).toFixed(1) }}</span> -->
+      <button class="reviewLink font-11" @click="goToReviews">
+        리뷰<span v-if="reviewCount"> {{ reviewCount }}개</span> 보기
+      </button>
+    </div>
     <!-- <div class="tags">
       <span v-for="(tag, i) in policy.tags" :key="i" class="tag">{{
         tag
@@ -52,7 +59,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { bookmarkAPI } from '@/api/policyInteraction';
 
@@ -61,6 +69,7 @@ import PolicyApplyModal from '../component/PolicyApplyModal.vue';
 import bookmarkBefore from '@/assets/images/icons/policy/bookmark_before.png';
 import bookmarkAfter from '@/assets/images/icons/policy/bookmark_after.png';
 import shareIcon from '@/assets/images/icons/policy/share.png';
+import PolicyReviewPage from '../review/PolicyReviewPage.vue';
 
 const props = defineProps({
   policy: {
@@ -75,6 +84,9 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  // 리뷰 값 전달받기 (추가)
+  reviewCount: { type: Number, default: 0 },
+  reviewRouteName: { type: String, default: 'policyReviewPage' },
 });
 
 // 💪(상일) 부모 컴포넌트로 이벤트 전달용
@@ -85,12 +97,13 @@ const selectedPolicy = ref(null);
 const bookmark = ref(false);
 const showModal = ref(false);
 
-const policyId = props.policy?.id || props.policy?.policyId;
-
 const authStore = useAuthStore();
+const router = useRouter();
 
 // 북마크 상태 조회 (로그인 한 경우에만)
 async function fetchBookmarkStatus() {
+  const policyId = props.policy?.id || props.policy?.policyId;
+  if (!policyId) return;
   try {
     const res = await bookmarkAPI.getBookmarks();
     const list = res.data || [];
@@ -109,6 +122,7 @@ onMounted(() => {
 });
 
 const toggleBookmark = async () => {
+  const policyId = props.policy?.id || props.policy?.policyId;
   if (!policyId) return;
   try {
     if (!bookmark.value) {
@@ -158,6 +172,19 @@ const handleShowStatusModal = (applicationData) => {
 
   // 부모 컴포넌트(PolicyDetailPage)로 이벤트 전달
   emit('showStatusModal', applicationData);
+};
+
+// 리뷰 페이지 이동
+const goToReviews = () => {
+  const policyId = props.policy?.id || props.policy?.policyId;
+  if (!policyId) {
+    console.warn('goToReviews: policyId is not available');
+    return;
+  }
+  router.push({
+    name: props.reviewRouteName,
+    params: { policyId: String(policyId) },
+  });
 };
 </script>
 
@@ -234,5 +261,22 @@ const handleShowStatusModal = (applicationData) => {
 .shareIcon {
   width: 16px;
   height: 16px;
+}
+
+/* 리뷰 안내 (추가) */
+.reviewRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 10px;
+}
+
+.reviewLink {
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+  color: var(--text-bluegray);
 }
 </style>
