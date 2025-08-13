@@ -532,7 +532,6 @@ const formatApplicationDate = (dateString) => {
   border-radius: 6px;
   font-size: 11px;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .reviewBtn.review-edit {

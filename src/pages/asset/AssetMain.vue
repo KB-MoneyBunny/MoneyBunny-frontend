@@ -69,6 +69,12 @@
 
     <!-- 지출 탭 컨텐츠 - 별도 컴포넌트로 분리 -->
     <AssetSpendingTab v-else-if="currentTab === '지출'" class="tab-content" />
+
+    <RecommendBannerCarousel
+      v-if="recommendBanners && recommendBanners.length"
+      :items="recommendBanners"
+      :interval="5000"
+    />
   </div>
 </template>
 
@@ -87,6 +93,12 @@ import AccountList from './component/account/AccountList.vue';
 import CardList from './component/card/CardList.vue';
 import NoDataCard from './component/common/NoDataCard.vue';
 import AssetSpendingTab from './tabs/AssetSpendingTab.vue';
+import RecommendBannerCarousel from './component/banner/RecommendBannerCarousel.vue';
+
+import certificateBunny from '@/assets/images/icons/bunny/certificate_bunny.png';
+import trafficBunny from '@/assets/images/icons/bunny/traffic_bunny.png';
+import rentBunny from '@/assets/images/icons/bunny/rent_bunny.png';
+import recommendBunny from '@/assets/images/icons/bunny/recommend_bunny.png';
 
 // 상태 관리
 const assetStore = useAssetStore();
@@ -94,6 +106,55 @@ const route = useRoute();
 const router = useRouter();
 const currentTab = ref(route.query.tab || '메인');
 
+const userName = computed(() => {
+  try {
+    const raw = localStorage.getItem('auth');
+    const a = raw ? JSON.parse(raw) : null;
+    return a?.name || a?.user?.name || a?.username || '사용자';
+  } catch {
+    return '사용자';
+  }
+});
+
+// 👉 자산탭 추천 배너 데이터 (개인화 멘트)
+const recommendBanners = computed(() => [
+  {
+    policyId: null, // 클릭 시 이동 없음
+    title: `${userName.value}님을 위한 맞춤 혜택`,
+    description: `꼭 필요한 정책만 모았어요. 확인해보세요!`,
+    amount: null,
+    tag: '',
+    deadline: null,
+    image: recommendBunny,
+  },
+  {
+    policyId: 101,
+    title: `${userName.value}님에게 딱 맞는 교통비 혜택`,
+    description: '대중교통비, 이렇게 아껴보세요!',
+    amount: 50000,
+    tag: '추천',
+    deadline: '2025-12-31',
+    image: trafficBunny,
+  },
+  {
+    policyId: 102,
+    title: `${userName.value}님 월세 부담을 줄여드려요`,
+    description: '월 최대 20만원, 집 걱정 덜어보세요!',
+    amount: 200000,
+    tag: '추천',
+    deadline: '2025-12-31',
+    image: rentBunny,
+  },
+  {
+    policyId: 103,
+    title: `${userName.value}님의 도전을 응원합니다!`,
+    description: '응시료부터 교육비까지 든든하게!',
+    amount: 300000,
+    tag: '추천',
+    deadline: '2025-12-31',
+    image: certificateBunny,
+  },
+]);
 // 뒤로/앞으로가기 등 쿼리 변화 대응
 watch(
   () => route.query.tab,
@@ -179,6 +240,6 @@ const totalCardUsage = computed(() =>
 }
 
 .tab-content > *:last-child {
-  margin-bottom: 0;
+  margin-bottom: 1rem;
 }
 </style>

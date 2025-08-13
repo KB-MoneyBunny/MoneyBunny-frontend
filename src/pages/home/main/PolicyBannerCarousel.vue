@@ -136,18 +136,12 @@ const trackStyle = computed(() => {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border: none;
-  /* border-radius: 6px; */
-  /* border: 1.5px solid rgba(44, 62, 80, 0.06); */
-  padding: 8px;
 }
 
 .slideInner {
-  padding: 0; /* 경계선 어긋남 방지 */
+  padding: 0;
 }
-.policyBanner {
-  border-radius: 0; /* 부모가 이미 radius 있으니 내부는 0 */
-}
+
 .track {
   display: flex;
   will-change: transform;
@@ -155,17 +149,13 @@ const trackStyle = computed(() => {
 .slide {
   flex: 0 0 100%;
   min-width: 100%;
-  padding: 6px; /* ← 여백은 여기로 */
-}
-
-.slideInner {
   padding: 0;
-} /* 안쪽은 0 */
+}
 .dots {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 4px;
+  bottom: 8px;
   display: flex;
   gap: 4px;
   justify-content: center;

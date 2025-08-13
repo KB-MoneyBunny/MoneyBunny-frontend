@@ -89,39 +89,26 @@ function onCtaClick() {
   background: #fff;
   color: var(--base-blue-dark);
   border-radius: 6px;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  /* gap: 12px; */
   min-height: 138px;
   width: 100%;
   isolation: isolate;
-
-  /* box-sizing: border-box; */
-  /* border: 1.5px solid rgba(44, 62, 80, 0.06); */
-}
-
-/* ✅ 가짜 보더로 잘림 방지 */
-.policyBanner::after {
-  content: '';
-  position: absolute;
-  inset: 0.5px; /* 테두리 안쪽으로 0.5px */
+  box-sizing: border-box;
   border: 1.5px solid rgba(44, 62, 80, 0.06);
-  border-radius: 6px;
-  pointer-events: none;
 }
 
 .left {
   min-width: 0;
-  width: 210px;
+  width: 215px;
 }
 
 .right {
   width: 96px;
   height: 96px;
   pointer-events: none;
-
-  /* ✅ 어떤 겹침에도 위로 */
   z-index: 3;
   display: grid;
   place-items: center;
@@ -136,7 +123,7 @@ function onCtaClick() {
   align-items: center;
   padding: 0 3px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
 }
 .pill.solid {
