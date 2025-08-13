@@ -1,17 +1,22 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { policyAPI } from '@/api/policy';
-import PolicySearchHeader from './PolicySearchHeader.vue';
-import NoResultView from './NoSearchResult.vue';
+import { ref, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { policyAPI } from "@/api/policy";
+import { guestPolicyAPI } from "@/api/guestPolicy";
+import { useAuthStore } from "@/stores/auth";
+import PolicySearchHeader from "./PolicySearchHeader.vue";
+import NoResultView from "./NoSearchResult.vue";
 
+const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
-const policies = ref([]);
-const searchText = ref(''); // 현재 검색어
-const filterData = ref({}); // 현재 필터 데이터
 
-function buildSearchPayload(filter, query = '') {
+const policies = ref([]);
+const searchText = ref(""); // 현재 검색어
+const filterData = ref({}); // 현재 필터 데이터
+const popularKeywords = ref([]); // 템플릿에서 사용 중
+
+function buildSearchPayload(filter, query = "") {
   return {
     age: filter.age || 0,
     educationLevels: filter.education || [],
@@ -20,7 +25,7 @@ function buildSearchPayload(filter, query = '') {
     keywords: [],
     majors: filter.major || [],
     marriage:
-      filter.marital && filter.marital.length > 0 ? filter.marital[0] : '',
+      filter.marital && filter.marital.length > 0 ? filter.marital[0] : "",
     regions: filter.region || [],
     searchTexts: query ? [query] : [],
     specialConditions: filter.specialty || [],
@@ -29,22 +34,35 @@ function buildSearchPayload(filter, query = '') {
 
 async function fetchPolicies() {
   let filter = {};
-  let query = '';
+  let query = "";
   try {
-    query = route.query.q || '';
+    query = route.query.q || "";
     filter = route.query.filter
       ? JSON.parse(decodeURIComponent(route.query.filter))
       : {};
-  } catch (e) {
+  } catch (_) {
     filter = {};
   }
+
   searchText.value = query;
   filterData.value = filter;
+
   const payload = buildSearchPayload(filter, query);
+
   try {
-    const res = await policyAPI.searchUserPolicy(payload);
-    policies.value = Array.isArray(res.data) ? res.data : [];
+    // 로그인/비로그인 분기
+    const api = auth.isLogin
+      ? policyAPI.searchUserPolicy
+      : guestPolicyAPI.search;
+    const res = await api(payload);
+    policies.value = Array.isArray(res.data) ? res.data : res.data?.list ?? [];
   } catch (e) {
+    // 서버 설정으로 401이 오면 게스트로 폴백
+    if (e?.response?.status === 401) {
+      const { data } = await guestPolicyAPI.search(payload);
+      policies.value = Array.isArray(data) ? data : data?.list ?? [];
+      return;
+    }
     policies.value = [];
   }
 }
@@ -65,7 +83,7 @@ onMounted(fetchPolicies);
 watch(() => [route.query.q, route.query.filter], fetchPolicies);
 
 function formatPeriod(periodStr) {
-  if (!periodStr) return '상시';
+  if (!periodStr) return "상시";
   const match = periodStr.match(/^(\d{8})\s*~\s*(\d{8})$/);
   if (!match) return periodStr;
   const [_, start, end] = match;
@@ -76,7 +94,7 @@ function formatPeriod(periodStr) {
 
 const goToApplyPage = (url) => {
   if (url) {
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   }
 };
 
@@ -85,12 +103,12 @@ function getUniqueLargeCategories(policy) {
   if (!policy.largeCategory) return [];
   if (Array.isArray(policy.largeCategory)) {
     return Array.from(
-      new Set(policy.largeCategory.filter((v) => !!v && v !== ''))
+      new Set(policy.largeCategory.filter((v) => !!v && v !== ""))
     );
   }
-  if (typeof policy.largeCategory === 'string') {
+  if (typeof policy.largeCategory === "string") {
     const arr = policy.largeCategory
-      .split(',')
+      .split(",")
       .map((v) => v.trim())
       .filter(Boolean);
     return Array.from(new Set(arr));
@@ -123,8 +141,9 @@ function getUniqueLargeCategories(policy) {
                 v-for="tag in getUniqueLargeCategories(policy)"
                 :key="tag"
                 class="cardTag font-10"
-                >{{ tag }}</span
               >
+                {{ tag }}
+              </span>
             </template>
           </div>
         </div>
@@ -132,7 +151,7 @@ function getUniqueLargeCategories(policy) {
         <p class="cardDeadline font-10">
           <span class="label">신청기간 : </span>
           <span class="date font-bold">
-            {{ policy.endDate ? formatPeriod(policy.endDate) : '상시' }}
+            {{ policy.endDate ? formatPeriod(policy.endDate) : "상시" }}
           </span>
         </p>
         <div class="cardActions">

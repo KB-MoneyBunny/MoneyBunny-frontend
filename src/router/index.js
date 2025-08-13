@@ -257,7 +257,11 @@ router.beforeEach(async (to, from, next) => {
     return next();
   }
   // 정책 검색 페이지/결과도 비로그인 허용
-  if (to.name === "policySearch" || to.name === "policySearchResult") {
+  if (
+    to.name === "policySearch" ||
+    to.name === "policySearchResult" ||
+    to.name === "policySearchGuest"
+  ) {
     return next();
   }
 
