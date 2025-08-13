@@ -1,6 +1,5 @@
-<!-- src/components/policy/detail/PolicyOverviewTab.vue -->
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { fetchCardTransportationFees } from '@/api/assetApi';
 
 const props = defineProps({
@@ -110,6 +109,32 @@ watch(
     }
   }
 );
+
+// ▼ 월별 혜택 요약/펼치기 상태
+const isBenefitOpen = ref(false);
+const recentCount = 3;
+const monthLabel = (ym) => `${Number(ym.split('-')[1])}월 혜택`;
+const fmt = (n) => (n ?? 0).toLocaleString();
+
+// 최근 N개월 평균/기간 계산
+const benefitSummary = computed(() => {
+  const list = (kpassBenefit.value || [])
+    .slice()
+    .sort((a, b) => a.month.localeCompare(b.month));
+  if (!list.length) {
+    return { label: `최근 ${recentCount}개월 평균`, period: '—', avg: 0 };
+  }
+  const tail = list.slice(-recentCount);
+  const avg = Math.round(
+    tail.reduce((s, x) => s + (x.benefit || 0), 0) / tail.length
+  );
+  const start = tail[0].month.split('-');
+  const end = tail[tail.length - 1].month.split('-');
+  const period = `${start[0]}년 ${Number(start[1])}월 ~ ${end[0]}년 ${Number(
+    end[1]
+  )}월`;
+  return { label: `최근 ${tail.length}개월 평균`, period, avg };
+});
 </script>
 
 <template>
@@ -148,11 +173,11 @@ watch(
     </div>
 
     <!-- K패스/기후동행카드 혜택 금액 카드 -->
-    <div
+    <!-- <div
       v-if="[3167, 423, 3589].includes(policyId)"
       class="kpassBenefitBox mb-4"
     >
-      <div class="font-bold font-15 mb-2">
+      <div class="font-bold font-14 mb-2">
         {{
           policyId === 3167
             ? 'K패스 월별 혜택 금액'
@@ -171,17 +196,53 @@ watch(
             :key="item.month"
             class="kpassBenefitItem"
           >
-            <span class="font-12">{{ item.month }}</span>
-            <span class="font-12 ml-2"
+            <span class="font-11">{{ item.month }}</span>
+            <span class="font-11 ml-2"
               >총 이용금액: {{ item.amount.toLocaleString() }}원</span
             >
-            <span class="font-12 ml-2 font-bold text-green">
+            <span class="font-11 ml-2 font-bold text-green">
               혜택금액: {{ item.benefit.toLocaleString() }}원
             </span>
           </div>
         </template>
-        <div v-else class="font-12 text-bluegray">교통 사용 내역 없음</div>
+        <div v-else class="font-11 text-bluegray">교통 사용 내역 없음</div>
       </div>
+    </div> -->
+    <!-- K패스/기후동행카드 혜택 금액 (요약 + 펼치기) -->
+    <div v-if="[3167, 423, 3589].includes(policyId)" class="benefitSection">
+      <div class="sectionHeaderRow">
+        <div class="sectionTitle">월별 혜택 금액</div>
+        <button class="toggleBtn" @click="isBenefitOpen = !isBenefitOpen">
+          {{ isBenefitOpen ? '접기' : '자세히 보기' }}
+          <span :class="['chev', { open: isBenefitOpen }]">▾</span>
+        </button>
+      </div>
+
+      <!-- 요약 카드 -->
+      <div class="benefitSummaryCard">
+        <div class="summaryLeft">
+          <div class="summaryTitle">{{ benefitSummary.label }}</div>
+          <div class="summaryPeriod">{{ benefitSummary.period }}</div>
+        </div>
+        <div class="summaryValue">{{ fmt(benefitSummary.avg) }}원</div>
+      </div>
+
+      <!-- 펼친 목록 -->
+      <transition name="fade">
+        <div v-if="isBenefitOpen" class="benefitDetailList">
+          <template v-if="kpassBenefit && kpassBenefit.length">
+            <div
+              v-for="item in kpassBenefit"
+              :key="item.month"
+              class="detailRow"
+            >
+              <span class="detailMonth">{{ monthLabel(item.month) }}</span>
+              <span class="detailValue">{{ fmt(item.benefit) }}원</span>
+            </div>
+          </template>
+          <div v-else class="emptyBox">교통 사용 내역 없음</div>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -263,5 +324,100 @@ watch(
 }
 .ml-2 {
   margin-left: 8px;
+}
+
+/* 월별 혜택 섹션 */
+.benefitSection {
+  margin-top: 16px;
+}
+.sectionHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.sectionTitle {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--text-default);
+}
+.toggleBtn {
+  background: none;
+  border: none;
+  padding: 4px 4px;
+  color: var(--base-blue-dark);
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.chev {
+  display: inline-block;
+}
+.chev.open {
+  transform: rotate(180deg);
+}
+
+.benefitSummaryCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--input-bg-2);
+  border-radius: 6px;
+  padding: 14px;
+}
+.summaryLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.summaryTitle {
+  font-weight: bold;
+  font-size: 12px;
+  color: var(--text-default);
+}
+.summaryPeriod {
+  font-size: 11px;
+  color: var(--text-bluegray);
+}
+.summaryValue {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2b446b;
+}
+
+.benefitDetailList {
+  background-color: var(--input-bg-2);
+  border-radius: 6px;
+  margin-top: 8px;
+  padding: 10px;
+}
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 8px;
+  font-size: 12px;
+}
+.detailRow + .detailRow {
+  border-top: 1px solid #eef1f5;
+}
+.detailMonth {
+  color: var(--text-default);
+}
+.detailValue {
+  font-weight: bold;
+  color: #2b446b;
+}
+
+.emptyBox {
+  background: #fff;
+  border: 1px dashed #e2e8f0;
+  color: var(--text-bluegray);
+  font-size: 11px;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
 }
 </style>
