@@ -92,6 +92,7 @@ import {
   getRegionNameByCode,
 } from '@/assets/utils/regionCodeMap';
 import { policyAPI } from '@/api/policy';
+import axios from '@/api/index'; // axios 인스턴스 import
 
 // 컴포넌트 import
 import AssetTabSwitcher from './component/common/AssetTabSwitcher.vue';
@@ -116,15 +117,17 @@ const route = useRoute();
 const router = useRouter();
 const currentTab = ref(route.query.tab || '메인');
 
-const userName = computed(() => {
+const userName = ref('사용자');
+
+// 사용자 프로필에서 name을 받아와 userName에 할당
+async function loadUserName() {
   try {
-    const raw = localStorage.getItem('auth');
-    const a = raw ? JSON.parse(raw) : null;
-    return a?.name || a?.user?.name || a?.username || '사용자';
+    const { data } = await axios.get('/api/member/information');
+    userName.value = data?.name || '사용자';
   } catch {
-    return '사용자';
+    userName.value = '사용자';
   }
-});
+}
 
 // 추천 배너 관련 상태
 const recommendBanners = ref([]);
@@ -290,6 +293,7 @@ watch(
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
+  await loadUserName();
   await assetStore.loadSummary();
   await loadRecommendBanners();
 });
