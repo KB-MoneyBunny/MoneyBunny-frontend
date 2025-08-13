@@ -1,35 +1,46 @@
 <template>
   <div class="asset-page">
-    <!-- 각 탭별 요약카드를 상단에 배치 -->
+    <!-- 1) 요약카드 (모든 탭 공통 위치) -->
+    <div class="summary-area">
+      <!-- 메인 탭 요약카드 -->
+      <TotalAssetCard v-if="currentTab === '메인'" :summary="summary" />
 
-    <!-- 메인 탭 요약카드 -->
-    <TotalAssetCard v-if="currentTab === '메인'" :summary="summary" />
+      <!-- 계좌 탭 요약카드 -->
+      <SummaryCard
+        v-else-if="currentTab === '계좌'"
+        title="총 계좌 잔액"
+        :mainAmount="totalAccountBalance"
+        rightLabel="계좌 수"
+        :rightValue="(summary.accounts || []).length"
+        rightUnit="개"
+      />
 
-    <!-- 계좌 탭 요약카드 -->
-    <SummaryCard
-      v-else-if="currentTab === '계좌'"
-      title="총 계좌 잔액"
-      :mainAmount="totalAccountBalance"
-      rightLabel="계좌 수"
-      :rightValue="(summary.accounts || []).length"
-      rightUnit="개"
-    />
+      <!-- 카드 탭 요약카드 -->
+      <SummaryCard
+        v-else-if="currentTab === '카드'"
+        title="이번 달 총 사용액"
+        :mainAmount="totalCardUsage"
+        rightLabel="카드 수"
+        :rightValue="(summary.cards || []).length"
+        rightUnit="개"
+      />
 
-    <!-- 카드 탭 요약카드 -->
-    <SummaryCard
-      v-else-if="currentTab === '카드'"
-      title="이번 달 총 사용액"
-      :mainAmount="totalCardUsage"
-      rightLabel="카드 수"
-      :rightValue="(summary.cards || []).length"
-      rightUnit="개"
-    />
+      <!-- 지출 탭 요약카드 (CalendarSection과 연동) -->
+      <SummaryCard
+        v-else-if="currentTab === '지출'"
+        title="이번 달 총 지출액"
+        :main-amount="spendingTabData.totalSpending"
+        right-label="지난달 대비"
+        :right-value="spendingTabData.comparisonText"
+        right-unit=""
+        variant="spending"
+      />
+    </div>
 
-    <!-- 탭 스위처 -->
+    <!-- 2) 탭 스위처 -->
     <AssetTabSwitcher :selectedTab="currentTab" @switchTab="switchTab" />
 
-    <!-- 각 탭별 컨텐츠 -->
-
+    <!-- 3) 컨텐츠 -->
     <!-- 메인 탭 컨텐츠 -->
     <div v-if="currentTab === '메인'" class="tab-content">
       <AccountOverviewCard
@@ -67,9 +78,15 @@
       </div>
     </div>
 
-    <!-- 지출 탭 컨텐츠 - 별도 컴포넌트로 분리 -->
-    <AssetSpendingTab v-else-if="currentTab === '지출'" class="tab-content" />
+    <!-- 지출 탭 컨텐츠 -->
+    <AssetSpendingTab
+      v-else-if="currentTab === '지출'"
+      ref="spendingTabRef"
+      @spending-data-updated="updateSpendingData"
+      class="tab-content"
+    />
 
+    <!-- 추천 배너 -->
     <RecommendBannerCarousel
       v-if="!recommendLoading && recommendBanners.length > 1"
       :items="recommendBanners"
@@ -116,6 +133,20 @@ const assetStore = useAssetStore();
 const route = useRoute();
 const router = useRouter();
 const currentTab = ref(route.query.tab || '메인');
+
+// 지출 탭 데이터 (요약카드용) - reactive 상태로 관리
+const spendingTabData = ref({
+  totalSpending: 0,
+  comparisonText: '–',
+});
+
+// 지출 탭에서 데이터를 받는 함수
+const updateSpendingData = (data) => {
+  spendingTabData.value = {
+    totalSpending: data.totalSpending || 0,
+    comparisonText: data.comparisonText || '–',
+  };
+};
 
 const userName = ref('사용자');
 
@@ -321,7 +352,7 @@ const totalCardUsage = computed(() =>
   )
 );
 
-// 계좌/카드 관련 이벤트 핸들러들
+// // 계좌/카드 관련 이벤트 핸들러들
 // const deleteAccount = (account) => {
 //   console.log('계좌 삭제:', account);
 //   // 실제 삭제 로직 구현 필요
@@ -357,6 +388,10 @@ const totalCardUsage = computed(() =>
 .asset-page {
   display: flex;
   flex-direction: column;
+}
+
+.summary-area {
+  margin-bottom: 0rem;
 }
 
 .tab-content {
