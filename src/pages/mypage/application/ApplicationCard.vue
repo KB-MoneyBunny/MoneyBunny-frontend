@@ -267,7 +267,7 @@ const handleReviewSave = async (reviewData) => {
         reviewData
       );
       // 💪(상일) 수정 완료 알림
-      alert('후기가 수정되었습니다!');
+      // alert('후기가 수정되었습니다!');
     } else {
       // 리뷰 신규 작성
       await policyInteractionAPI.addReview(
@@ -275,7 +275,7 @@ const handleReviewSave = async (reviewData) => {
         reviewData
       );
       // 💪(상일) 작성 완료 알림
-      alert('후기 작성이 완료되었습니다!');
+      // alert('후기 작성이 완료되었습니다!');
     }
 
     hasReview.value = true; // 저장 성공하면 리뷰 존재 상태로 변경

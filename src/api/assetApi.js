@@ -32,7 +32,7 @@ export async function fetchCardTransactions(
 }
 
 /**
- * 카드 교통비 내역 전체 조회 (파라미터 없음)
+ * 최근 6개월 후불교통대금 거래내역 조회
  */
 export async function fetchCardTransportationFees() {
   return axios.get('/api/asset/cards/transportation-fees');
@@ -98,4 +98,14 @@ export function updateTransactionCategory(transactionId, categoryId) {
   return axios.patch(`/api/asset/transactions/${transactionId}/category`, {
     categoryId,
   });
+}
+
+// 한국산업인력공단 카드 결제내역 존재 여부
+export async function fetchHrdkoreaCardExists() {
+  return axios.get('/api/asset/cards/hrdkorea-exists');
+}
+
+// 월세 거래내역 존재 여부
+export async function fetchRentAccountExists() {
+  return axios.get('/api/asset/accounts/rent-exists');
 }
