@@ -4,10 +4,10 @@
     <!-- 헤더 -->
     <DetailHeader :title="headerTitle" @back="$emit('back')" />
 
-    <!-- 카테고리 정보 + 거래내역 카드 -->
-    <DetailSummaryCard>
-      <!-- 카테고리 아이콘 -->
-      <template #custom-icon>
+    <!-- 카테고리 정보 카드 (고정) -->
+    <div class="category-info-card">
+      <div class="category-header">
+        <!-- 카테고리 아이콘 -->
         <div
           class="category-icon"
           :style="{ backgroundColor: (categoryData.color || '#999') + '20' }"
@@ -17,83 +17,80 @@
             :style="{ backgroundColor: categoryData.color || '#999' }"
           ></div>
         </div>
-      </template>
 
-      <!-- 카테고리 정보 -->
-      <template #custom-content>
-        <p class="category-name">
-          {{ categoryData.name || '알 수 없는 카테고리' }}
-        </p>
-        <p class="category-period">{{ getSelectedMonthText() }} 총 지출</p>
-        <p class="category-amount">{{ formatAmount(totalAmount) }}</p>
-      </template>
+        <!-- 카테고리 정보 -->
+        <div class="category-info">
+          <p class="category-name">
+            {{ categoryData.name || '알 수 없는 카테고리' }}
+          </p>
+          <p class="category-period">{{ getSelectedMonthText() }} 총 지출</p>
+          <p class="category-amount">{{ formatAmount(totalAmount) }}</p>
+        </div>
+      </div>
+    </div>
 
-      <!-- 거래내역 리스트 -->
-      <template #additional>
-        <div class="transaction-section">
-          <!-- 섹션 헤더: 제목 + 건수 + 월 선택 -->
-          <div class="section-header">
-            <div class="header-left">
-              <h4 class="section-title">거래 내역</h4>
-              <span class="transaction-count">
-                {{ transactions.length }}건
-              </span>
-            </div>
-
-            <!-- 월 선택 드롭다운 -->
-            <CategoryMonthSelector
-              :current-month="selectedMonth"
-              @month-change="handleMonthChange"
-            />
+    <!-- 거래내역 카드 (스크롤 가능) -->
+    <div class="transaction-card">
+      <div class="transaction-section">
+        <!-- 섹션 헤더: 제목 + 건수 + 월 선택 -->
+        <div class="section-header">
+          <div class="header-left">
+            <h4 class="section-title">거래 내역</h4>
+            <span class="transaction-count"> {{ transactions.length }}건 </span>
           </div>
 
-          <!-- 로딩 -->
-          <div v-if="loading" class="no-transactions">
-            <p class="no-transactions-text">불러오는 중...</p>
-          </div>
+          <!-- 월 선택 드롭다운 -->
+          <CategoryMonthSelector
+            :current-month="selectedMonth"
+            @month-change="handleMonthChange"
+          />
+        </div>
 
-          <!-- 거래내역 리스트 -->
+        <!-- 로딩 -->
+        <div v-if="loading" class="no-transactions">
+          <p class="no-transactions-text">불러오는 중...</p>
+        </div>
+
+        <!-- 거래내역 리스트 -->
+        <div
+          v-else-if="transactions.length > 0"
+          class="transaction-list-container"
+        >
           <div
-            v-else-if="transactions.length > 0"
-            class="transaction-list-container"
+            v-for="t in sortedTransactions"
+            :key="t.id || t.transactionId || Math.random()"
+            class="transaction-item"
+            @click="openTransactionDetail(t)"
           >
-            <div
-              v-for="t in sortedTransactions"
-              :key="t.id || t.transactionId || Math.random()"
-              class="transaction-item"
-              @click="openTransactionDetail(t)"
-            >
-              <div class="transaction-info">
-                <p class="transaction-date">
-                  {{ formatTransactionDate(t.date) }}
-                </p>
-                <p class="transaction-title">
-                  {{ getTransactionTitle(t) }}
-                </p>
-                <!-- 메모가 있으면 표시 -->
-                <p v-if="t.memo" class="transaction-memo">
-                  {{ t.memo }}
-                </p>
-              </div>
-
-              <div class="transaction-amount">
-                <p class="amount-text">
-                  -{{ formatAmount(t.amount || t.price || 0) }}
-                </p>
-              </div>
+            <div class="transaction-info">
+              <p class="transaction-date">
+                {{ formatTransactionDate(t.date) }}
+              </p>
+              <p class="transaction-title">
+                {{ getTransactionTitle(t) }}
+              </p>
+              <!-- 메모가 있으면 표시 -->
+              <p v-if="t.memo" class="transaction-memo">
+                {{ t.memo }}
+              </p>
             </div>
-          </div>
 
-          <!-- 거래내역 없음 -->
-          <div v-else class="no-transactions">
-            <p class="no-transactions-text">
-              {{ getSelectedMonthText() }}에는 이 카테고리의 거래 내역이
-              없습니다
-            </p>
+            <div class="transaction-amount">
+              <p class="amount-text">
+                -{{ formatAmount(t.amount || t.price || 0) }}
+              </p>
+            </div>
           </div>
         </div>
-      </template>
-    </DetailSummaryCard>
+
+        <!-- 거래내역 없음 -->
+        <div v-else class="no-transactions">
+          <p class="no-transactions-text">
+            {{ getSelectedMonthText() }}에는 이 카테고리의 거래 내역이 없습니다
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- 거래 상세 모달 -->
     <CategoryTransactionDetailModal
@@ -109,7 +106,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import DetailHeader from '../detail/DetailHeader.vue';
-import DetailSummaryCard from '../detail/DetailSummaryCard.vue';
 import CategoryMonthSelector from '../detail/CategoryMonthSelector.vue';
 import CategoryTransactionDetailModal from '../detail/CategoryTransactionDetailModal.vue';
 import {
@@ -335,8 +331,26 @@ const formatTransactionDate = (d) => {
 
 <style scoped>
 .category-detail-view {
-  background-color: transparent;
-  padding-bottom: 1rem;
+  background-color: var(--input-bg-2);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 카테고리 정보 카드 (고정) */
+.category-info-card {
+  background: white;
+  border-radius: 0.75rem;
+  margin: 0.75rem 1rem 0 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1rem;
 }
 
 /* 카테고리 아이콘 */
@@ -347,6 +361,7 @@ const formatTransactionDate = (d) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .category-dot {
@@ -356,6 +371,10 @@ const formatTransactionDate = (d) => {
 }
 
 /* 카테고리 정보 */
+.category-info {
+  flex: 1;
+}
+
 .category-name {
   font-size: 1.125rem;
   font-weight: 700;
@@ -376,7 +395,27 @@ const formatTransactionDate = (d) => {
   margin: 0;
 }
 
-/* 거래내역 섹션 */
+/* 거래내역 카드 (스크롤 가능) */
+.transaction-card {
+  background: white;
+  border-radius: 0.75rem;
+  margin: 0.75rem 1rem 1rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-section {
+  padding: 1.5rem;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 거래내역 섹션 헤더 */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -384,6 +423,7 @@ const formatTransactionDate = (d) => {
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--input-bg-3);
+  flex-shrink: 0;
 }
 
 .header-left {
@@ -404,48 +444,69 @@ const formatTransactionDate = (d) => {
   color: var(--text-bluegray);
 }
 
+/* 거래내역 리스트 컨테이너 (스크롤 영역) */
+.transaction-list-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* 스크롤바 숨기기 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+  /* 하단 여백 추가로 마지막 아이템까지 스크롤 가능하게 */
+  padding-bottom: 1rem;
+}
+
+/* 웹킷 스크롤바 숨기기 */
+.transaction-list-container::-webkit-scrollbar {
+  display: none;
+}
+
 /* 거래내역 아이템 */
 .transaction-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--input-bg-3);
-  -webkit-tap-highlight-color: transparent; /* iOS 터치 하이라이트 제거 */
-  user-select: none; /* 텍스트 선택 방지 */
+  user-select: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-/* 터치/클릭 시 색상 변화 (모바일 앱 스타일) */
 .transaction-item:active {
   background-color: var(--input-bg-1);
-  border-radius: 0.5rem;
-  margin: 0 -0.75rem;
-  padding: 0.75rem;
 }
 
 .transaction-item:last-child {
   border-bottom: none;
+  /* 마지막 아이템 하단 여백 추가 */
+  margin-bottom: 0.5rem;
 }
 
 .transaction-info {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 /* 거래 날짜 (상단) */
 .transaction-date {
   font-size: 0.75rem;
   color: var(--text-bluegray);
-  margin: 0 0 0.375rem 0; /* 날짜와 제목 사이 간격 조정 */
+  margin: 0;
 }
 
 /* 거래 제목 (중간) */
 .transaction-title {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-login);
+  font-weight: 500;
+  color: var(--base-blue-dark);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0 0 0.25rem 0; /* 제목과 메모 사이 간격 */
+  margin: 0;
 }
 
 /* 거래 메모 (하단) */
@@ -453,9 +514,16 @@ const formatTransactionDate = (d) => {
   font-size: 0.75rem;
   color: var(--text-bluegray);
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 거래 금액 */
+.transaction-amount {
+  text-align: right;
+}
+
 .transaction-amount .amount-text {
   font-size: 0.875rem;
   font-weight: 600;
@@ -463,14 +531,19 @@ const formatTransactionDate = (d) => {
   margin: 0;
 }
 
-/* 상태 */
+/* 상태 메시지 */
 .no-transactions {
-  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 2rem 0;
 }
+
 .no-transactions-text {
   font-size: 0.875rem;
   color: var(--text-lightgray);
   margin: 0;
+  text-align: center;
 }
 </style>
