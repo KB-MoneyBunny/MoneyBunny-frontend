@@ -71,7 +71,7 @@
     <AssetSpendingTab v-else-if="currentTab === '지출'" class="tab-content" />
 
     <RecommendBannerCarousel
-      v-if="recommendBanners && recommendBanners.length"
+      v-if="!recommendLoading && recommendBanners.length > 1"
       :items="recommendBanners"
       :interval="5000"
     />
@@ -82,6 +82,17 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useAssetStore } from '@/stores/asset';
 import { useRoute, useRouter } from 'vue-router';
+import {
+  fetchHrdkoreaCardExists,
+  fetchRentAccountExists,
+  fetchCardTransportationFees,
+} from '@/api/assetApi'; // API import 추가
+import {
+  regionCodeMap,
+  getRegionNameByCode,
+} from '@/assets/utils/regionCodeMap';
+import { policyAPI } from '@/api/policy';
+import axios from '@/api/index'; // axios 인스턴스 import
 
 // 컴포넌트 import
 import AssetTabSwitcher from './component/common/AssetTabSwitcher.vue';
@@ -106,55 +117,170 @@ const route = useRoute();
 const router = useRouter();
 const currentTab = ref(route.query.tab || '메인');
 
-const userName = computed(() => {
-  try {
-    const raw = localStorage.getItem('auth');
-    const a = raw ? JSON.parse(raw) : null;
-    return a?.name || a?.user?.name || a?.username || '사용자';
-  } catch {
-    return '사용자';
-  }
-});
+const userName = ref('사용자');
 
-// 👉 자산탭 추천 배너 데이터 (개인화 멘트)
-const recommendBanners = computed(() => [
-  {
-    policyId: null, // 클릭 시 이동 없음
-    title: `${userName.value}님을 위한 맞춤 혜택`,
+// 사용자 프로필에서 name을 받아와 userName에 할당
+async function loadUserName() {
+  try {
+    const { data } = await axios.get('/api/member/information');
+    userName.value = data?.name || '사용자';
+  } catch {
+    userName.value = '사용자';
+  }
+}
+
+// 추천 배너 관련 상태
+const recommendBanners = ref([]);
+const recommendLoading = ref(true);
+
+// 사용자 정책 정보 상태
+const userPolicy = ref(null);
+
+// 사용자 정책 정보 조회 및 지역 정책 추천 로직
+async function getUserRegionPolicyId() {
+  try {
+    if (!userPolicy.value) {
+      const { data } = await policyAPI.getUserPolicy();
+      userPolicy.value = data;
+    }
+    const regions = userPolicy.value?.regions || [];
+    // 지역코드 우선순위: 첫 번째 값 사용, 없으면 기본
+    const code = regions.length ? regions[0] : null;
+    if (!code) return { policyId: 3167, title: 'K패스', calcType: 'kpass' };
+    // 5자리 코드로 판별
+    if (code.startsWith('11')) {
+      // 서울(11000)
+      return { policyId: 423, title: '기후동행카드', calcType: 'climate' };
+    }
+    if (code.startsWith('41')) {
+      // 경기(41000)
+      return { policyId: 3167, title: '경기 K패스', calcType: 'specialKpass' };
+    }
+    return { policyId: 3589, title: 'K패스', calcType: 'kpass' };
+  } catch {
+    return { policyId: 3589, title: 'K패스', calcType: 'kpass' };
+  }
+}
+
+// 교통비 정책별 예상 혜택 계산 함수
+function calcKpassBenefit(amount) {
+  if (amount < 23250) return 0;
+  return Math.floor(amount * 0.3);
+}
+function calcClimateBenefit(amount) {
+  const benefit = amount - 55000;
+  return benefit > 0 ? benefit : 0;
+}
+function calcSpecialKpassBenefit(amount) {
+  if (amount < 93000) return calcKpassBenefit(amount);
+  return Math.floor(93000 * 0.3);
+}
+
+async function loadRecommendBanners() {
+  recommendLoading.value = true;
+  const banners = [];
+
+  const user = userName.value;
+
+  // 1. 기본 배너(개인화 멘트)
+  banners.push({
+    policyId: null,
+    title: `${user}님을 위한 맞춤 혜택`,
     description: `꼭 필요한 정책만 모았어요. 확인해보세요!`,
     amount: null,
     tag: '',
     deadline: null,
     image: recommendBunny,
-  },
-  {
-    policyId: 101,
-    title: `${userName.value}님에게 딱 맞는 교통비 혜택`,
-    description: '대중교통비, 이렇게 아껴보세요!',
-    amount: 50000,
-    tag: '추천',
-    deadline: '2025-12-31',
-    image: trafficBunny,
-  },
-  {
-    policyId: 102,
-    title: `${userName.value}님 월세 부담을 줄여드려요`,
-    description: '월 최대 20만원, 집 걱정 덜어보세요!',
-    amount: 200000,
-    tag: '추천',
-    deadline: '2025-12-31',
-    image: rentBunny,
-  },
-  {
-    policyId: 103,
-    title: `${userName.value}님의 도전을 응원합니다!`,
-    description: '응시료부터 교육비까지 든든하게!',
-    amount: 300000,
-    tag: '추천',
-    deadline: '2025-12-31',
-    image: certificateBunny,
-  },
-]);
+  });
+
+  let hasPolicyBanner = false;
+
+  // 2. 교통비(후불교통대금) - 지역별 정책/계산방식 적용
+  try {
+    const { policyId, title, calcType } = await getUserRegionPolicyId();
+    const { data: transactions } = await fetchCardTransportationFees();
+    if (Array.isArray(transactions) && transactions.length > 0) {
+      // 월별로 그룹핑
+      const monthMap = {};
+      transactions.forEach((tx) => {
+        const date = new Date(tx.transactionDate);
+        const ym = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        if (!monthMap[ym]) monthMap[ym] = [];
+        monthMap[ym].push(tx);
+      });
+      let totalBenefit = 0;
+      Object.values(monthMap).forEach((list) => {
+        const sum = list.reduce((acc, tx) => acc + (tx.amount || 0), 0);
+        if (calcType === 'climate') {
+          totalBenefit += calcClimateBenefit(sum);
+        } else if (calcType === 'kpass') {
+          totalBenefit += calcSpecialKpassBenefit(sum);
+        } else {
+          totalBenefit += calcKpassBenefit(sum);
+        }
+      });
+      banners.push({
+        policyId,
+        title: `${user}님에게 딱 맞는 ${title} 혜택`,
+        description: `${title}로 교통비 아껴보세요!`,
+        amount: totalBenefit,
+        tag: '추천',
+        deadline: '상시',
+        image: trafficBunny,
+      });
+      hasPolicyBanner = true;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 3. 월세 거래내역 있을 때만
+  try {
+    const { data: exists } = await fetchRentAccountExists();
+    if (exists) {
+      banners.push({
+        policyId: 1390,
+        title: `${user}님 월세 부담을 줄여드려요`,
+        description: '월 최대 20만원, 집 걱정 덜어보세요!',
+        amount: 2400000,
+        tag: '추천',
+        deadline: '상시',
+        image: rentBunny,
+      });
+      hasPolicyBanner = true;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 4. 한국산업인력공단 카드 결제내역 있을 때만
+  try {
+    const { data: exists } = await fetchHrdkoreaCardExists();
+    if (exists) {
+      banners.push({
+        policyId: 813,
+        title: `${user}님의 도전을 응원합니다!`,
+        description: '응시료부터 교육비까지 든든하게!',
+        amount: 0,
+        tag: '추천',
+        deadline: '상시',
+        image: certificateBunny,
+      });
+      hasPolicyBanner = true;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 정책 배너가 하나도 없으면 기본 배너도 제거
+  if (!hasPolicyBanner) {
+    recommendBanners.value = [];
+  } else {
+    recommendBanners.value = banners;
+  }
+  recommendLoading.value = false;
+}
+
 // 뒤로/앞으로가기 등 쿼리 변화 대응
 watch(
   () => route.query.tab,
@@ -167,7 +293,9 @@ watch(
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
+  await loadUserName();
   await assetStore.loadSummary();
+  await loadRecommendBanners();
 });
 
 // 탭 전환 함수

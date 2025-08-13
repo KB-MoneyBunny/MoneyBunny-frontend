@@ -57,23 +57,26 @@ function groupByMonth(transactions, policyId) {
     result[month] += tx.amount;
   });
   return Object.entries(result).map(([month, amount]) => {
-    if (policyId === 3167) {
-      return {
-        month,
-        amount,
-        benefit: calcKpassBenefit(amount),
-      };
-    } else if (policyId === 423) {
+    if (policyId === 423) {
+      // 서울: 기후동행카드
       return {
         month,
         amount,
         benefit: calcClimateBenefit(amount),
       };
     } else if (policyId === 3589) {
+      // 경기: 경기 K패스
       return {
         month,
         amount,
         benefit: calcSpecialKpassBenefit(amount),
+      };
+    } else if (policyId === 3167) {
+      // 그 외: K패스
+      return {
+        month,
+        amount,
+        benefit: calcKpassBenefit(amount),
       };
     }
     return { month, amount, benefit: 0 };
