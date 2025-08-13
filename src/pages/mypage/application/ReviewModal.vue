@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed } from 'vue';
 
 const props = defineProps({
   policyId: Number,
@@ -11,27 +11,43 @@ const props = defineProps({
   },
   existingContent: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
-const emit = defineEmits(["close", "save", "delete"]);
+//👸🏻(은진) : 토스트
+const showToast = ref(false);
+const toastText = ref('');
+let toastTimer = null;
+const DEFAULT_TOAST_MS = 2800;
 
-const reviewContent = ref(props.existingContent || "");
+const showToastMsg = (text, ms = DEFAULT_TOAST_MS) => {
+  toastText.value = text;
+  showToast.value = true;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    showToast.value = false;
+    toastTimer = null;
+  }, ms);
+};
+
+const emit = defineEmits(['close', 'save', 'delete']);
+
+const reviewContent = ref(props.existingContent || '');
 
 const modalTitle = computed(() => {
-  return props.isEdit ? "후기 수정" : "후기 작성";
+  return props.isEdit ? '후기 수정' : '후기 작성';
 });
 
 const buttonText = computed(() => {
-  return props.isEdit ? "수정" : "작성";
+  return props.isEdit ? '수정' : '작성';
 });
 
 const benefitStatusText = computed(() => {
   const statusMap = {
-    PENDING: "처리 중",
-    RECEIVED: "수령 완료",
-    NOT_ELIGIBLE: "수령 불가",
+    PENDING: '처리 중',
+    RECEIVED: '수령 완료',
+    NOT_ELIGIBLE: '수령 불가',
   };
   return statusMap[props.benefitStatus] || props.benefitStatus;
 });
@@ -40,22 +56,22 @@ const benefitStatusText = computed(() => {
 const placeholderText = computed(() => {
   const placeholderMap = {
     RECEIVED:
-      "예: 신청하고 1주 후 지원금을 받았습니다. 절차가 간단해서 좋았어요!",
+      '예: 신청하고 1주 후 지원금을 받았습니다. 절차가 간단해서 좋았어요!',
     PENDING:
-      "예: 신청을 완료하고 결과를 기다리고 있습니다. 상담 과정이 친절했어요.",
-    NOT_ELIGIBLE: "예: 소득 분위 조건에 걸려서 신청할 수 없었어요.",
+      '예: 신청을 완료하고 결과를 기다리고 있습니다. 상담 과정이 친절했어요.',
+    NOT_ELIGIBLE: '예: 소득 분위 조건에 걸려서 신청할 수 없었어요.',
   };
   return (
     placeholderMap[props.benefitStatus] ||
-    "후기 작성을 통해 추천 정확도를 높여보세요!"
+    '후기 작성을 통해 추천 정확도를 높여보세요!'
   );
 });
 
-const close = () => emit("close");
+const close = () => emit('close');
 
 const save = () => {
   if (!reviewContent.value.trim()) {
-    alert("후기 내용을 입력해주세요.");
+    showToastMsg('후기 내용을 입력해주세요.');
     return;
   }
 
@@ -64,13 +80,19 @@ const save = () => {
     content: reviewContent.value.trim(),
   };
 
-  emit("save", reviewData);
+  emit('save', reviewData);
+  showToastMsg(
+    props.isEdit
+      ? '후기 수정이 완료되었습니다.'
+      : '후기 작성이 완료되었습니다.',
+    3200
+  );
 };
 
 // 💪(상일) 리뷰 삭제 처리
 const deleteReview = () => {
-  if (confirm("후기를 삭제하시겠습니까?")) {
-    emit("delete");
+  if (confirm('후기를 삭제하시겠습니까?')) {
+    emit('delete');
   }
 };
 </script>
@@ -79,7 +101,7 @@ const deleteReview = () => {
   <div class="modalOverlay" @click.self="close">
     <div class="modalContainer">
       <header class="modalHeader">
-        <span class="modalTitle font-17 font-bold">{{ modalTitle }}</span>
+        <span class="modalTitle font-16 font-bold">{{ modalTitle }}</span>
         <button class="iconBtn right" @click="close">
           <img src="@/assets/images/icons/common/x.png" alt="닫기" />
         </button>
@@ -119,6 +141,9 @@ const deleteReview = () => {
         <button class="applyBtn" @click="save">{{ buttonText }}</button>
       </div>
     </div>
+    <transition name="fade">
+      <div v-if="showToast" class="toastMsg">{{ toastText }}</div>
+    </transition>
   </div>
 </template>
 
@@ -135,9 +160,9 @@ const deleteReview = () => {
 
 .modalContainer {
   background: #fff;
-  border-radius: 12px;
-  width: 380px;
-  max-width: 90vw;
+  border-radius: 6px;
+  width: 340px;
+  /* max-width: 90vw; */
   box-sizing: border-box;
   padding: 0 0 20px 0;
   display: flex;
@@ -171,23 +196,23 @@ const deleteReview = () => {
   margin-bottom: 20px;
   padding: 12px;
   background-color: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .policyTitle {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   color: var(--text-login);
-  margin-bottom: 8px;
-  line-height: 1.4;
+  margin-bottom: 6px;
+  /* line-height: 1.4; */
 }
 
 .benefitStatus {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 11px;
+  /* font-weight: bold; */
 }
 
 .status-pending {
@@ -208,7 +233,7 @@ const deleteReview = () => {
 .reviewSection {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* 💪(상일) 후기 헤더 - 라벨과 삭제 버튼 */
@@ -219,9 +244,10 @@ const deleteReview = () => {
 }
 
 .reviewLabel {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: bold;
   color: var(--text-login);
+  /* margin-bottom: 5px; */
 }
 
 /* 💪(상일) 작은 삭제 버튼 스타일 */
@@ -229,25 +255,24 @@ const deleteReview = () => {
   background: none;
   border: none;
   color: #ef4444;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.2s;
+  border-radius: 6px;
 }
 
-.deleteSmallBtn:hover {
+/* .deleteSmallBtn:hover {
   background-color: #fee2e2;
   color: #dc2626;
-}
+} */
 
 .reviewTextarea {
   width: 100%;
   min-height: 120px;
   padding: 12px;
   border: 1.5px solid var(--input-bg-1);
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 12px;
   color: var(--text-login);
   resize: vertical;
   box-sizing: border-box;
@@ -255,7 +280,7 @@ const deleteReview = () => {
 
 .reviewTextarea:focus {
   outline: none;
-  border-color: var(--base-blue-dark);
+  border-color: var(--input-bg-3);
 }
 
 .reviewTextarea::placeholder {
@@ -264,7 +289,7 @@ const deleteReview = () => {
 
 .charCount {
   text-align: right;
-  font-size: 12px;
+  font-size: 11px;
   color: #6b7280;
 }
 
@@ -273,18 +298,18 @@ const deleteReview = () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 18px 0 18px;
-  gap: 8px;
+  padding: 0 18px;
+  gap: 10px;
 }
 
 .cancelBtn {
   flex: 1;
   padding: 10px 0;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #f3f4f6;
   color: #6b7280;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -292,11 +317,11 @@ const deleteReview = () => {
 .applyBtn {
   flex: 2;
   padding: 10px 0;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--base-blue-dark);
   color: #fff;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -316,12 +341,26 @@ const deleteReview = () => {
 }
 
 .iconBtn img {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
 .iconBtn.right {
   margin-left: auto;
+}
+
+.toastMsg {
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: rgba(48, 70, 99, 0.95);
+  color: #fff;
+  font-size: 12px;
+  z-index: 10000;
+  pointer-events: none;
 }
 </style>
