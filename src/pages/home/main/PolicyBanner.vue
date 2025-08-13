@@ -18,9 +18,12 @@
       <p v-if="description" class="desc">{{ description }}</p>
 
       <div class="ctaRow">
-        <span v-if="amount != null" class="amountChip"
-          >+{{ amountText }}원</span
-        >
+        <span v-if="amount != null" class="amountChip">
+          <template v-if="amount === 0">
+            {{ amountText }}
+          </template>
+          <template v-else> +{{ amountText }}원 </template>
+        </span>
       </div>
     </div>
 
@@ -49,14 +52,34 @@ const props = defineProps({
 
 const router = useRouter();
 
-const amountText = computed(() =>
-  typeof props.amount === 'number' ? props.amount.toLocaleString('ko-KR') : ''
-);
+const amountText = computed(() => {
+  if (typeof props.amount === 'number') {
+    return props.amount === 0
+      ? '지원 금액 상이'
+      : props.amount.toLocaleString('ko-KR');
+  }
+  return '';
+});
 
 const dDayLabel = computed(() => {
-  if (props.deadline == null) return '';
+  if (props.deadline == null) return '상시';
   if (typeof props.deadline === 'number')
     return props.deadline >= 0 ? `D-${props.deadline}` : '마감';
+  // YYYYMMDD 문자열 처리
+  if (typeof props.deadline === 'string' && /^\d{8}$/.test(props.deadline)) {
+    const year = Number(props.deadline.slice(0, 4));
+    const month = Number(props.deadline.slice(4, 6)) - 1;
+    const day = Number(props.deadline.slice(6, 8));
+    const d = new Date(year, month, day);
+    if (isNaN(d)) return '';
+    const today = new Date();
+    const diff = Math.ceil(
+      (d - new Date(today.getFullYear(), today.getMonth(), today.getDate())) /
+        86400000
+    );
+    return diff >= 0 ? `D-${diff}` : '마감';
+  }
+  // 기존 Date 처리
   const d = new Date(props.deadline);
   if (isNaN(d)) return '';
   const today = new Date();
@@ -89,36 +112,26 @@ function onCtaClick() {
   background: #fff;
   color: var(--base-blue-dark);
   border-radius: 6px;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
-
-  min-height: 128px;
+  /* gap: 12px; */
+  min-height: 138px;
+  width: 100%;
   isolation: isolate;
+  box-sizing: border-box;
+  border: 1.5px solid rgba(44, 62, 80, 0.06);
 }
 
 .left {
-  /* flex: 1 1 auto; */
   min-width: 0;
-
-  /* ✅ 토끼 자리 확보: 96(토끼) + 12(우측 여백) */
-  width: 210px;
+  width: 215px;
 }
 
-/* ✅ 토끼를 카드 오른쪽에 ‘절대 고정’ */
 .right {
-  /* position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%); */
-  /* position: absolute; */
-  /* right: 8px; */
   width: 96px;
   height: 96px;
   pointer-events: none;
-
-  /* ✅ 어떤 겹침에도 위로 */
   z-index: 3;
   display: grid;
   place-items: center;
@@ -133,7 +146,7 @@ function onCtaClick() {
   align-items: center;
   padding: 0 3px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
 }
 .pill.solid {

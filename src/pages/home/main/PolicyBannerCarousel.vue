@@ -42,7 +42,15 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import PolicyBanner from './PolicyBanner.vue';
+import { policyAPI } from '@/api/policy';
 
+// 이미지 경로 import
+import banner1 from '@/assets/images/icons/bunny/banner_bunny1.png';
+import banner2 from '@/assets/images/icons/bunny/banner_bunny2.png';
+import banner3 from '@/assets/images/icons/bunny/banner_bunny3.png';
+import top3bunny from '@/assets/images/icons/bunny/top3_bunny.png';
+
+const items = ref([]);
 const props = defineProps({
   items: { type: Array, required: true },
   autoplay: { type: Boolean, default: true },
@@ -83,7 +91,47 @@ function go(i) {
   index.value = i;
 }
 
+async function fetchTop3Policies() {
+  const res = await policyAPI.getTop3Views();
+  const banners = [banner1, banner2, banner3];
+  const introBanner = {
+    policyId: null,
+    title: '이번 주 인기 지원금 TOP3',
+    description: '한 주간 가장 관심받은 혜택을 모았어요!',
+    tag: '',
+    deadline: null,
+    amount: null,
+    image: top3bunny,
+  };
+  const apiBanners = (res.data || []).map((p, idx) => {
+    // endDate 처리: "20250102 ~ 20251130" 형태 또는 빈 값
+    let deadline = null;
+    if (!p.endDate || p.endDate.trim() === '') {
+      deadline = null; // 상시
+    } else {
+      // "~" 기준 뒤 날짜 추출
+      const match = p.endDate.match(/~\s*(\d{8})$/);
+      if (match) {
+        deadline = match[1]; // "20251130"
+      } else {
+        deadline = null;
+      }
+    }
+    return {
+      policyId: p.policyId,
+      title: p.title,
+      description: p.policyBenefitDescription,
+      amount: p.policyBenefitAmount,
+      tag: '인기', // default
+      deadline,
+      image: banners[idx] ?? '', // 순서대로 이미지 할당
+    };
+  });
+  items.value = [introBanner, ...apiBanners];
+}
+
 onMounted(() => {
+  fetchTop3Policies();
   start();
   document.addEventListener('visibilitychange', vis);
 });
@@ -136,8 +184,12 @@ const trackStyle = computed(() => {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 6px;
 }
+
+.slideInner {
+  padding: 0;
+}
+
 .track {
   display: flex;
   will-change: transform;
@@ -145,24 +197,20 @@ const trackStyle = computed(() => {
 .slide {
   flex: 0 0 100%;
   min-width: 100%;
+  padding: 0;
 }
-.slideInner {
-  box-sizing: border-box;
-  padding: 6px 6px 0; /* overflow:visible 유지 */
-}
-
 .dots {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 3px;
+  bottom: 8px;
   display: flex;
-  gap: 3px;
+  gap: 4px;
   justify-content: center;
 }
 .dot {
-  width: 3px;
-  height: 3px;
+  width: 4px;
+  height: 4px;
   border-radius: 999px;
   border: none;
   background: rgba(31, 59, 97, 0.25);
