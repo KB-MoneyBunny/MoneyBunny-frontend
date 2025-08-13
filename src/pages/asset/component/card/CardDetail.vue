@@ -72,7 +72,8 @@ const filter = ref('전체');
 // 🥕 추가: 고급 필터 상태 (검색, 기간, 정렬 등)
 function makeDefaultAdvancedFilters() {
   const today = new Date();
-  const endDate = today.toISOString().slice(0, 10);
+  const endDate = today.toLocaleDateString('sv-SE'); // YYYY-MM-DD 형식
+
   const start = new Date();
   start.setMonth(start.getMonth() - 3);
   const startDate = start.toISOString().slice(0, 10);
