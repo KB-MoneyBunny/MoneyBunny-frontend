@@ -41,7 +41,24 @@ const filterInitial = ref({
   jobStatus: [],
   specialty: [],
 });
-const filterData = ref({});
+
+//
+const filterData = ref({ ...filterInitial.value });
+
+// 게스트용 검색 payload (백엔드 SearchRequestDTO에 맞춰 매핑)
+function buildGuestSearchPayload(searchTexts = []) {
+  const f = filterData.value || {};
+  return {
+    searchTexts,
+    regions: f.region || [],
+    age: f.age || "",
+    income: f.income || "",
+    educationLevels: f.education || [],
+    majors: f.major || [],
+    employmentStatuses: f.jobStatus || [],
+    specialConditions: f.specialty || [],
+  };
+}
 
 const goBack = () => {
   router.back();
@@ -141,14 +158,14 @@ async function searchWithKeyword(keyword) {
 
 onMounted(() => {
   fetchPopularKeywords();
-  fetchRecentKeywords();
+  // fetchRecentKeywords();
   // fetchUserPolicyFilter();
 });
 </script>
 
 <template>
   <div class="policySearchPage">
-    <section class="section">
+    <!-- <section class="section">
       <div class="recentHeader">
         <span class="title">최근 검색어</span>
         <button class="clearAllBtn" @click="clearAllRecent">전체 삭제</button>
@@ -167,7 +184,7 @@ onMounted(() => {
           </span>
         </span>
       </div>
-    </section>
+    </section> -->
 
     <!-- 인기 검색어 -->
     <section class="section">

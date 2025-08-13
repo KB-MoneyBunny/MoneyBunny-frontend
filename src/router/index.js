@@ -252,6 +252,11 @@ const router = createRouter({
 
 // 인증 가드
 router.beforeEach(async (to, from, next) => {
+  // 리뷰 페이지는 비로그인 허용
+  if (to.name === "policyReviewPage") {
+    return next();
+  }
+
   // 정책 상세는 비로그인 허용
   if (/^\/policy\/\d+$/.test(to.path)) {
     return next();
