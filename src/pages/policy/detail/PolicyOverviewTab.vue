@@ -10,14 +10,6 @@ const props = defineProps({
   policyId: Number,
 });
 
-// policyId 로그 한 번만 출력
-onMounted(() => {
-  console.log('PolicyOverviewTab에서 받은 policyId:', props.policyId);
-  if (props.policyId === 3167) {
-    loadKpassBenefit();
-  }
-});
-
 const formatPeriod = (periodStr) => {
   if (!periodStr) return '상시';
   const match = periodStr.match(/^(\d{8})\s*~\s*(\d{8})$/);
@@ -32,7 +24,7 @@ const formatPeriod = (periodStr) => {
 const splitLines = (str) =>
   str ? str.split('\n').filter((s) => s.trim() !== '') : [];
 
-// K패스 혜택 금액 관련 상태
+// K패스/기후동행카드 혜택 금액 관련 상태
 const kpassBenefit = ref(null);
 const kpassLoading = ref(false);
 
@@ -41,8 +33,19 @@ const calcKpassBenefit = (amount) => {
   return Math.floor(amount * 0.3);
 };
 
+const calcClimateBenefit = (amount) => {
+  const benefit = amount - 55000;
+  return benefit > 0 ? benefit : 0;
+};
+
+// 3589: 93000원 미만은 K패스 방식, 93000원 이상은 93000원의 30%만 혜택
+const calcSpecialKpassBenefit = (amount) => {
+  if (amount < 93000) return calcKpassBenefit(amount);
+  return Math.floor(93000 * 0.3);
+};
+
 // 월별로 거래내역을 합산하는 함수
-function groupByMonth(transactions) {
+function groupByMonth(transactions, policyId) {
   const result = {};
   transactions.forEach((tx) => {
     const date = new Date(tx.transactionDate);
@@ -53,11 +56,28 @@ function groupByMonth(transactions) {
     if (!result[month]) result[month] = 0;
     result[month] += tx.amount;
   });
-  return Object.entries(result).map(([month, amount]) => ({
-    month,
-    amount,
-    benefit: calcKpassBenefit(amount),
-  }));
+  return Object.entries(result).map(([month, amount]) => {
+    if (policyId === 3167) {
+      return {
+        month,
+        amount,
+        benefit: calcKpassBenefit(amount),
+      };
+    } else if (policyId === 423) {
+      return {
+        month,
+        amount,
+        benefit: calcClimateBenefit(amount),
+      };
+    } else if (policyId === 3589) {
+      return {
+        month,
+        amount,
+        benefit: calcSpecialKpassBenefit(amount),
+      };
+    }
+    return { month, amount, benefit: 0 };
+  });
 }
 
 const loadKpassBenefit = async () => {
@@ -65,7 +85,7 @@ const loadKpassBenefit = async () => {
   try {
     const res = await fetchCardTransportationFees();
     const transactions = res.data || [];
-    kpassBenefit.value = groupByMonth(transactions);
+    kpassBenefit.value = groupByMonth(transactions, props.policyId);
   } catch (e) {
     kpassBenefit.value = [];
   }
@@ -73,7 +93,11 @@ const loadKpassBenefit = async () => {
 };
 
 onMounted(() => {
-  if (props.policyId === 3167) {
+  if (
+    props.policyId === 3167 ||
+    props.policyId === 423 ||
+    props.policyId === 3589
+  ) {
     loadKpassBenefit();
   }
 });
@@ -81,7 +105,7 @@ onMounted(() => {
 watch(
   () => props.policyId,
   (val) => {
-    if (val === 3167) {
+    if (val === 3167 || val === 423) {
       loadKpassBenefit();
     }
   }
@@ -123,9 +147,20 @@ watch(
       </div>
     </div>
 
-    <!-- K패스 혜택 금액 카드 (policyId가 3167일 때만 표시) -->
-    <div v-if="policyId === 3167" class="kpassBenefitBox mb-4">
-      <div class="font-bold font-15 mb-2">K패스 월별 혜택 금액</div>
+    <!-- K패스/기후동행카드 혜택 금액 카드 -->
+    <div
+      v-if="[3167, 423, 3589].includes(policyId)"
+      class="kpassBenefitBox mb-4"
+    >
+      <div class="font-bold font-15 mb-2">
+        {{
+          policyId === 3167
+            ? 'K패스 월별 혜택 금액'
+            : policyId === 423
+            ? '기후동행카드 월별 혜택 금액'
+            : 'K패스 월별 혜택 금액'
+        }}
+      </div>
       <div v-if="kpassLoading" class="font-12 text-bluegray">
         불러오는 중...
       </div>
