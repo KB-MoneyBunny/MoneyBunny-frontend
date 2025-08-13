@@ -48,6 +48,7 @@ import { policyAPI } from '@/api/policy';
 import banner1 from '@/assets/images/icons/bunny/banner_bunny1.png';
 import banner2 from '@/assets/images/icons/bunny/banner_bunny2.png';
 import banner3 from '@/assets/images/icons/bunny/banner_bunny3.png';
+import top3bunny from '@/assets/images/icons/bunny/top3_bunny.png';
 
 const items = ref([]);
 const props = defineProps({
@@ -93,7 +94,16 @@ function go(i) {
 async function fetchTop3Policies() {
   const res = await policyAPI.getTop3Views();
   const banners = [banner1, banner2, banner3];
-  items.value = (res.data || []).map((p, idx) => {
+  const introBanner = {
+    policyId: null,
+    title: '이번 주 인기 지원금 TOP3',
+    description: '한 주간 가장 관심받은 혜택을 모았어요!',
+    tag: '',
+    deadline: null,
+    amount: null,
+    image: top3bunny,
+  };
+  const apiBanners = (res.data || []).map((p, idx) => {
     // endDate 처리: "20250102 ~ 20251130" 형태 또는 빈 값
     let deadline = null;
     if (!p.endDate || p.endDate.trim() === '') {
@@ -117,6 +127,7 @@ async function fetchTop3Policies() {
       image: banners[idx] ?? '', // 순서대로 이미지 할당
     };
   });
+  items.value = [introBanner, ...apiBanners];
 }
 
 onMounted(() => {
