@@ -63,6 +63,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useSpendingData } from '@/assets/utils/useSpendingData';
+import { categoryMap } from '@/constants/categoryMap';
 
 // 컴포넌트 import
 import SummaryCard from '../component/common/SummaryCard.vue';
@@ -91,9 +92,7 @@ const selectedCategoryData = ref(null);
 
 // 카테고리 이름 매핑 함수 (categoryMap이 없는 경우 기본값)
 const getCategoryName = (id) => {
-  // import { categoryMap } from '@/constants/categoryMap'; // 필요시 활성화
-  // return categoryMap?.[id] || '기타';
-  return '기타'; // 임시 기본값
+  categoryMap?.[id] ?? categoryMap?.[String(id)] ?? '기타';
 };
 
 // 트랜잭션 데이터 변환 함수
@@ -166,7 +165,7 @@ const handleCategoryDetailClick = (category) => {
 const openCategoryDetail = async (category) => {
   try {
     const raw = await getCategoryDetail(category.id);
-    const catName = getCategoryName(category.id);
+    const catName = category.name || getCategoryName(category.id);
 
     const transactions = Array.isArray(raw)
       ? raw.map((vo) => adaptTx(vo, catName))

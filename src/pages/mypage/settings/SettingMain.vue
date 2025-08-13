@@ -71,6 +71,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useAssetStore } from '@/stores/asset';
 import LogoutConfirmModal from './LogoutConfirmModal.vue';
 // 👸🏻(은진) 알림 설정 모달창
 import NotificationSettingsModal from '../modals/NotificationSettingsModal.vue';
@@ -79,6 +80,8 @@ import ChangePasswordModal from '../modals/ChangePasswordModal.vue';
 import { policyAPI } from '@/api/policy';
 const router = useRouter();
 const authStore = useAuthStore();
+const assetStore = useAssetStore();
+
 const showLogoutModal = ref(false);
 
 // 💪(상일) 알림 설정 페이지로 이동
@@ -100,6 +103,8 @@ const handleLogout = () => {
 const confirmLogout = async () => {
   showLogoutModal.value = false;
   await authStore.logout();
+
+  assetStore.clearSummary?.();
 
   // Vue next tick 사용하여 상태 반영 이후 이동
   await new Promise((resolve) => setTimeout(resolve)); // 상태 반영 기다림
