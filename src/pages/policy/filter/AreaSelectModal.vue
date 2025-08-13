@@ -231,7 +231,7 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 .modalWrapper {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 2147483647;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
@@ -247,6 +247,9 @@ const canApply = computed(() => selectedRegions.value.length > 0);
   padding: 20px;
   display: flex;
   flex-direction: column;
+  /* 기본값(안 잡히는 경우 대비) */
+  --footer-h: 64px;
+  --tags-h: 0px;
 }
 .modalHeader {
   display: flex;
@@ -275,9 +278,9 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 
 .selectedRegions {
   position: sticky;
-  bottom: calc(env(safe-area-inset-bottom, 0) + 64px);
+  bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px));
   background: #fff;
-  padding: 8px 0;
+  padding: 4px 0;
   z-index: 3;
 }
 
@@ -301,11 +304,11 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 .regionTag {
   margin-top: 3px;
   /* margin-bottom: px; */
-  height: 28px;
+  height: 26px;
   background: var(--input-bg-1);
   color: var(--text-login);
   border-radius: 6px;
-  padding: 6px 11px;
+  padding: 4px 10px;
   font-size: 11px;
   display: inline-flex;
   align-items: center;
@@ -335,7 +338,7 @@ const canApply = computed(() => selectedRegions.value.length > 0);
   display: flex;
   max-height: 290px;
   gap: 5px;
-  /* margin-bottom: 10px; */
+  margin-bottom: 12px;
 }
 
 .sidoColumn {
@@ -399,10 +402,11 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 .modalFooter {
   position: sticky;
   bottom: 0;
+  z-index: 2;
   margin-top: 5px;
   display: flex;
   gap: 6px;
-  padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0));
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
   /* border-top: 1px solid var(--input-outline-2); */
 }
 
@@ -434,9 +438,12 @@ const canApply = computed(() => selectedRegions.value.length > 0);
 }
 
 .scrollArea {
-  position: relative;
+  /* position: relative; */
   max-height: 270px;
   overflow-y: auto;
+  padding-bottom: calc(
+    var(--footer-h) + var(--tags-h) + env(safe-area-inset-bottom, 0px) + 4px
+  );
   /* padding-right: 6px; */
   /* 크롬, 사파리, 엣지용 스크롤바 숨기기 */
   scrollbar-width: none; /* Firefox */

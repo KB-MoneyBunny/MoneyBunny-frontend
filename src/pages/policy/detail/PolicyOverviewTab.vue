@@ -1,9 +1,13 @@
 <!-- src/components/policy/detail/PolicyOverviewTab.vue -->
 <script setup>
+import { ref, onMounted, watch } from 'vue';
+import { fetchCardTransportationFees } from '@/api/assetApi';
+
 const props = defineProps({
   description: String,
   supportContent: String,
-  applyPeriod: String, // "20250220 ~ 20251015" 형태 또는 undefined
+  applyPeriod: String,
+  policyId: Number,
 });
 
 const formatPeriod = (periodStr) => {
@@ -19,6 +23,93 @@ const formatPeriod = (periodStr) => {
 // 줄바꿈 분리 함수
 const splitLines = (str) =>
   str ? str.split('\n').filter((s) => s.trim() !== '') : [];
+
+// K패스/기후동행카드 혜택 금액 관련 상태
+const kpassBenefit = ref(null);
+const kpassLoading = ref(false);
+
+const calcKpassBenefit = (amount) => {
+  if (amount < 23250) return 0;
+  return Math.floor(amount * 0.3);
+};
+
+const calcClimateBenefit = (amount) => {
+  const benefit = amount - 55000;
+  return benefit > 0 ? benefit : 0;
+};
+
+// 3589: 93000원 미만은 K패스 방식, 93000원 이상은 93000원의 30%만 혜택
+const calcSpecialKpassBenefit = (amount) => {
+  if (amount < 93000) return calcKpassBenefit(amount);
+  return Math.floor(93000 * 0.3);
+};
+
+// 월별로 거래내역을 합산하는 함수
+function groupByMonth(transactions, policyId) {
+  const result = {};
+  transactions.forEach((tx) => {
+    const date = new Date(tx.transactionDate);
+    const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      '0'
+    )}`;
+    if (!result[month]) result[month] = 0;
+    result[month] += tx.amount;
+  });
+  return Object.entries(result).map(([month, amount]) => {
+    if (policyId === 3167) {
+      return {
+        month,
+        amount,
+        benefit: calcKpassBenefit(amount),
+      };
+    } else if (policyId === 423) {
+      return {
+        month,
+        amount,
+        benefit: calcClimateBenefit(amount),
+      };
+    } else if (policyId === 3589) {
+      return {
+        month,
+        amount,
+        benefit: calcSpecialKpassBenefit(amount),
+      };
+    }
+    return { month, amount, benefit: 0 };
+  });
+}
+
+const loadKpassBenefit = async () => {
+  kpassLoading.value = true;
+  try {
+    const res = await fetchCardTransportationFees();
+    const transactions = res.data || [];
+    kpassBenefit.value = groupByMonth(transactions, props.policyId);
+  } catch (e) {
+    kpassBenefit.value = [];
+  }
+  kpassLoading.value = false;
+};
+
+onMounted(() => {
+  if (
+    props.policyId === 3167 ||
+    props.policyId === 423 ||
+    props.policyId === 3589
+  ) {
+    loadKpassBenefit();
+  }
+});
+
+watch(
+  () => props.policyId,
+  (val) => {
+    if (val === 3167 || val === 423) {
+      loadKpassBenefit();
+    }
+  }
+);
 </script>
 
 <template>
@@ -53,6 +144,43 @@ const splitLines = (str) =>
         <span v-if="!applyPeriod" class="periodSub font-11">
           연중 상시 접수 (예산 소진 시 조기 마감)
         </span>
+      </div>
+    </div>
+
+    <!-- K패스/기후동행카드 혜택 금액 카드 -->
+    <div
+      v-if="[3167, 423, 3589].includes(policyId)"
+      class="kpassBenefitBox mb-4"
+    >
+      <div class="font-bold font-15 mb-2">
+        {{
+          policyId === 3167
+            ? 'K패스 월별 혜택 금액'
+            : policyId === 423
+            ? '기후동행카드 월별 혜택 금액'
+            : 'K패스 월별 혜택 금액'
+        }}
+      </div>
+      <div v-if="kpassLoading" class="font-12 text-bluegray">
+        불러오는 중...
+      </div>
+      <div v-else>
+        <template v-if="kpassBenefit && kpassBenefit.length">
+          <div
+            v-for="item in kpassBenefit"
+            :key="item.month"
+            class="kpassBenefitItem"
+          >
+            <span class="font-12">{{ item.month }}</span>
+            <span class="font-12 ml-2"
+              >총 이용금액: {{ item.amount.toLocaleString() }}원</span
+            >
+            <span class="font-12 ml-2 font-bold text-green">
+              혜택금액: {{ item.benefit.toLocaleString() }}원
+            </span>
+          </div>
+        </template>
+        <div v-else class="font-12 text-bluegray">교통 사용 내역 없음</div>
       </div>
     </div>
   </div>
@@ -120,5 +248,20 @@ const splitLines = (str) =>
   color: var(--text-bluegray);
   /* line-height: 1.6; */
   margin-left: 0;
+}
+.kpassBenefitBox {
+  background: #f7f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+.kpassBenefitItem {
+  margin-bottom: 8px;
+}
+.text-green {
+  color: #2db400;
+}
+.ml-2 {
+  margin-left: 8px;
 }
 </style>
