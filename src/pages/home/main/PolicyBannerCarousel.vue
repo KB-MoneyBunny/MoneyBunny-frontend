@@ -136,8 +136,12 @@ const trackStyle = computed(() => {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 6px;
 }
+
+.slideInner {
+  padding: 0;
+}
+
 .track {
   display: flex;
   will-change: transform;
@@ -145,24 +149,20 @@ const trackStyle = computed(() => {
 .slide {
   flex: 0 0 100%;
   min-width: 100%;
+  padding: 0;
 }
-.slideInner {
-  box-sizing: border-box;
-  padding: 6px 6px 0; /* overflow:visible 유지 */
-}
-
 .dots {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 3px;
+  bottom: 8px;
   display: flex;
-  gap: 3px;
+  gap: 4px;
   justify-content: center;
 }
 .dot {
-  width: 3px;
-  height: 3px;
+  width: 4px;
+  height: 4px;
   border-radius: 999px;
   border: none;
   background: rgba(31, 59, 97, 0.25);

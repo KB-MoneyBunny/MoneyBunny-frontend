@@ -11,19 +11,19 @@
 
       <!-- 💪(상일) 혜택 상태 탭 (알림 센터 스타일) -->
       <div class="tab-switcher">
-        <button 
+        <button
           :class="['tab-button', { active: benefitFilter === 'all' }]"
           @click="setBenefitFilter('all')"
         >
           전체
         </button>
-        <button 
+        <button
           :class="['tab-button', { active: benefitFilter === 'received' }]"
           @click="setBenefitFilter('received')"
         >
           혜택자
         </button>
-        <button 
+        <button
           :class="['tab-button', { active: benefitFilter === 'not_eligible' }]"
           @click="setBenefitFilter('not_eligible')"
         >
@@ -33,14 +33,14 @@
 
       <!-- 정렬 필터 텍스트 -->
       <div class="sortTextRow">
-        <span 
+        <span
           :class="['sortText', { active: sortOrder === 'recommended' }]"
           @click="setSortOrder('recommended')"
         >
           추천순
         </span>
         <span class="divider">·</span>
-        <span 
+        <span
           :class="['sortText', { active: sortOrder === 'latest' }]"
           @click="setSortOrder('latest')"
         >
@@ -55,7 +55,11 @@
       />
 
       <template v-else>
-        <section v-for="r in filteredReviews" :key="r.id" class="reviewCard card">
+        <section
+          v-for="r in filteredReviews"
+          :key="r.id"
+          class="reviewCard card"
+        >
           <div class="reviewHeader">
             <!-- 💪(상일) 프로필 이미지로 변경 -->
             <div class="avatar">
@@ -84,11 +88,12 @@
           <p class="body font-12">{{ r.content }}</p>
 
           <div class="actionRow">
-            <button
-              class="chip"
-              @click="toggleHelpful(r)"
-            >
-              <img :src="likeIcon" alt="like" :class="['chipIcon', { liked: r.helped }]" />
+            <button class="chip" @click="toggleHelpful(r)">
+              <img
+                :src="likeIcon"
+                alt="like"
+                :class="['chipIcon', { liked: r.helped }]"
+              />
               <span class="count">{{ r.helpCount || 0 }}</span>
             </button>
           </div>
@@ -102,22 +107,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import likeIcon from "@/assets/images/icons/policy/like.png";
-import PolicyReviewEmpty from "./PolicyReviewEmpty.vue";
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import likeIcon from '@/assets/images/icons/policy/like.png';
+import PolicyReviewEmpty from './PolicyReviewEmpty.vue';
 // 💪(상일) 정책 리뷰 API 추가
-import { policyInteractionAPI } from "@/api/policyInteraction";
+import { policyInteractionAPI } from '@/api/policyInteraction';
 // 💪(상일) 프로필 이미지 imports
-import imgSprout from "@/assets/images/icons/profile/profile_edit_sprout.png";
-import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";
-import imgEyelash from "@/assets/images/icons/profile/profile_edit_eyelash.png";
-import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
+import imgSprout from '@/assets/images/icons/profile/profile_edit_sprout.png';
+import imgBeard from '@/assets/images/icons/profile/profile_edit_beard.png';
+import imgEyelash from '@/assets/images/icons/profile/profile_edit_eyelash.png';
+import imgCarrot from '@/assets/images/icons/profile/profile_edit_carrot.png';
 
 const route = useRoute();
 const router = useRouter();
 const policyId = computed(() => Number(route.params.policyId)); // 💪(상일) id → policyId로 수정
-const policyTitle = ref("");
+const policyTitle = ref('');
 
 // 💪(상일) 프로필 이미지 배열 (마이페이지와 동일)
 const profileImages = [imgSprout, imgBeard, imgEyelash, imgCarrot];
@@ -138,25 +143,31 @@ const benefitFilter = ref('all'); // 'all' | 'received' | 'not_eligible'
 // 💪(상일) 필터링된 리뷰 계산
 const filteredReviews = computed(() => {
   let filtered = [...reviews.value];
-  
+
   // 혜택 상태 필터링
   if (benefitFilter.value !== 'all') {
     const statusMap = {
-      'received': 'RECEIVED',
-      'not_eligible': 'NOT_ELIGIBLE'
+      received: 'RECEIVED',
+      not_eligible: 'NOT_ELIGIBLE',
     };
-    filtered = filtered.filter(r => r.benefitStatus === statusMap[benefitFilter.value]);
+    filtered = filtered.filter(
+      (r) => r.benefitStatus === statusMap[benefitFilter.value]
+    );
   }
-  
+
   // 정렬
   if (sortOrder.value === 'recommended') {
     // 좋아요 수 내림차순
     filtered.sort((a, b) => (b.helpCount || 0) - (a.helpCount || 0));
   } else {
     // 최신순 (날짜 내림차순)
-    filtered.sort((a, b) => new Date(b.date.replace(/\./g, '-')) - new Date(a.date.replace(/\./g, '-')));
+    filtered.sort(
+      (a, b) =>
+        new Date(b.date.replace(/\./g, '-')) -
+        new Date(a.date.replace(/\./g, '-'))
+    );
   }
-  
+
   return filtered;
 });
 
@@ -170,11 +181,11 @@ const allReviews = ref([]);
 
 // 💪(상일) 날짜 포맷팅 함수
 function formatDate(dateString) {
-  if (!dateString) return "";
+  if (!dateString) return '';
   const date = new Date(dateString);
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   return `${year}.${month}.${day}`;
 }
 
@@ -183,15 +194,16 @@ async function fetchReviews({ page, size }) {
   try {
     // 첫 페이지일 때만 API 호출
     if (page === 1 && allReviews.value.length === 0) {
-      const response = await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
-        policyId.value
-      );
-      console.log("💪(상일) API 응답 데이터:", response.data);
+      const response =
+        await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
+          policyId.value
+        );
+      console.log('💪(상일) API 응답 데이터:', response.data);
 
       // 💪(상일) 백엔드 데이터를 프론트엔드 형식으로 변환
       allReviews.value = response.data.map((review) => ({
         id: review.reviewId,
-        nickname: review.userName || "익명",
+        nickname: review.userName || '익명',
         date: formatDate(review.createdAt),
         content: review.content,
         helpCount: review.likeCount || 0,
@@ -203,7 +215,7 @@ async function fetchReviews({ page, size }) {
         isLoading: false, // 💪(상일) 좋아요 로딩 상태
       }));
 
-      console.log("💪(상일) 변환된 데이터:", allReviews.value);
+      console.log('💪(상일) 변환된 데이터:', allReviews.value);
     }
 
     // 클라이언트 사이드 페이지네이션
@@ -213,11 +225,11 @@ async function fetchReviews({ page, size }) {
     return {
       items: allReviews.value.slice(start, end),
       total: allReviews.value.length,
-      policyTitle: "정책 리뷰",
+      policyTitle: '정책 리뷰',
     };
   } catch (error) {
-    console.error("💪(상일) 리뷰 조회 실패:", error);
-    console.error("💪(상일) 에러 상세 정보:", {
+    console.error('💪(상일) 리뷰 조회 실패:', error);
+    console.error('💪(상일) 에러 상세 정보:', {
       message: error.message,
       response: error.response,
       status: error.response?.status,
@@ -228,18 +240,18 @@ async function fetchReviews({ page, size }) {
     // 💪(상일) 에러 타입별 처리
     if (error.response?.status === 500) {
       console.warn(
-        "💪(상일) 서버 내부 오류 - 리뷰 데이터를 불러올 수 없습니다."
+        '💪(상일) 서버 내부 오류 - 리뷰 데이터를 불러올 수 없습니다.'
       );
       // TODO: 백엔드 테이블 확인 필요
     } else if (error.response?.status === 404) {
-      console.warn("💪(상일) 정책을 찾을 수 없습니다.");
+      console.warn('💪(상일) 정책을 찾을 수 없습니다.');
     }
 
     // 에러 시 빈 배열 반환하여 빈 상태 표시
     return {
       items: [],
       total: 0,
-      policyTitle: "정책 리뷰",
+      policyTitle: '정책 리뷰',
     };
   }
 }
@@ -274,9 +286,9 @@ async function loadMore() {
 // 💪(상일) 혜택 상태 텍스트 반환
 function getBenefitText(benefitStatus) {
   const statusMap = {
-    RECEIVED: "수령완료",
-    PENDING: "처리중",
-    NOT_ELIGIBLE: "수령불가",
+    RECEIVED: '수령완료',
+    PENDING: '처리중',
+    NOT_ELIGIBLE: '수령불가',
   };
   return statusMap[benefitStatus] || benefitStatus;
 }
@@ -284,11 +296,11 @@ function getBenefitText(benefitStatus) {
 // 💪(상일) 혜택 상태별 CSS 클래스 반환
 function getBenefitClass(benefitStatus) {
   const classMap = {
-    RECEIVED: "benefit-received",
-    PENDING: "benefit-pending",
-    NOT_ELIGIBLE: "benefit-not-eligible",
+    RECEIVED: 'benefit-received',
+    PENDING: 'benefit-pending',
+    NOT_ELIGIBLE: 'benefit-not-eligible',
   };
-  return classMap[benefitStatus] || "benefit-default";
+  return classMap[benefitStatus] || 'benefit-default';
 }
 
 // 💪(상일) 프로필 이미지 반환 함수 (마이페이지와 동일)
@@ -331,7 +343,7 @@ async function toggleHelpful(review) {
     );
     review.helpCount = response.data;
   } catch (error) {
-    console.error("좋아요 처리 실패:", error);
+    console.error('좋아요 처리 실패:', error);
     // 에러 시 원래 상태로 롤백
     review.helped = originalHelped;
     review.helpCount = originalHelpCount;
@@ -339,7 +351,7 @@ async function toggleHelpful(review) {
     // 에러 메시지 표시 (선택적)
     if (error.response?.status === 400) {
       // 400: 이미 좋아요한 상태 또는 좋아요하지 않은 상태
-      console.warn("좋아요 상태 또는 이미 좋아요한 상태입니다.");
+      console.warn('좋아요 상태 또는 이미 좋아요한 상태입니다.');
     }
   } finally {
     review.isLoading = false;
@@ -362,7 +374,7 @@ onBeforeUnmount(() => {
 });
 
 const goWriteReview = () => {
-  router.push({ name: "policyReviewWrite", params: { id: policyId.value } });
+  router.push({ name: 'policyReviewWrite', params: { id: policyId.value } });
 };
 
 // 💪(상일) 필터 변경 함수들
@@ -531,7 +543,6 @@ const setBenefitFilter = (filter) => {
   border-radius: 6px;
   padding: 6px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .tab-button {
@@ -543,8 +554,7 @@ const setBenefitFilter = (filter) => {
   color: #777;
   cursor: pointer;
   position: relative;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 13px;
 }
 
 .tab-button.active {
@@ -557,17 +567,16 @@ const setBenefitFilter = (filter) => {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 12px;
   color: var(--text-bluegray);
-  margin: 12px 0;
-  padding: 0 12px;
+  margin: 10px 0;
+  padding: 0 10px;
 }
 
 .sortText {
   cursor: pointer;
-  transition: color 0.2s;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .sortText:hover {
