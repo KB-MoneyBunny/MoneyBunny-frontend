@@ -113,6 +113,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useAssetStore } from '@/stores/asset';
 import {
   connectAccount,
   registerAccounts,
@@ -121,6 +122,8 @@ import {
 } from '@/api/assetApi';
 import { getBankLogo } from '@/assets/utils/bankLogoMap.js';
 import { getCardLogo } from '@/assets/utils/cardLogoMap.js';
+
+const assetStore = useAssetStore();
 
 const props = defineProps({
   type: String,
@@ -235,13 +238,22 @@ const submit = async () => {
 
   // 🎯 등록 로딩 시작
   isRegistering.value = true;
+  let res = null;
 
   try {
     if (props.type === 'account') {
-      await registerAccounts(selectedData.map((item) => item.raw));
+      res = await registerAccounts(selectedData.map((item) => item.raw));
     } else {
-      await registerCards(selectedData.map((item) => item.raw));
+      res = await registerCards(selectedData.map((item) => item.raw));
     }
+
+    // 등록 성공 응답의 최신 요약을 Pinia에 즉시 반영
+    if (res?.data) {
+      assetStore.$patch({ summary: res.data });
+    } else {
+      await assetStore.loadSummary(true);
+    }
+
     emit('items-selected', {
       institutionInfo: props.institutionInfo,
       selectedItems: selectedData,

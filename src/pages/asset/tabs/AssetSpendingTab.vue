@@ -54,9 +54,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onActivated, nextTick } from 'vue';
 import { useSpendingData } from '@/assets/utils/useSpendingData';
 import { categoryMap } from '@/constants/categoryMap';
+import { useUiFlagsStore } from '@/stores/uiFlags';
 
 // 컴포넌트 import
 import CalendarSection from '../component/spending/CalendarSection.vue';
@@ -69,6 +70,8 @@ import DetailModal from '../component/detail/DetailModal.vue';
 // 이벤트 emit 정의
 const emit = defineEmits(['spending-data-updated']);
 
+const ui = useUiFlagsStore();
+
 // 지출 데이터 composable
 const {
   currentDate,
@@ -78,6 +81,7 @@ const {
   chartData,
   monthlyTrendData,
   getCategoryDetail,
+  refetch,
 } = useSpendingData();
 
 // 상태 관리
@@ -185,6 +189,7 @@ const openCategoryDetail = async (category) => {
 const closeCategoryDetail = () => {
   showCategoryDetail.value = false;
   selectedCategoryData.value = null;
+  maybeRefetchIfDirty();
 };
 
 // 데이터 변경 시 부모에게 알림
@@ -212,7 +217,36 @@ watch(
 
 onMounted(() => {
   emitSpendingData();
+  maybeRefetchIfDirty();
 });
+
+// KeepAlive로 탭을 나갔다 돌아왔을 때
+onActivated(() => {
+  maybeRefetchIfDirty();
+});
+
+// 더러워졌을 때 반응형 감지(즉시 새로고침)
+watch(
+  () => ui.spendingDirty,
+  (dirty) => {
+    if (dirty) maybeRefetchIfDirty();
+  }
+);
+
+async function maybeRefetchIfDirty() {
+  if (!ui.spendingDirty) return;
+  try {
+    if (typeof refetch === 'function') {
+      await refetch();
+    } else {
+      const d = new Date(currentDate.value);
+      currentDate.value = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      await nextTick();
+    }
+  } finally {
+    ui.clearSpendingDirty();
+  }
+}
 </script>
 
 <style scoped>

@@ -364,7 +364,7 @@ function snapshotSummary() {
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
-// 탭별 자동 동기화 (백엔드 비동기 + 폴링)
+// 탭별 자동 동기화
 async function autoSyncForTab(tab) {
   console.debug('[autoSyncForTab]', tab);
   if (tab === '계좌') {
@@ -379,7 +379,7 @@ async function autoSyncForTab(tab) {
         assetStore.summary = res.data;
       } else {
         // 3) 없으면 잠깐 대기 후 서버 요약 딱 한 번만 강제 호출
-        await sleep(1500); // 필요시 1000~2000ms로 조절
+        await sleep(1000); // 필요시 1000~2000ms로 조절
         await assetStore.loadSummary(true);
       }
       syncing.value.accounts = false;
@@ -395,7 +395,7 @@ async function autoSyncForTab(tab) {
       if (res?.data) {
         assetStore.summary = res.data;
       } else {
-        await sleep(1500);
+        await sleep(1000);
         await assetStore.loadSummary(true);
       }
       syncing.value.cards = false;
