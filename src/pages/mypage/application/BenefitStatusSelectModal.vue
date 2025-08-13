@@ -1,17 +1,17 @@
 <script setup>
 import { ref } from 'vue';
 
-const props = defineProps({ 
+const props = defineProps({
   policyTitle: String,
-  currentBenefitStatus: String
+  currentBenefitStatus: String,
 });
 
 const emit = defineEmits(['close', 'select']);
 
 const benefitOptions = [
   { value: 'RECEIVED', label: '네 받았어요!' },
-  { value: 'PENDING', label: '기다리는 중이에요ㅠ' },
-  { value: 'NOT_ELIGIBLE', label: '조건이 까다로워서 못 받았어요' }
+  { value: 'PENDING', label: '기다리는 중이에요 🥲' },
+  { value: 'NOT_ELIGIBLE', label: '조건이 까다로워서 못 받았어요' },
 ];
 
 const selected = ref(props.currentBenefitStatus || '');
@@ -31,17 +31,17 @@ const selectStatus = () => {
   <div class="modalOverlay" @click.self="close">
     <div class="modalContainer">
       <header class="modalHeader">
-        <span class="modalTitle font-17 font-bold">[{{ policyTitle }}]</span>
+        <span class="modalTitle font-15 font-bold">[{{ policyTitle }}]</span>
         <button class="iconBtn right" @click="close">
           <img src="@/assets/images/icons/common/x.png" alt="닫기" />
         </button>
       </header>
-      
+
       <div class="modalContent">
         <div class="questionSection">
-          <div class="question">Q : 이 정책의 혜택을 받으셨나요?</div>
+          <div class="question">이 정책의 혜택을 받으셨나요?</div>
         </div>
-        
+
         <div class="optionList">
           <button
             v-for="option in benefitOptions"
@@ -54,7 +54,7 @@ const selectStatus = () => {
           </button>
         </div>
       </div>
-      
+
       <div class="modalFooter">
         <button class="applyBtn" @click="selectStatus" :disabled="!selected">
           다음
@@ -77,7 +77,7 @@ const selectStatus = () => {
 
 .modalContainer {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 6px;
   width: 340px;
   max-width: 90vw;
   box-sizing: border-box;
@@ -89,20 +89,22 @@ const selectStatus = () => {
 .modalHeader {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 18px 20px;
   border-bottom: 1px solid #eee;
-  position: relative;
-  justify-content: center;
+  gap: 8px;
+  /* position: relative; */
+  /* justify-content: center; */
 }
 
 .modalTitle {
-  position: absolute;
+  position: static;
   left: 50%;
-  transform: translateX(-50%);
+  transform: none;
   white-space: nowrap;
   max-width: calc(100% - 60px);
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
 }
 
 .modalContent {
@@ -111,13 +113,13 @@ const selectStatus = () => {
 }
 
 .questionSection {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   text-align: left;
 }
 
 .question {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: bold;
   color: var(--text-login);
   line-height: 1.4;
 }
@@ -125,7 +127,7 @@ const selectStatus = () => {
 .optionList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .optionBtn {
@@ -133,41 +135,36 @@ const selectStatus = () => {
   padding: 12px 16px;
   background: #fff;
   border: 1.5px solid var(--input-bg-1);
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s;
-}
-
-.optionBtn:hover {
-  border-color: #93c5fd;
 }
 
 .optionBtn.selected {
-  background: #dbeafe;
-  border-color: #3b82f6;
+  background: var(--input-bg-1);
+  /* border-color: var(--base-blue-dark); */
 }
 
 .optionLabel {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  /* font-weight: bold; */
   color: var(--text-login);
 }
 
 .modalFooter {
   display: flex;
-  padding: 10px 18px 0 18px;
+  padding: 0 18px;
 }
 
 .applyBtn {
   width: 100%;
   padding: 12px 0;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--base-blue-dark);
   color: #fff;
   border: none;
   font-size: 14px;
-  font-weight: 500;
+  /* font-weight: 500; */
   cursor: pointer;
 }
 
@@ -187,8 +184,8 @@ const selectStatus = () => {
 }
 
 .iconBtn img {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
