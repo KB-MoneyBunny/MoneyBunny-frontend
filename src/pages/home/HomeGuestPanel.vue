@@ -1,4 +1,3 @@
-<!-- src/pages/home/HomeGuestPanel.vue -->
 <template>
   <section class="guestWrap">
     <!-- 로그인 안내 카드 -->
@@ -48,36 +47,51 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import bunny5 from '@/assets/images/icons/bunny/loginbunny.png'; // 기본 히어로 이미지
+import { computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import bunny5 from "@/assets/images/icons/bunny/loginbunny.png"; // 기본 히어로 이미지
 
 const props = defineProps({
-  image: { type: String, default: '' },
-  loginRouteName: { type: String, default: 'login' },
-  signupRouteName: { type: String, default: 'signUpEmailRequest' },
+  image: { type: String, default: "" },
+  loginRouteName: { type: String, default: "login" },
+  signupRouteName: { type: String, default: "signUpEmailRequest" },
 });
 
-const emit = defineEmits(['login', 'signUpEmailRequest']);
+const emit = defineEmits(["login", "signUpEmailRequest"]);
 const router = useRouter();
+const route = useRoute();
 
 const heroSrc = computed(() => props.image || bunny5);
+
+const redirectTarget = computed(() => {
+  // 이미 redirect가 붙어있으면 그 값을 그대로 유지 (연속 이동 시)
+  const fromQuery = route.query.redirect?.toString();
+  return fromQuery || route.fullPath;
+});
 
 function goLogin() {
   // 라우트가 없으면 emit만
   try {
-    if (props.loginRouteName) router.push({ name: props.loginRouteName });
-    else emit('login');
+    if (props.loginRouteName)
+      router.push({
+        name: props.loginRouteName,
+        query: { redirect: redirectTarget.value },
+      });
+    else emit("login");
   } catch {
-    emit('login');
+    emit("login");
   }
 }
 function goSignup() {
   try {
-    if (props.signupRouteName) router.push({ name: props.signupRouteName });
-    else emit('signup');
+    if (props.signupRouteName)
+      router.push({
+        name: props.signupRouteName,
+        query: { redirect: redirectTarget.value },
+      });
+    else emit("signup");
   } catch {
-    emit('signup');
+    emit("signup");
   }
 }
 </script>

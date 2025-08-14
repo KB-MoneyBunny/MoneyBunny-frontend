@@ -135,6 +135,12 @@ const period = computed(() => policy.value?.endDate || "");
 
 // 💪(상일) 미완료 신청 체크
 const checkIncompleteApplication = async () => {
+  // 비로그인 시 바로 종료
+  if (!authStore.isLogin) {
+    console.log("비로그인 상태 → API 호출 생략");
+    return;
+  }
+
   try {
     const response = await policyInteractionAPI.getIncompleteApplication();
     if (response.data) {
