@@ -1,7 +1,7 @@
 <template>
   <div class="spending-no-data">
     <img
-      src="@/assets/images/icons/bunny/nodata_bunny.png"
+      src="@/assets/images/icons/bunny/nospending_bunny.png"
       alt="지출 내역 없음"
       class="no-data-icon"
     />

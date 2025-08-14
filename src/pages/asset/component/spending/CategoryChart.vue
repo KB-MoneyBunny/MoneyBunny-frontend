@@ -6,7 +6,7 @@
       <p class="chart-subtitle">최근 6개월</p>
     </div>
 
-    <!-- 데이터가 없을 때 -->
+    <!-- 데이터가 없을 때 SpendingNodata 컴포넌트 사용 -->
     <SpendingNodata v-if="isEmpty" />
 
     <!-- 차트 컨테이너 -->
@@ -270,19 +270,6 @@ const formatBarAmount = (amount) => {
 .chart-label.selected {
   color: var(--text-login);
   font-weight: 600;
-}
-
-.no-data {
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.no-data-text {
-  font-size: 0.875rem;
-  color: var(--text-lightgray);
-  margin: 0;
 }
 
 /* 반응형 처리 */
