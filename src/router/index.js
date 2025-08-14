@@ -54,6 +54,11 @@ import PolicyReviewPage from "@/pages/policy/review/PolicyReviewPage.vue";
 // 비로그인 정책 조회 페이지
 import PolicySearchGuestPage from "@/pages/policy/search/PolicySearchGuestPage.vue";
 
+import HomeGuestPanel from "@/pages/home/HomeGuestPanel.vue";
+
+// 게스트 접근
+import HomeGuestPanel from "@/pages/home/HomeGuestPanel.vue";
+// import GuestGatePage from "@/pages/home/GuestGatePage.vue";
 const routes = [
   //
   // ─── 인증 관련 ──────────────────────────────────────
@@ -110,6 +115,16 @@ const routes = [
     component: ChangePassword,
   },
 
+  // 게스트 패널
+  {
+    path: "/guest",
+    name: "guest",
+    component: HomeGuestPanel, // 단독 페이지로 사용
+    props: {
+      loginRouteName: "login",
+      signupRouteName: "signUpEmailRequest",
+    },
+  },
   // ─── 기본 레이아웃 하위 라우트 ─────────
   {
     path: "/",
@@ -319,6 +334,9 @@ router.beforeEach(async (to, from, next) => {
     "/policy/search",
     "/policy/search/result",
     "/policy/search/guest",
+
+    // 게스트페이지
+    "/guest",
   ];
 
   const authRequired = !publicPages.includes(to.path);
@@ -328,10 +346,17 @@ router.beforeEach(async (to, from, next) => {
   );
 
   // 👸🏻 은진
+  // if (authRequired && !authStore.isLogin) {
+  //   // 로그인이 필요한 페이지인데 로그인하지 않은 경우
+  //   console.log("인증되지 않은 접근 - 로그인 페이지로 리다이렉트");
+  //   return next({ path: "/", query: { error: "auth_required" } });
+  // }
+  // 🎵 유정
   if (authRequired && !authStore.isLogin) {
-    // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-    console.log("인증되지 않은 접근 - 로그인 페이지로 리다이렉트");
-    return next({ path: "/", query: { error: "auth_required" } });
+    // return next({ name: 'guest', query: { redirect: to.fullPath } });
+    // 게스트 페이지로 보낼 때, 게스트 자체는 통과
+    if (to.name === "guest") return next();
+    return next({ name: "guest", query: { redirect: to.fullPath } });
   }
 
   if (to.path === "/" && authStore.isLogin) {

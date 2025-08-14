@@ -81,7 +81,7 @@ const handleCategoryClick = (category) => {
   color: var(--text-bluegray);
   cursor: pointer;
   border-radius: 8px;
-  transition: background-color 0.2s ease;
+  /* transition: background-color 0.2s ease; */
 
   /* 모바일 터치 최적화 */
   -webkit-tap-highlight-color: transparent;

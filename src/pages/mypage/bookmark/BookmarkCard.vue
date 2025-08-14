@@ -36,7 +36,9 @@
     </div>
     <div class="metaRow">
       <span>북마크일 : {{ item.savedDate }}</span>
-      <button class="detailBtn" @click.stop="handleDetailClick">자세히 보기</button>
+      <button class="detailBtn" @click.stop="handleDetailClick">
+        자세히 보기
+      </button>
     </div>
   </div>
 </template>
@@ -109,10 +111,10 @@ const handleRemoveBookmark = async () => {
   min-width: 0;
 }
 .badge {
-  font-size: 11px;
-  border-radius: 10px;
-  padding: 5px 8px;
-  font-weight: bold;
+  font-size: 10px;
+  border-radius: 6px;
+  padding: 4px 7px;
+  /* font-weight: bold; */
   margin-left: 2px;
 }
 .badgeActive {

@@ -151,7 +151,7 @@ const formatBarAmount = (amount) => {
   background: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
   margin-top: 1.5rem;
 }
 

@@ -78,7 +78,7 @@ const close = () => emit('close');
 
         <p class="contact">
           문의
-          <a href="mailto:support@moneybunny.app">support@moneybunny.app</a>
+          <a href="mailto:support@moneybunny.app">moneybunnykb@gmail.com</a>
         </p>
       </div>
 

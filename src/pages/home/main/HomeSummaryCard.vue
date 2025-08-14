@@ -1,7 +1,13 @@
 <!-- HomeSummaryCard.vue -->
 <template>
   <div class="homeSummaryCard">
+    <!-- <AssetConnectCallout
+      v-if="!isConnected"
+      @connectAccount="onConnectAccount"
+      @connectCard="onConnectCard"
+    /> -->
     <!-- Row 1: KPI -->
+    <!-- <template v-else> -->
     <div class="kpiRow">
       <div class="kpi">
         <div class="kpiLabel">현재 자산</div>
@@ -69,6 +75,7 @@
 
     <div v-if="assetStore.loading" class="hint">불러오는 중...</div>
     <div v-if="assetStore.error" class="err">{{ assetStore.error }}</div>
+    <!-- </template> -->
   </div>
 </template>
 
@@ -82,6 +89,7 @@ import {
   nextTick,
 } from 'vue';
 import { useAssetStore } from '@/stores/asset';
+import AssetConnectCallout from './AssetConnectCallout.vue';
 
 const props = defineProps({
   // 정책 TOP3로 기대되는 합산 금액 (없으면 0)

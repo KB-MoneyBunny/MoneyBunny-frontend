@@ -39,7 +39,11 @@
           title="상태 변경하기"
         >
           {{ getBenefitStatusText(application.benefitStatus) }}
-          <span class="editIcon">✏️</span>
+          <img
+            src="@/assets/images/icons/mypage/edit.png"
+            alt="상태 수정"
+            class="editIcon"
+          />
         </button>
       </div>
     </div>
@@ -398,8 +402,8 @@ const formatApplicationDate = (dateString) => {
 .statusBadge {
   font-size: 10px;
   border-radius: 6px;
-  padding: 5px 8px;
-  font-weight: bold;
+  padding: 4px 7px;
+  /* font-weight: bold; */
   margin-left: 2px;
   border: none;
   cursor: pointer;
@@ -411,15 +415,6 @@ const formatApplicationDate = (dateString) => {
 /* .statusBadge:hover {
   transform: scale(1.05);
 } */
-
-.editIcon {
-  font-size: 10px;
-  opacity: 0.7;
-}
-
-.statusBadge:hover .editIcon {
-  opacity: 1;
-}
 
 /* 기존 badge 클래스는 유지 (다른 곳에서 사용할 수 있음) */
 .badge {
@@ -536,5 +531,15 @@ const formatApplicationDate = (dateString) => {
 
 .reviewBtn.review-edit {
   background-color: var(--top-rank-3); /* 수정 모드 */
+}
+
+.editIcon {
+  width: 11px;
+  height: 11px;
+  /* opacity: 0.7; */
+}
+
+.statusBadge:hover .editIcon {
+  opacity: 1;
 }
 </style>

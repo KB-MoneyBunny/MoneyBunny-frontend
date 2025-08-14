@@ -37,19 +37,7 @@ const goToAccountTab = () => {
   background-color: #fff;
   border-radius: 1rem;
   padding: 1rem;
-  box-shadow: var(--shadow-sm, 0 2px 6px rgba(0, 0, 0, 0.05));
-  cursor: pointer; /* 커서 포인터로 변경 */
-  transition: transform 0.2s ease, box-shadow 0.2s ease; /* 부드러운 애니메이션 */
-
-  /* 모바일 터치 최적화 */
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-/* 카드 호버/활성 상태 (모바일에서는 터치 시) */
-.overview-card:active {
-  transform: scale(0.98); /* 살짝 축소 효과 */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* box-shadow: var(--shadow-sm, 0 2px 6px rgba(0, 0, 0, 0.05)); */
 }
 
 .title-row {
