@@ -114,6 +114,7 @@ import {
   updateTransactionCategory,
 } from '@/api/assetApi';
 import { categoryMap } from '@/constants/categoryMap';
+import { useUiFlagsStore } from '@/stores/uiFlags';
 
 const props = defineProps({
   // AssetMain에서 { id, name, color, transactions? } 형태로 전달
@@ -130,6 +131,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['back']);
+
+const ui = useUiFlagsStore();
 
 const currentDate = ref(new Date(props.selectedDate));
 const selectedMonth = ref(currentDate.value.toISOString().slice(0, 7)); // YYYY-MM
@@ -300,6 +303,8 @@ const onCategoryUpdated = async ({ transactionId, category }) => {
     }
 
     await updateTransactionCategory(transactionId, newCategoryId);
+
+    ui.markSpendingDirty();
 
     // 현재 상세 카테고리와 다른 카테고리로 바꿨다면 목록에서 제거
     const currentCategoryName = props.categoryData.name || '';
