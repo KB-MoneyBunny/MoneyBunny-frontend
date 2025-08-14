@@ -51,6 +51,14 @@ const profileImages = [
 
 const selectedImageKey = ref(profileImages[0].key); // 초기값: "sprout"
 
+// 선택한 프로필 키를 백엔드 imageId(0~3)로 매핑
+const imageIdMap = {
+  sprout: 0,
+  beard: 1,
+  eyelash: 2,
+  carrot: 3,
+};
+
 // 👁️ 비밀번호 보기/숨기기 아이콘
 const eyeView = new URL(
   "@/assets/images/icons/signup/eye_view.png",
@@ -76,8 +84,12 @@ const showConfirmPassword = ref(false);
 // 안내/에러 메시지
 const usernameMsg = ref("");
 const idStatusType = ref(""); // 'error' | 'success'
-const passwordMsg = ref("");
-const confirmStatusType = ref(""); // 'error' | 'success'
+
+// 변경
+const pwFormatMsg = ref(""); // 형식 안내
+const pwFormatStatus = ref(""); // 'error' | 'success' (형식)
+const pwMatchMsg = ref(""); // 일치 안내
+const pwMatchStatus = ref(""); // 'error' | 'success' (일치)
 
 // 약관 체크
 const agreement = reactive({
@@ -130,17 +142,33 @@ const checkUsername = async () => {
 
 // 비밀번호 일치 검사
 const validatePassword = () => {
-  if (!password.value || !confirmPassword.value) {
-    passwordMsg.value = "";
-    confirmStatusType.value = "";
-    return;
-  }
-  if (password.value !== confirmPassword.value) {
-    passwordMsg.value = "비밀번호가 서로 일치하지 않습니다.";
-    confirmStatusType.value = "error";
+  // 1) 형식 검사 (password 값 있을 때만)
+  if (password.value) {
+    if (!pwRule.test(password.value)) {
+      pwFormatMsg.value = "8자 이상, 영문/숫자/특수문자 모두 포함해야 합니다.";
+      pwFormatStatus.value = "error";
+    } else {
+      pwFormatMsg.value = "사용 가능한 비밀번호 형식입니다.";
+      pwFormatStatus.value = "success";
+    }
   } else {
-    passwordMsg.value = "";
-    confirmStatusType.value = "success";
+    pwFormatMsg.value = "";
+    pwFormatStatus.value = "";
+  }
+
+  // 2) 일치 검사 (둘 다 있을 때만)
+  if (password.value && confirmPassword.value) {
+    if (password.value !== confirmPassword.value) {
+      pwMatchMsg.value = "비밀번호가 서로 일치하지 않습니다.";
+      pwMatchStatus.value = "error";
+    } else {
+      pwMatchMsg.value = "비밀번호가 일치합니다.";
+      pwMatchStatus.value = "success";
+    }
+  } else {
+    // 하나라도 비었으면 일치 메시지 비우기
+    pwMatchMsg.value = "";
+    pwMatchStatus.value = "";
   }
 };
 
@@ -178,13 +206,10 @@ const handleSignUp = async () => {
       loginId: username.value,
       email: email.value,
       password: password.value,
+      profileImageId: imageIdMap[selectedImageKey.value], // 프로필 이미지 저장
     };
 
     await axios.post("/api/member/join", payload);
-
-    // 여기서 localStorage에 저장
-
-    localStorage.setItem("avatarKey", selectedImageKey.value);
 
     showToast.value = true;
     setTimeout(() => {
@@ -268,20 +293,6 @@ const onAgreeMarketing = () => {
             :class="{ error: !isValidName && name }"
             placeholder="이름을 입력하세요"
           />
-          <p
-            v-if="name"
-            class="font-10 idStatusMsg"
-            :class="{
-              error: !isValidName,
-              success: isValidName,
-            }"
-          >
-            {{
-              isValidName
-                ? "사용 가능한 이름입니다!"
-                : "이름은 2~20자 한글/영문만 입력해주세요."
-            }}
-          </p>
         </div>
         <!-- 아이디 -->
         <div class="formGroup">
@@ -342,8 +353,19 @@ const onAgreeMarketing = () => {
               @click="showPassword = !showPassword"
             />
           </div>
-          <p class="font-10 font-light">8자 이상, 영문/숫자/특수문자 포함</p>
+          <!-- <p class="font-10 font-light">8자 이상, 영문/숫자/특수문자 포함</p> -->
+          <p
+            v-if="pwFormatMsg"
+            class="pwStatusMsg font-10"
+            :class="{
+              error: pwFormatStatus === 'error',
+              success: pwFormatStatus === 'success',
+            }"
+          >
+            {{ pwFormatMsg }}
+          </p>
         </div>
+
         <!-- 비밀번호 확인 -->
         <div class="formGroup">
           <label class="font-13 font-bold">비밀번호 확인</label>
@@ -363,16 +385,17 @@ const onAgreeMarketing = () => {
             />
           </div>
           <p
-            v-if="passwordMsg"
+            v-if="pwMatchMsg"
             class="pwStatusMsg font-10"
             :class="{
-              error: confirmStatusType === 'error',
-              success: confirmStatusType === 'success',
+              error: pwMatchStatus === 'error',
+              success: pwMatchStatus === 'success',
             }"
           >
-            {{ passwordMsg }}
+            {{ pwMatchMsg }}
           </p>
         </div>
+
         <div class="agreementGroup font-11">
           <label class="checkboxRow">
             <input
