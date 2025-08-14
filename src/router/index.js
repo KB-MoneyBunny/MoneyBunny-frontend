@@ -54,6 +54,8 @@ import PolicyReviewPage from "@/pages/policy/review/PolicyReviewPage.vue";
 // 비로그인 정책 조회 페이지
 import PolicySearchGuestPage from "@/pages/policy/search/PolicySearchGuestPage.vue";
 
+import HomeGuestPanel from "@/pages/home/HomeGuestPanel.vue";
+
 // 게스트 접근
 import HomeGuestPanel from "@/pages/home/HomeGuestPanel.vue";
 // import GuestGatePage from "@/pages/home/GuestGatePage.vue";
