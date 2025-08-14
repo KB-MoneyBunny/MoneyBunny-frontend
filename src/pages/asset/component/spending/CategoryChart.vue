@@ -6,10 +6,8 @@
       <p class="chart-subtitle">최근 6개월</p>
     </div>
 
-    <!-- 데이터가 없을 때 -->
-    <div v-if="isEmpty" class="no-data">
-      <p class="no-data-text">지출 내역이 없습니다</p>
-    </div>
+    <!-- 데이터가 없을 때 SpendingNodata 컴포넌트 사용 -->
+    <SpendingNodata v-if="isEmpty" />
 
     <!-- 차트 컨테이너 -->
     <div v-else class="chart-container">
@@ -58,6 +56,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue';
+import SpendingNodata from './SpendingNodata.vue';
 
 // Props 정의 (월별 추이 데이터와 현재 선택된 월)
 const props = defineProps({
@@ -152,7 +151,7 @@ const formatBarAmount = (amount) => {
   background: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
   margin-top: 1.5rem;
 }
 
@@ -271,19 +270,6 @@ const formatBarAmount = (amount) => {
 .chart-label.selected {
   color: var(--text-login);
   font-weight: 600;
-}
-
-.no-data {
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.no-data-text {
-  font-size: 0.875rem;
-  color: var(--text-lightgray);
-  margin: 0;
 }
 
 /* 반응형 처리 */

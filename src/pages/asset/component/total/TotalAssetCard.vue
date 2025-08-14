@@ -49,6 +49,7 @@ const monthlyExpenseDisplay = computed(() =>
   height: 120px;
   padding: 1.25rem 1.5rem;
   gap: 1rem;
+  border-radius: 6px;
   overflow: hidden;
 }
 
