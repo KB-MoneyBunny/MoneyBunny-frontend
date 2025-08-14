@@ -70,16 +70,22 @@ const currentFilterText = ref('3개월·전체·최신');
 const filter = ref('전체');
 
 // 🥕 추가: 고급 필터 상태 (검색, 기간, 정렬 등)
-const advancedFilters = ref({
-  searchKeyword: '',
-  dateRange: {
-    type: '3개월',
-    startDate: null,
-    endDate: null,
-  },
-  transactionType: '전체', // 카드는 '전체', '지출', '환불'
-  sortBy: '최신순',
-});
+function makeDefaultAdvancedFilters() {
+  const today = new Date();
+  const endDate = today.toLocaleDateString('sv-SE'); // YYYY-MM-DD 형식
+
+  const start = new Date();
+  start.setMonth(start.getMonth() - 3);
+  const startDate = start.toISOString().slice(0, 10);
+
+  return {
+    searchKeyword: '',
+    dateRange: { type: '3개월', startDate, endDate },
+    transactionType: '전체', // 카드: 전체/지출/환불
+    sortBy: '최신순',
+  };
+}
+const advancedFilters = ref(makeDefaultAdvancedFilters());
 
 // 🥕거래 상세 모달 관련 상태 (기존 유지)
 const showTransactionModal = ref(false);

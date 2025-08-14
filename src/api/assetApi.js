@@ -8,25 +8,28 @@ export async function fetchAssetSummary() {
   return await axios.get('/api/asset/summary');
 }
 
-// 특정 계좌의 거래내역 페이징 조회
+/** 계좌 거래내역: 서버 필터링 */
 export async function fetchAccountTransactions(
   accountId,
-  page = 0,
-  size = 20,
-  txType = ''
+  { page = 0, size = 20, startDate, endDate, q, txType, sort = 'DESC' } = {}
 ) {
-  const params = { page, size };
-  if (txType) params.txType = txType; // 한글 X, 영어 그대로!
+  const params = { page, size, sort };
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
+  if (q) params.q = q;
+  if (txType) params.txType = txType;
   return axios.get(`/api/asset/accounts/${accountId}/transactions`, { params });
 }
 
+/** 카드 거래내역: 서버 필터링 */
 export async function fetchCardTransactions(
   cardId,
-  page = 0,
-  size = 20,
-  txType = '' // 카드도 income/expense/cancel 등 확장 가능
+  { page = 0, size = 20, startDate, endDate, q, txType, sort = 'DESC' } = {}
 ) {
-  const params = { page, size };
+  const params = { page, size, sort };
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
+  if (q) params.q = q;
   if (txType) params.txType = txType;
   return axios.get(`/api/asset/cards/${cardId}/transactions`, { params });
 }
