@@ -82,10 +82,16 @@ const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
 // 안내/에러 메시지
+// 아이디
 const usernameMsg = ref("");
 const idStatusType = ref(""); // 'error' | 'success'
 
-// 변경
+// 이름
+const nameMsg = ref("");
+const nameStatusType = ref(""); // 'error' | 'success'
+const nameTouched = ref(false);
+
+// 비밀번호
 const pwFormatMsg = ref(""); // 형식 안내
 const pwFormatStatus = ref(""); // 'error' | 'success' (형식)
 const pwMatchMsg = ref(""); // 일치 안내
@@ -116,6 +122,26 @@ const nameRule = /^[가-힣a-zA-Z\s]{2,20}$/;
 // 이름 유효성 검사 정규식
 const isValidName = computed(() => nameRule.test(name.value));
 
+const validateName = () => {
+  const v = name.value.trim();
+
+  if (!v) {
+    nameMsg.value = "이름을 입력하세요.";
+    nameStatusType.value = "error";
+    return;
+  }
+
+  // 2~20자, 한글/영문/공백 허용 (nameRule 이미 선언됨)
+  if (!nameRule.test(v)) {
+    nameMsg.value = "이름은 한글/영문 2~20자만 가능합니다.";
+    nameStatusType.value = "error";
+    return;
+  }
+
+  nameMsg.value = "사용 가능한 이름입니다.";
+  nameStatusType.value = "success";
+};
+
 // 아이디 중복확인
 const checkUsername = async () => {
   usernameMsg.value = "";
@@ -131,7 +157,7 @@ const checkUsername = async () => {
       usernameMsg.value = "이미 사용 중인 아이디입니다.";
       idStatusType.value = "error";
     } else {
-      usernameMsg.value = "사용 가능한 아이디입니다!";
+      usernameMsg.value = "사용 가능한 아이디입니다.";
       idStatusType.value = "success";
     }
   } catch {
@@ -176,7 +202,7 @@ const validatePassword = () => {
 const canSignUp = computed(() => {
   return (
     selectedImage.value &&
-    name.value.trim().length > 0 &&
+    isValidName.value &&
     username.value.length >= 6 &&
     idStatusType.value === "success" &&
     email.value.trim().length > 0 &&
@@ -290,9 +316,27 @@ const onAgreeMarketing = () => {
           <input
             type="text"
             v-model="name"
-            :class="{ error: !isValidName && name }"
+            :class="{ error: nameTouched && !isValidName && name }"
             placeholder="이름을 입력하세요"
+            @input="
+              nameTouched = true;
+              validateName();
+            "
+            @blur="
+              nameTouched = true;
+              validateName();
+            "
           />
+          <p
+            v-if="nameTouched && nameMsg"
+            class="nameStatusMsg font-10"
+            :class="{
+              error: nameStatusType === 'error',
+              success: nameStatusType === 'success',
+            }"
+          >
+            {{ nameMsg }}
+          </p>
         </div>
         <!-- 아이디 -->
         <div class="formGroup">
@@ -743,5 +787,16 @@ input:focus {
 }
 .agreeText.clickable.checked {
   color: var(--base-blue-dark); /* 체크 시 네이비 강조 */
+}
+/* 이름 처리 안내 메시지 */
+.nameStatusMsg {
+  margin-top: 3px;
+  margin-left: 5px;
+}
+.nameStatusMsg.error {
+  color: var(--alert-strong);
+}
+.nameStatusMsg.success {
+  color: var(--success-text);
 }
 </style>
