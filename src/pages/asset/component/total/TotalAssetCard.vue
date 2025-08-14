@@ -44,6 +44,7 @@ const monthlyExpenseDisplay = computed(() =>
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  border-radius: 6px;
 }
 
 /* 각 섹션 스타일 조정 */

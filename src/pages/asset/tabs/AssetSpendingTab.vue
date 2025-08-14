@@ -204,7 +204,7 @@ const closeCategoryDetail = () => {
 .unified-spending-card {
   background-color: white;
   border-radius: 0.75rem;
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04);
+  /* box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); */
   margin-bottom: 1rem;
   overflow: hidden;
 }
@@ -213,7 +213,7 @@ const closeCategoryDetail = () => {
 .spending-card {
   background-color: white;
   border-radius: 0.75rem;
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04);
+  /* box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04); */
   margin-bottom: 1rem;
   overflow: hidden;
 }

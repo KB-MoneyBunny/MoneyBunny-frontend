@@ -104,6 +104,7 @@ const formatSubValue = (subInfo) => {
   height: 120px;
   padding: 1.25rem 1.5rem;
   gap: 0.5rem;
+  border-radius: 6px;
 }
 
 .summary-content {
@@ -119,8 +120,8 @@ const formatSubValue = (subInfo) => {
 }
 
 .summary-main .home-card-value {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: bold;
   margin: 0;
 }
 
@@ -134,27 +135,27 @@ const formatSubValue = (subInfo) => {
 }
 
 .summary-right .home-card-rate {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.775rem;
+  font-weight: bold;
   color: var(--text-rate);
   margin: 0;
 }
 
 /* 기본 우측 값 스타일 */
 .summary-right-value {
-  font-weight: 700;
+  font-weight: bold;
   margin: 0;
 }
 
 /* 개수 표시용 (3개, 15건 등) */
 .summary-right-value.count-text {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: white;
 }
 
 /* 비교 텍스트용 (+417,500원(+20%) 등) */
 .summary-right-value.comparison-text {
-  font-size: 0.875rem;
+  font-size: 0.775rem;
 }
 
 .summary-right-value.positive,
@@ -168,6 +169,6 @@ const formatSubValue = (subInfo) => {
 
 /* 서브 값에도 같은 규칙 적용 (이미 클래스는 붙고 있었음) */
 .sub-value {
-  font-weight: 700;
+  font-weight: bold;
 }
 </style>

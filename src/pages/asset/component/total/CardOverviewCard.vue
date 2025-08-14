@@ -42,7 +42,7 @@ const goToCardTab = () => emit('switchTab', '카드');
   background-color: white;
   border-radius: 1rem;
   padding: 1.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); */
   display: flex;
   flex-direction: column;
   gap: 1rem;
