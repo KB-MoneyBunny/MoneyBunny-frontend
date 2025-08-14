@@ -115,7 +115,7 @@ watch(
 
 // ▼ 월별 혜택 요약/펼치기 상태
 const isBenefitOpen = ref(false);
-const recentCount = 3;
+const recentCount = 6; // 6개월로 변경
 const monthLabel = (ym) => `${Number(ym.split('-')[1])}월 혜택`;
 const fmt = (n) => (n ?? 0).toLocaleString();
 
