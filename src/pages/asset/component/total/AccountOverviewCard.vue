@@ -2,7 +2,7 @@
   <div class="overview-card">
     <!-- 타이틀 -->
     <div class="title-row" @click="goToAccountTab">
-      <h3>계좌 현황</h3>
+      <div>계좌 현황</div>
       <div class="arrow">
         <img
           src="@/assets/images/icons/common/arrow_right.png"
@@ -45,23 +45,20 @@ const goToAccountTab = () => emit('switchTab', '계좌');
 <style scoped>
 .overview-card {
   background-color: #fff;
-  border-radius: 1rem;
+  border-radius: 6px;
   padding: 1rem;
-  /* box-shadow: var(--shadow-sm, 0 2px 6px rgba(0, 0, 0, 0.05)); */
 }
 
 .title-row {
+  padding: 0 0.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   margin-bottom: 1rem;
-}
-
-.title-row h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-title, #111827);
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: var(--base-blue-dark);
 }
 
 .arrow-icon {

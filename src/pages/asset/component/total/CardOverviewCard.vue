@@ -1,13 +1,21 @@
 <template>
   <div class="card-overview-card">
     <!-- 헤더 -->
-    <div class="card-header" @click="goToCardTab">
-      <div class="card-title">카드 현황</div>
+    <div class="title-row" @click="goToCardTab">
+      <!-- <div class="card-title">카드 현황</div>
       <img
         src="@/assets/images/icons/common/arrow_right.png"
         class="arrow-icon"
         alt="이동"
-      />
+      /> -->
+      <div>카드 현황</div>
+      <div class="arrow">
+        <img
+          src="@/assets/images/icons/common/arrow_right.png"
+          alt="계좌이동 아이콘"
+          class="arrow-icon"
+        />
+      </div>
     </div>
 
     <!-- 카드 리스트 -->
@@ -39,24 +47,19 @@ const goToCardTab = () => emit('switchTab', '카드');
 
 <style scoped>
 .card-overview-card {
-  background-color: white;
-  border-radius: 1rem;
-  padding: 1.25rem;
-  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); */
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 0.5rem;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 1rem;
 }
-.card-header {
+.title-row {
+  padding: 0 0.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-}
-.card-title {
-  font-size: 1rem;
-  font-weight: 600;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-size: 0.9rem;
   color: var(--base-blue-dark);
 }
 .arrow-icon {

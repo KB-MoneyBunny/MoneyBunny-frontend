@@ -2,7 +2,7 @@
   <header class="top-header">
     <div class="header-inner">
       <RouterLink to="/home" class="logo-link">
-        <div class="logo-text font-28 font-extrabold">MoneyBunny</div>
+        <div class="logo-text font-30 font-extrabold">MoneyBunny</div>
       </RouterLink>
       <!--💪(상일) 알림 이동 (미읽은 개수 배지 포함)-->
       <RouterLink
@@ -99,7 +99,7 @@ onMounted(async () => {
 }
 
 .logo-text {
-  font-size: clamp(20px, 5.5vw, 28px);
+  font-size: clamp(22px, 5.5vw, 30px);
   line-height: 1;
   color: var(--base-blue-dark);
 
