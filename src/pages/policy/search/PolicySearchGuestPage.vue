@@ -1,7 +1,7 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
-import { policyAPI } from "@/api/policy";
+import { guestPolicyAPI } from "@/api/guestPolicy";
 
 const router = useRouter();
 const searchQuery = ref("");
@@ -13,7 +13,7 @@ const recentKeywords = ref([]);
 const removeRecent = async (idx) => {
   const keyword = recentKeywords.value[idx];
   try {
-    await policyAPI.removeRecentKeyword(keyword);
+    await guestPolicyAPI.removeRecentKeyword(keyword);
     recentKeywords.value.splice(idx, 1);
   } catch (e) {
     // 에러 무시, UI는 삭제
@@ -23,7 +23,7 @@ const removeRecent = async (idx) => {
 // 최근검색어 전체삭제
 const clearAllRecent = async () => {
   try {
-    await policyAPI.clearAllRecentKeywords();
+    await guestPolicyAPI.clearAllRecentKeywords();
     recentKeywords.value = [];
   } catch (e) {
     recentKeywords.value = [];
@@ -41,76 +41,131 @@ const filterInitial = ref({
   jobStatus: [],
   specialty: [],
 });
-const filterData = ref({});
+
+//
+const filterData = ref({ ...filterInitial.value });
+
+// 게스트용 검색 payload (백엔드 SearchRequestDTO에 맞춰 매핑)
+function buildGuestSearchPayload(searchTexts = []) {
+  const f = filterData.value || {};
+  return {
+    searchTexts,
+    regions: f.region || [],
+    age: f.age || "",
+    income: f.income || "",
+    educationLevels: f.education || [],
+    majors: f.major || [],
+    employmentStatuses: f.jobStatus || [],
+    specialConditions: f.specialty || [],
+  };
+}
 
 const goBack = () => {
   router.back();
 };
 
-const search = () => {
-  console.log(`검색어: ${searchQuery.value}`);
+const search = async () => {
+  const q = (searchQuery.value || "").trim();
+  if (!q) return;
+  const payload = buildGuestSearchPayload([q]);
+  try {
+    const { data } = await guestPolicyAPI.search(payload);
+    router.push({
+      name: "policySearchResult",
+      query: {
+        q,
+        filter: encodeURIComponent(JSON.stringify(filterData.value)),
+      },
+      // 선택: 결과를 함께 넘기고 싶으면 state 사용 (결과 페이지에서 history.state로 접근)
+      state: { results: data },
+    });
+  } catch (e) {
+    console.error("게스트 검색 실패:", e);
+  }
 };
 
 const fetchPopularKeywords = async () => {
   try {
-    const res = await policyAPI.getUserPolicyPopularKeywords();
-    popularKeywords.value = Array.isArray(res.data) ? res.data : [];
+    // 비로그인 전용 인기검색어 API 호출
+    const res = await guestPolicyAPI.getPopularKeywords();
+    const data = Array.isArray(res?.data)
+      ? res.data
+      : Array.isArray(res)
+      ? res
+      : [];
+    popularKeywords.value = data ?? [];
   } catch (e) {
-    console.error("인기 검색어 조회 실패", e);
+    // 게스트 API 실패 시 조용히 빈 배열
+    popularKeywords.value = [];
   }
 };
 
 const fetchRecentKeywords = async () => {
   try {
-    const res = await policyAPI.getUserPolicyRecentKeywords();
-    recentKeywords.value = Array.isArray(res.data) ? res.data : [];
+    const res = await guestPolicyAPI.getUserPolicyRecentKeywords();
+    const data = Array.isArray(res?.data)
+      ? res.data
+      : Array.isArray(res)
+      ? res
+      : [];
+    recentKeywords.value = data ?? [];
   } catch (e) {
-    console.error("최근 검색어 조회 실패", e);
+    // 비로그인이면 401이 떨어질 수 있음 → 조용히 빈 배열
+    recentKeywords.value = [];
   }
 };
 
-// 사용자 기본 필터 조건 불러오기
-const fetchUserPolicyFilter = async () => {
-  try {
-    const res = await policyAPI.getUserPolicy();
-    const d = res.data || {};
-    Object.assign(filterInitial.value, {
-      marital: d.marriage ? [d.marriage] : [],
-      region: d.regions || [],
-      age: d.age || "",
-      income: d.income || "",
-      education: d.educationLevels || [],
-      major: d.majors || [],
-      jobStatus: d.employmentStatuses || [],
-      specialty: d.specialConditions || [],
-    });
-    Object.assign(filterData.value, filterInitial.value);
-  } catch (e) {
-    // 에러 무시
-  }
-};
+// 사용자 기본 필터 조건 불러오기 (비로그인 401 무시)
+// const fetchUserPolicyFilter = async () => {
+//   try {
+//     const res = await guestPolicyAPI.getUserPolicy();
+//     const d = (res?.data ?? res) || {};
+//     Object.assign(filterInitial.value, {
+//       marital: d.marriage ? [d.marriage] : [],
+//       region: d.regions || [],
+//       age: d.age ?? "",
+//       income: d.income ?? "",
+//       education: d.educationLevels || [],
+//       major: d.majors || [],
+//       jobStatus: d.employmentStatuses || [],
+//       specialty: d.specialConditions || [],
+//     });
+//     Object.assign(filterData.value, filterInitial.value);
+//   } catch (_) {
+//     // 비로그인/404/401 등은 무시: 기본값 유지
+//   }
+// };
 
 // 검색어 클릭 시 기본 필터 + 해당 검색어로 검색 결과 페이지 이동
-function searchWithKeyword(keyword) {
-  router.push({
-    name: "policySearchResult",
-    query: {
-      q: keyword,
-      filter: encodeURIComponent(JSON.stringify(filterData.value)),
-    },
-  });
+async function searchWithKeyword(keyword) {
+  const q = (keyword || "").trim();
+  if (!q) return;
+  const payload = buildGuestSearchPayload([q]);
+  try {
+    const { data } = await guestPolicyAPI.search(payload);
+    router.push({
+      name: "policySearchResult",
+      query: {
+        q,
+        filter: encodeURIComponent(JSON.stringify(filterData.value)),
+      },
+      state: { results: data }, // 선택
+    });
+  } catch (e) {
+    console.error("게스트 검색 실패:", e);
+  }
 }
 
 onMounted(() => {
   fetchPopularKeywords();
-  fetchRecentKeywords();
-  fetchUserPolicyFilter();
+  // fetchRecentKeywords();
+  // fetchUserPolicyFilter();
 });
 </script>
 
 <template>
   <div class="policySearchPage">
-    <section class="section">
+    <!-- <section class="section">
       <div class="recentHeader">
         <span class="title">최근 검색어</span>
         <button class="clearAllBtn" @click="clearAllRecent">전체 삭제</button>
@@ -129,7 +184,7 @@ onMounted(() => {
           </span>
         </span>
       </div>
-    </section>
+    </section> -->
 
     <!-- 인기 검색어 -->
     <section class="section">
