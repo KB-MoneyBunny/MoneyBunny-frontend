@@ -254,12 +254,21 @@ const router = createRouter({
 
 // 인증 가드
 router.beforeEach(async (to, from, next) => {
+  // 리뷰 페이지는 비로그인 허용
+  if (to.name === 'policyReviewPage') {
+    return next();
+  }
+
   // 정책 상세는 비로그인 허용
   if (/^\/policy\/\d+$/.test(to.path)) {
     return next();
   }
   // 정책 검색 페이지/결과도 비로그인 허용
-  if (to.name === 'policySearch' || to.name === 'policySearchResult') {
+  if (
+    to.name === 'policySearch' ||
+    to.name === 'policySearchResult' ||
+    to.name === 'policySearchGuest'
+  ) {
     return next();
   }
 

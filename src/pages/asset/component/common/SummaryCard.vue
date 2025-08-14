@@ -1,4 +1,3 @@
-<!-- SummaryCard.vue 수정 버전 -->
 <template>
   <div class="home-card summary-card" :class="`summary-card--${variant}`">
     <div class="summary-content">
@@ -103,12 +102,14 @@ const formatSubValue = (subInfo) => {
   justify-content: space-between;
   height: 120px;
   padding: 1.25rem 1.5rem;
-  gap: 0.5rem;
-  border-radius: 6px;
+  gap: 1rem; /* 기존 0.5rem → 1rem으로 늘림 */
+  /* 텍스트 오버플로우 방지 */
+  overflow: hidden;
 }
 
 .summary-content {
   flex: 1;
+  min-width: 0; /* flex item 축소 허용 */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -123,6 +124,10 @@ const formatSubValue = (subInfo) => {
   font-size: 1.1rem;
   font-weight: bold;
   margin: 0;
+  /* 긴 텍스트 처리 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-height: 1.3;
 }
 
 .summary-right {
@@ -132,6 +137,9 @@ const formatSubValue = (subInfo) => {
   justify-content: center;
   text-align: right;
   gap: 0.25rem;
+  /* 고정 너비로 우측 영역 확보 */
+  flex-shrink: 0;
+  min-width: 120px; /* 비교 텍스트가 길 때를 대비 */
 }
 
 .summary-right .home-card-rate {
@@ -145,6 +153,10 @@ const formatSubValue = (subInfo) => {
 .summary-right-value {
   font-weight: bold;
   margin: 0;
+  /* 긴 텍스트 처리 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 /* 개수 표시용 (3개, 15건 등) */
@@ -155,20 +167,54 @@ const formatSubValue = (subInfo) => {
 
 /* 비교 텍스트용 (+417,500원(+20%) 등) */
 .summary-right-value.comparison-text {
+<<<<<<< HEAD
   font-size: 0.775rem;
+=======
+  font-size: 0.8rem; /* 기존 0.875rem → 0.8rem으로 살짝 줄임 */
+  line-height: 1.3;
+  /* 여러 줄 허용하여 밀림 방지 */
+  white-space: normal;
+>>>>>>> origin/dev
 }
 
 .summary-right-value.positive,
 .sub-value.positive {
-  color: var(--alert-red); /* 커스텀 변수 없으면 기본 빨강 */
+  color: var(--alert-strong); /* 커스텀 변수 없으면 기본 빨강 */
 }
 .summary-right-value.negative,
 .sub-value.negative {
-  color: var(--success-text); /* 커스텀 변수 없으면 기본 파랑 */
+  color: var(--text-green); /* 성공/감소는 녹색으로 변경 */
 }
 
-/* 서브 값에도 같은 규칙 적용 (이미 클래스는 붙고 있었음) */
+/* 서브 값에도 같은 규칙 적용 */
 .sub-value {
+<<<<<<< HEAD
   font-weight: bold;
+=======
+  font-weight: 700;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-height: 1.3;
+}
+
+/* 모바일 대응: 더 작은 화면에서는 폰트 사이즈 조정 */
+@media (max-width: 400px) {
+  .summary-card {
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .summary-main .home-card-value {
+    font-size: 1.1rem;
+  }
+
+  .summary-right-value.comparison-text {
+    font-size: 0.75rem;
+  }
+
+  .summary-right {
+    min-width: 100px;
+  }
+>>>>>>> origin/dev
 }
 </style>

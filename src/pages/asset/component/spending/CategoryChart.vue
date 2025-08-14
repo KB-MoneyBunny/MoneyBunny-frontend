@@ -17,12 +17,25 @@
         <div
           v-for="(value, index) in chartData.amounts"
           :key="index"
-          class="chart-bar"
-          :style="{
-            height: `${getBarHeight(value)}%`,
-            backgroundColor: getBarColor(index),
-          }"
-        ></div>
+          class="chart-bar-wrapper"
+          @click="selectBar(index)"
+        >
+          <!-- 현재 월이거나 선택된 막대 위에 금액 표시 -->
+          <div v-if="shouldShowAmount(index)" class="bar-amount">
+            {{ formatBarAmount(value) }}만원
+          </div>
+
+          <div
+            class="chart-bar"
+            :class="{
+              active: isCurrentMonth(index) && selectedBarIndex === null,
+              selected: selectedBarIndex === index,
+            }"
+            :style="{
+              height: `${getBarHeight(value)}px`,
+            }"
+          ></div>
+        </div>
       </div>
 
       <div class="chart-labels">
@@ -30,7 +43,11 @@
           v-for="(label, index) in chartData.months"
           :key="index"
           class="chart-label"
-          :class="{ active: isCurrentMonth(index) }"
+          :class="{
+            active: isCurrentMonth(index) && selectedBarIndex === null,
+            selected: selectedBarIndex === index,
+          }"
+          @click="selectBar(index)"
         >
           {{ label }}
         </span>
@@ -40,7 +57,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 
 // Props 정의 (월별 추이 데이터와 현재 선택된 월)
 const props = defineProps({
@@ -53,6 +70,9 @@ const props = defineProps({
     default: new Date().getMonth() + 1, // 기본값: 현재 월
   },
 });
+
+// 선택된 막대 인덱스 상태
+const selectedBarIndex = ref(null);
 
 // Props에서 받은 차트 데이터
 const chartData = computed(() => props.monthlyTrendData);
@@ -69,10 +89,36 @@ const maxValue = computed(() => {
   return Math.max(...amounts, 1);
 });
 
-// 막대 높이 계산 (퍼센트 반환)
+// 현재 월 인덱스 찾기
+const currentMonthIndex = computed(() => {
+  return chartData.value.months.findIndex((monthStr) => {
+    if (!monthStr) return false;
+    const monthNum = parseInt(monthStr.replace('월', ''));
+    return monthNum === props.selectedMonth;
+  });
+});
+
+// 컴포넌트 마운트 시 현재 월 자동 선택하지 않음 (기본 상태 유지)
+onMounted(() => {
+  // 현재 월은 기본적으로 강조되지만 선택되지는 않음
+  selectedBarIndex.value = null;
+});
+
+// 금액 표시 여부 결정 함수
+const shouldShowAmount = (index) => {
+  // 선택된 막대가 있으면 선택된 막대만 표시
+  if (selectedBarIndex.value !== null) {
+    return selectedBarIndex.value === index;
+  }
+  // 선택된 막대가 없으면 현재 월만 표시
+  return isCurrentMonth(index);
+};
+
+// 막대 높이 계산 (픽셀 단위로 반환)
 const getBarHeight = (value) => {
-  if (!value || value === 0) return 5; // 최소 높이 5%
-  return Math.max((value / maxValue.value) * 100, 5);
+  if (!value || value === 0) return 8; // 최소 높이 8px
+  const maxHeight = 80; // 최대 높이 80px
+  return Math.max((value / maxValue.value) * maxHeight, 8);
 };
 
 // 현재 월인지 확인 (강조 표시용)
@@ -83,11 +129,21 @@ const isCurrentMonth = (index) => {
   return monthNum === props.selectedMonth;
 };
 
-// 막대 색상 결정 (현재 월은 진한색, 나머지는 연한색)
-const getBarColor = (index) => {
-  return isCurrentMonth(index)
-    ? 'var(--base-blue-dark)'
-    : 'var(--base-blue-light)';
+// 막대 선택 함수
+const selectBar = (index) => {
+  // 같은 막대를 다시 클릭하면 선택 해제
+  if (selectedBarIndex.value === index) {
+    selectedBarIndex.value = null;
+  } else {
+    selectedBarIndex.value = index;
+  }
+};
+
+// 막대 위 금액 포맷팅 (만원 단위로 간단히)
+const formatBarAmount = (amount) => {
+  if (!amount) return '0';
+  const manWon = Math.round(amount / 10000);
+  return manWon.toLocaleString();
 };
 </script>
 
@@ -104,7 +160,7 @@ const getBarColor = (index) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .chart-title {
@@ -121,7 +177,7 @@ const getBarColor = (index) => {
 }
 
 .chart-container {
-  height: 120px;
+  position: relative;
 }
 
 .chart-bars {
@@ -129,20 +185,71 @@ const getBarColor = (index) => {
   align-items: flex-end;
   justify-content: space-between;
   height: 100px;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0 0.25rem;
+}
+
+.chart-bar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  max-width: 32px;
+}
+
+/* 막대 위 금액 표시 */
+.bar-amount {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: var(--text-login);
+  font-weight: 600;
+  text-align: center;
+  animation: slideUp 0.2s ease;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .chart-bar {
-  flex: 1;
-  border-radius: 0.25rem 0.25rem 0 0;
-  min-height: 5px;
+  width: 100%;
+  border-radius: 4px;
+  min-height: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  background: var(--base-lavender);
+}
+
+/* 현재 월 막대 스타일 */
+.chart-bar.active {
+  background: var(--base-blue-dark);
+}
+
+/* 선택된 막대 스타일 */
+.chart-bar.selected {
+  background: var(--base-blue-dark);
+  transform: scaleY(1.05);
+  box-shadow: 0 2px 8px rgba(255, 230, 235, 0.6);
 }
 
 .chart-labels {
   display: flex;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  padding: 0 0.25rem;
 }
 
 .chart-label {
@@ -150,6 +257,10 @@ const getBarColor = (index) => {
   text-align: center;
   font-size: 0.75rem;
   color: var(--text-bluegray);
+  padding: 0.375rem 0.25rem;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .chart-label.active {
@@ -157,8 +268,13 @@ const getBarColor = (index) => {
   font-weight: 600;
 }
 
+.chart-label.selected {
+  color: var(--text-login);
+  font-weight: 600;
+}
+
 .no-data {
-  height: 100px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,5 +284,26 @@ const getBarColor = (index) => {
   font-size: 0.875rem;
   color: var(--text-lightgray);
   margin: 0;
+}
+
+/* 반응형 처리 */
+@media (max-width: 375px) {
+  .chart-bars {
+    gap: 0.5rem;
+  }
+
+  .chart-labels {
+    gap: 0.5rem;
+  }
+
+  .chart-label {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.125rem;
+  }
+
+  .bar-amount {
+    font-size: 0.65rem;
+    padding: 3px 4px;
+  }
 }
 </style>

@@ -1,35 +1,46 @@
 <template>
   <div class="asset-page">
-    <!-- 각 탭별 요약카드를 상단에 배치 -->
+    <!-- 1) 요약카드 (모든 탭 공통 위치) -->
+    <div class="summary-area">
+      <!-- 메인 탭 요약카드 -->
+      <TotalAssetCard v-if="currentTab === '메인'" :summary="summary" />
 
-    <!-- 메인 탭 요약카드 -->
-    <TotalAssetCard v-if="currentTab === '메인'" :summary="summary" />
+      <!-- 계좌 탭 요약카드 -->
+      <SummaryCard
+        v-else-if="currentTab === '계좌'"
+        title="총 계좌 잔액"
+        :mainAmount="totalAccountBalance"
+        rightLabel="계좌 수"
+        :rightValue="rightValueForAccounts"
+        :rightUnit="typeof rightValueForAccounts === 'number' ? '개' : ''"
+      />
 
-    <!-- 계좌 탭 요약카드 -->
-    <SummaryCard
-      v-else-if="currentTab === '계좌'"
-      title="총 계좌 잔액"
-      :mainAmount="totalAccountBalance"
-      rightLabel="계좌 수"
-      :rightValue="(summary.accounts || []).length"
-      rightUnit="개"
-    />
+      <!-- 카드 탭 요약카드 -->
+      <SummaryCard
+        v-else-if="currentTab === '카드'"
+        title="이번 달 총 사용액"
+        :mainAmount="totalCardUsage"
+        rightLabel="카드 수"
+        :rightValue="rightValueForCards"
+        :rightUnit="typeof rightValueForCards === 'number' ? '개' : ''"
+      />
 
-    <!-- 카드 탭 요약카드 -->
-    <SummaryCard
-      v-else-if="currentTab === '카드'"
-      title="이번 달 총 사용액"
-      :mainAmount="totalCardUsage"
-      rightLabel="카드 수"
-      :rightValue="(summary.cards || []).length"
-      rightUnit="개"
-    />
+      <!-- 지출 탭 요약카드 (CalendarSection과 연동) -->
+      <SummaryCard
+        v-else-if="currentTab === '지출'"
+        title="이번 달 총 지출액"
+        :main-amount="spendingTabData.totalSpending"
+        right-label="지난달 대비"
+        :right-value="spendingTabData.comparisonText"
+        right-unit=""
+        variant="spending"
+      />
+    </div>
 
-    <!-- 탭 스위처 -->
+    <!-- 2) 탭 스위처 -->
     <AssetTabSwitcher :selectedTab="currentTab" @switchTab="switchTab" />
 
-    <!-- 각 탭별 컨텐츠 -->
-
+    <!-- 3) 컨텐츠 -->
     <!-- 메인 탭 컨텐츠 -->
     <div v-if="currentTab === '메인'" class="tab-content">
       <AccountOverviewCard
@@ -67,9 +78,15 @@
       </div>
     </div>
 
-    <!-- 지출 탭 컨텐츠 - 별도 컴포넌트로 분리 -->
-    <AssetSpendingTab v-else-if="currentTab === '지출'" class="tab-content" />
+    <!-- 지출 탭 컨텐츠 -->
+    <AssetSpendingTab
+      v-else-if="currentTab === '지출'"
+      ref="spendingTabRef"
+      @spending-data-updated="updateSpendingData"
+      class="tab-content"
+    />
 
+    <!-- 추천 배너 -->
     <RecommendBannerCarousel
       v-if="!recommendLoading && recommendBanners.length > 1"
       :items="recommendBanners"
@@ -86,6 +103,8 @@ import {
   fetchHrdkoreaCardExists,
   fetchRentAccountExists,
   fetchCardTransportationFees,
+  syncAccounts,
+  syncCards,
 } from '@/api/assetApi'; // API import 추가
 import {
   regionCodeMap,
@@ -116,6 +135,20 @@ const assetStore = useAssetStore();
 const route = useRoute();
 const router = useRouter();
 const currentTab = ref(route.query.tab || '메인');
+
+// 지출 탭 데이터 (요약카드용) - reactive 상태로 관리
+const spendingTabData = ref({
+  totalSpending: 0,
+  comparisonText: '–',
+});
+
+// 지출 탭에서 데이터를 받는 함수
+const updateSpendingData = (data) => {
+  spendingTabData.value = {
+    totalSpending: data.totalSpending || 0,
+    comparisonText: data.comparisonText || '–',
+  };
+};
 
 const userName = ref('사용자');
 
@@ -281,20 +314,29 @@ async function loadRecommendBanners() {
   recommendLoading.value = false;
 }
 
+const syncing = ref({ accounts: false, cards: false });
+
 // 뒤로/앞으로가기 등 쿼리 변화 대응
 watch(
   () => route.query.tab,
-  (tab) => {
-    if (tab && tab !== currentTab.value) {
-      currentTab.value = tab;
-    }
+  async (tab) => {
+    if (!tab) return;
+    if (tab !== currentTab.value) currentTab.value = tab;
   }
 );
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
   await loadUserName();
-  await assetStore.loadSummary();
+  await assetStore.loadSummary(true);
+  const navEntries = performance.getEntriesByType?.('navigation') || [];
+  const isReload = navEntries[0]?.type === 'reload';
+  if (
+    isReload &&
+    (currentTab.value === '계좌' || currentTab.value === '카드')
+  ) {
+    await autoSyncForTab(currentTab.value);
+  }
   await loadRecommendBanners();
 });
 
@@ -302,6 +344,68 @@ onMounted(async () => {
 function switchTab(tab) {
   currentTab.value = tab;
   router.replace({ query: { ...route.query, tab } });
+}
+
+// 요약 스냅샷 (변경 감지용)
+function snapshotSummary() {
+  const s = assetStore.summary || {};
+  return {
+    lastUpdatedAt: s.lastUpdatedAt || null,
+    totalAccountBalance:
+      (s.accounts || []).reduce((sum, acc) => sum + (acc.balance || 0), 0) || 0,
+    accountsLen: (s.accounts || []).length || 0,
+    totalCardUsage:
+      (s.cards || []).reduce((sum, c) => sum + (c.thisMonthUsed || 0), 0) || 0,
+    cardsLen: (s.cards || []).length || 0,
+  };
+}
+
+// sleep 유틸
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+// 탭별 자동 동기화
+async function autoSyncForTab(tab) {
+  console.debug('[autoSyncForTab]', tab);
+  if (tab === '계좌') {
+    if (syncing.value.accounts) return;
+    syncing.value.accounts = true;
+    const before = snapshotSummary();
+    try {
+      // 1) 동기화 트리거
+      const res = await syncAccounts(); // 202 or 200(+요약)
+      // 2) 응답에 요약이 있으면 즉시 반영
+      if (res?.data) {
+        assetStore.summary = res.data;
+      } else {
+        // 3) 없으면 잠깐 대기 후 서버 요약 딱 한 번만 강제 호출
+        await sleep(1000); // 필요시 1000~2000ms로 조절
+        await assetStore.loadSummary(true);
+      }
+      syncing.value.accounts = false;
+    } catch (e) {
+      console.error('[SYNC][계좌] 실패', e);
+    }
+  } else if (tab === '카드') {
+    if (syncing.value.cards) return;
+    syncing.value.cards = true;
+    const before = snapshotSummary();
+    try {
+      const res = await syncCards();
+      if (res?.data) {
+        assetStore.summary = res.data;
+      } else {
+        await sleep(1000);
+        await assetStore.loadSummary(true);
+      }
+      syncing.value.cards = false;
+    } catch (e) {
+      console.error('[SYNC][카드] 실패', e);
+      syncing.value.cards = false;
+    }
+  } else {
+    // 메인/지출 등은 기존 요약만 유지
+  }
 }
 
 // computed 속성들
@@ -321,7 +425,15 @@ const totalCardUsage = computed(() =>
   )
 );
 
-// 계좌/카드 관련 이벤트 핸들러들
+// 우측 값: 동기화 중이면 "동기화중…"으로 표시
+const rightValueForAccounts = computed(() =>
+  syncing.value.accounts ? '동기화중…' : (summary.value.accounts || []).length
+);
+const rightValueForCards = computed(() =>
+  syncing.value.cards ? '동기화중…' : (summary.value.cards || []).length
+);
+
+// // 계좌/카드 관련 이벤트 핸들러들
 // const deleteAccount = (account) => {
 //   console.log('계좌 삭제:', account);
 //   // 실제 삭제 로직 구현 필요
@@ -357,6 +469,10 @@ const totalCardUsage = computed(() =>
 .asset-page {
   display: flex;
   flex-direction: column;
+}
+
+.summary-area {
+  margin-bottom: 0rem;
 }
 
 .tab-content {

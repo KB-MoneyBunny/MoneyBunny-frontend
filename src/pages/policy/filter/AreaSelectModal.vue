@@ -45,7 +45,7 @@ const props = defineProps({
 
 onMounted(() => {
   document.body.classList.add('modal-open');
-  // 코드값이 넘어오면 지역명으로 변환하여 selectedRegions에 반영
+  // props.initialRegionCodes가 있으면 그 값으로, 없으면 빈 배열로 초기화
   if (props.initialRegionCodes && props.initialRegionCodes.length > 0) {
     selectedRegions.value = props.initialRegionCodes
       .map((code) => {
@@ -54,6 +54,8 @@ onMounted(() => {
         return { sido: region.sido, gugun: region.gugun };
       })
       .filter(Boolean);
+  } else {
+    selectedRegions.value = [];
   }
 });
 onUnmounted(() => {

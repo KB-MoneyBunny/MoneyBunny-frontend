@@ -107,22 +107,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import likeIcon from '@/assets/images/icons/policy/like.png';
-import PolicyReviewEmpty from './PolicyReviewEmpty.vue';
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useAuthStore } from "@/stores/auth"; // 비로그인
+import { useRoute, useRouter } from "vue-router";
+import likeIcon from "@/assets/images/icons/policy/like.png";
+import PolicyReviewEmpty from "./PolicyReviewEmpty.vue";
 // 💪(상일) 정책 리뷰 API 추가
-import { policyInteractionAPI } from '@/api/policyInteraction';
+import { policyInteractionAPI } from "@/api/policyInteraction";
 // 💪(상일) 프로필 이미지 imports
-import imgSprout from '@/assets/images/icons/profile/profile_edit_sprout.png';
-import imgBeard from '@/assets/images/icons/profile/profile_edit_beard.png';
-import imgEyelash from '@/assets/images/icons/profile/profile_edit_eyelash.png';
-import imgCarrot from '@/assets/images/icons/profile/profile_edit_carrot.png';
+import imgSprout from "@/assets/images/icons/profile/profile_edit_sprout.png";
+import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";
+import imgEyelash from "@/assets/images/icons/profile/profile_edit_eyelash.png";
+import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
+
+const authStore = useAuthStore(); // 비로그인
 
 const route = useRoute();
 const router = useRouter();
 const policyId = computed(() => Number(route.params.policyId)); // 💪(상일) id → policyId로 수정
-const policyTitle = ref('');
+const policyTitle = ref("");
 
 // 💪(상일) 프로필 이미지 배열 (마이페이지와 동일)
 const profileImages = [imgSprout, imgBeard, imgEyelash, imgCarrot];
@@ -137,18 +140,18 @@ const reviews = ref([]);
 const totalCount = ref(0);
 
 // 💪(상일) 필터 상태
-const sortOrder = ref('latest'); // 'recommended' | 'latest'
-const benefitFilter = ref('all'); // 'all' | 'received' | 'not_eligible'
+const sortOrder = ref("latest"); // 'recommended' | 'latest'
+const benefitFilter = ref("all"); // 'all' | 'received' | 'not_eligible'
 
 // 💪(상일) 필터링된 리뷰 계산
 const filteredReviews = computed(() => {
   let filtered = [...reviews.value];
 
   // 혜택 상태 필터링
-  if (benefitFilter.value !== 'all') {
+  if (benefitFilter.value !== "all") {
     const statusMap = {
-      received: 'RECEIVED',
-      not_eligible: 'NOT_ELIGIBLE',
+      received: "RECEIVED",
+      not_eligible: "NOT_ELIGIBLE",
     };
     filtered = filtered.filter(
       (r) => r.benefitStatus === statusMap[benefitFilter.value]
@@ -156,15 +159,15 @@ const filteredReviews = computed(() => {
   }
 
   // 정렬
-  if (sortOrder.value === 'recommended') {
+  if (sortOrder.value === "recommended") {
     // 좋아요 수 내림차순
     filtered.sort((a, b) => (b.helpCount || 0) - (a.helpCount || 0));
   } else {
     // 최신순 (날짜 내림차순)
     filtered.sort(
       (a, b) =>
-        new Date(b.date.replace(/\./g, '-')) -
-        new Date(a.date.replace(/\./g, '-'))
+        new Date(b.date.replace(/\./g, "-")) -
+        new Date(a.date.replace(/\./g, "-"))
     );
   }
 
@@ -181,11 +184,11 @@ const allReviews = ref([]);
 
 // 💪(상일) 날짜 포맷팅 함수
 function formatDate(dateString) {
-  if (!dateString) return '';
+  if (!dateString) return "";
   const date = new Date(dateString);
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}.${month}.${day}`;
 }
 
@@ -194,20 +197,34 @@ async function fetchReviews({ page, size }) {
   try {
     // 첫 페이지일 때만 API 호출
     if (page === 1 && allReviews.value.length === 0) {
-      const response =
-        await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
+      // const response =
+      //   await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
+      //     policyId.value
+      //   );
+      let response;
+      if (authStore.isLogin) {
+        // 로그인: 좋아요 상태 포함 버전
+        response = await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
           policyId.value
         );
-      console.log('💪(상일) API 응답 데이터:', response.data);
+      } else {
+        // 게스트: 공개 리스트 호출
+        response = await policyInteractionAPI.getPolicyReviewsPublic(
+          policyId.value
+        );
+      }
+      console.log("💪(상일) API 응답 데이터:", response.data);
 
       // 💪(상일) 백엔드 데이터를 프론트엔드 형식으로 변환
       allReviews.value = response.data.map((review) => ({
         id: review.reviewId,
-        nickname: review.userName || '익명',
+        nickname: review.userName || "익명",
         date: formatDate(review.createdAt),
         content: review.content,
         helpCount: review.likeCount || 0,
-        helped: review.isLikedByCurrentUser || false, // 💪(상일) 백엔드에서 받은 좋아요 상태
+        // helped: review.isLikedByCurrentUser || false, // 💪(상일) 백엔드에서 받은 좋아요 상태
+        // 게스트는 isLikedByCurrentUser 없음 → false 처리
+        helped: Boolean(review.isLikedByCurrentUser) && authStore.isLogin,
         benefitStatus: review.benefitStatus,
         userId: review.userId,
         profileImageId: review.profileImageId,
@@ -215,7 +232,7 @@ async function fetchReviews({ page, size }) {
         isLoading: false, // 💪(상일) 좋아요 로딩 상태
       }));
 
-      console.log('💪(상일) 변환된 데이터:', allReviews.value);
+      console.log("💪(상일) 변환된 데이터:", allReviews.value);
     }
 
     // 클라이언트 사이드 페이지네이션
@@ -225,11 +242,11 @@ async function fetchReviews({ page, size }) {
     return {
       items: allReviews.value.slice(start, end),
       total: allReviews.value.length,
-      policyTitle: '정책 리뷰',
+      policyTitle: "정책 리뷰",
     };
   } catch (error) {
-    console.error('💪(상일) 리뷰 조회 실패:', error);
-    console.error('💪(상일) 에러 상세 정보:', {
+    console.error("💪(상일) 리뷰 조회 실패:", error);
+    console.error("💪(상일) 에러 상세 정보:", {
       message: error.message,
       response: error.response,
       status: error.response?.status,
@@ -237,21 +254,53 @@ async function fetchReviews({ page, size }) {
       config: error.config,
     });
 
+    // 인터셉터 때문에 error.response가 비어있을 수도 있어서,
+    // 게스트라면 공개 API로 한 번 더 재시도
+    if (!authStore.isLogin) {
+      try {
+        const response = await policyInteractionAPI.getPolicyReviewsPublic(
+          policyId.value
+        );
+        allReviews.value = response.data.map((review) => ({
+          id: review.reviewId,
+          nickname: review.userName || "익명",
+          date: formatDate(review.createdAt),
+          content: review.content,
+          helpCount: review.likeCount || 0,
+          helped: false,
+          benefitStatus: review.benefitStatus,
+          userId: review.userId,
+          profileImageId: review.profileImageId,
+          reviewId: review.reviewId,
+          isLoading: false,
+        }));
+        const start = (page - 1) * size;
+        const end = start + size;
+        return {
+          items: allReviews.value.slice(start, end),
+          total: allReviews.value.length,
+          policyTitle: "정책 리뷰",
+        };
+      } catch (e) {
+        console.warn("게스트 공개 엔드포인트 재시도도 실패:", e);
+      }
+    }
+
     // 💪(상일) 에러 타입별 처리
     if (error.response?.status === 500) {
       console.warn(
-        '💪(상일) 서버 내부 오류 - 리뷰 데이터를 불러올 수 없습니다.'
+        "💪(상일) 서버 내부 오류 - 리뷰 데이터를 불러올 수 없습니다."
       );
       // TODO: 백엔드 테이블 확인 필요
     } else if (error.response?.status === 404) {
-      console.warn('💪(상일) 정책을 찾을 수 없습니다.');
+      console.warn("💪(상일) 정책을 찾을 수 없습니다.");
     }
 
     // 에러 시 빈 배열 반환하여 빈 상태 표시
     return {
       items: [],
       total: 0,
-      policyTitle: '정책 리뷰',
+      policyTitle: "정책 리뷰",
     };
   }
 }
@@ -286,9 +335,9 @@ async function loadMore() {
 // 💪(상일) 혜택 상태 텍스트 반환
 function getBenefitText(benefitStatus) {
   const statusMap = {
-    RECEIVED: '수령완료',
-    PENDING: '처리중',
-    NOT_ELIGIBLE: '수령불가',
+    RECEIVED: "수령완료",
+    PENDING: "처리중",
+    NOT_ELIGIBLE: "수령불가",
   };
   return statusMap[benefitStatus] || benefitStatus;
 }
@@ -296,11 +345,11 @@ function getBenefitText(benefitStatus) {
 // 💪(상일) 혜택 상태별 CSS 클래스 반환
 function getBenefitClass(benefitStatus) {
   const classMap = {
-    RECEIVED: 'benefit-received',
-    PENDING: 'benefit-pending',
-    NOT_ELIGIBLE: 'benefit-not-eligible',
+    RECEIVED: "benefit-received",
+    PENDING: "benefit-pending",
+    NOT_ELIGIBLE: "benefit-not-eligible",
   };
-  return classMap[benefitStatus] || 'benefit-default';
+  return classMap[benefitStatus] || "benefit-default";
 }
 
 // 💪(상일) 프로필 이미지 반환 함수 (마이페이지와 동일)
@@ -343,7 +392,7 @@ async function toggleHelpful(review) {
     );
     review.helpCount = response.data;
   } catch (error) {
-    console.error('좋아요 처리 실패:', error);
+    console.error("좋아요 처리 실패:", error);
     // 에러 시 원래 상태로 롤백
     review.helped = originalHelped;
     review.helpCount = originalHelpCount;
@@ -351,7 +400,7 @@ async function toggleHelpful(review) {
     // 에러 메시지 표시 (선택적)
     if (error.response?.status === 400) {
       // 400: 이미 좋아요한 상태 또는 좋아요하지 않은 상태
-      console.warn('좋아요 상태 또는 이미 좋아요한 상태입니다.');
+      console.warn("좋아요 상태 또는 이미 좋아요한 상태입니다.");
     }
   } finally {
     review.isLoading = false;
@@ -374,7 +423,7 @@ onBeforeUnmount(() => {
 });
 
 const goWriteReview = () => {
-  router.push({ name: 'policyReviewWrite', params: { id: policyId.value } });
+  router.push({ name: "policyReviewWrite", params: { id: policyId.value } });
 };
 
 // 💪(상일) 필터 변경 함수들
