@@ -47,7 +47,7 @@ const goToAccountTab = () => emit('switchTab', '계좌');
   background-color: #fff;
   border-radius: 1rem;
   padding: 1rem;
-  box-shadow: var(--shadow-sm, 0 2px 6px rgba(0, 0, 0, 0.05));
+  /* box-shadow: var(--shadow-sm, 0 2px 6px rgba(0, 0, 0, 0.05)); */
 }
 
 .title-row {

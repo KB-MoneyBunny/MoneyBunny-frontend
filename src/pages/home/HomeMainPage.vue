@@ -1,10 +1,5 @@
 <template>
   <div class="homeContainer">
-    <!-- 비로그인 -->
-    <!-- <HomeGuestPanel v-if="!isAuthed" /> -->
-
-    <!-- 로그인 후 -->
-    <!-- <template v-else> -->
     <HomeSummaryCard :top3-total-amount="top3TotalAmount" />
     <!-- <TotalSummaryCard ref="totalSummaryCardRef" /> -->
 
@@ -19,7 +14,6 @@
     <!-- <DailyMessageCard class="tightTopMargin" /> -->
 
     <PolicyBannerCarousel :items="top3Banners" :interval="5000" />
-    <!-- </template> -->
   </div>
 </template>
 

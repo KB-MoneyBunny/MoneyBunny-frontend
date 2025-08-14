@@ -23,7 +23,7 @@
   border-radius: 1rem;
   padding: 4rem 1.5rem;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); */
   margin-top: 1rem;
 }
 
