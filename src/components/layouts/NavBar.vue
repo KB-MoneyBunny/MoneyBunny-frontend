@@ -3,7 +3,7 @@
     <RouterLink
       v-for="item in navItems"
       :key="item.name"
-      :to="item.path"
+      :to="targetPath(item)"
       class="nav-item"
       :class="{ active: isActive(item.path) }"
     >
@@ -18,43 +18,71 @@
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router';
-import api from '@/api'; // 🛠️ 제승 수정: api import
+import { useRoute, useRouter } from "vue-router";
+import api from "@/api"; // 🛠️ 제승 수정: api import
+import { computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
+const isGuest = computed(() => !authStore.isLogin);
 
 const navItems = [
   {
-    name: '홈',
-    path: '/home',
-    icon: new URL('@/assets/navbar/Home.png', import.meta.url).href,
-    iconActive: new URL('@/assets/navbar/Home_color.png', import.meta.url).href,
+    name: "홈",
+    path: "/home",
+    icon: new URL("@/assets/navbar/Home.png", import.meta.url).href,
+    iconActive: new URL("@/assets/navbar/Home_color.png", import.meta.url).href,
   },
 
   {
-    name: '정책',
-    path: '/policy',
-    icon: new URL('@/assets/navbar/policy.png', import.meta.url).href,
-    iconActive: new URL('@/assets/navbar/policy_color.png', import.meta.url)
+    name: "정책",
+    path: "/policy",
+    icon: new URL("@/assets/navbar/policy.png", import.meta.url).href,
+    iconActive: new URL("@/assets/navbar/policy_color.png", import.meta.url)
       .href,
   },
   {
-    name: '자산',
-    path: '/asset',
-    icon: new URL('@/assets/navbar/asset.png', import.meta.url).href,
-    iconActive: new URL('@/assets/navbar/asset_color.png', import.meta.url)
+    name: "자산",
+    path: "/asset",
+    icon: new URL("@/assets/navbar/asset.png", import.meta.url).href,
+    iconActive: new URL("@/assets/navbar/asset_color.png", import.meta.url)
       .href,
   },
   {
-    name: '마이페이지',
-    path: '/mypage',
-    icon: new URL('@/assets/navbar/User.png', import.meta.url).href,
-    iconActive: new URL('@/assets/navbar/User_color.png', import.meta.url).href,
+    name: "마이페이지",
+    path: "/mypage",
+    icon: new URL("@/assets/navbar/User.png", import.meta.url).href,
+    iconActive: new URL("@/assets/navbar/User_color.png", import.meta.url).href,
+  },
+];
+// 게스트 전용 내비(정책 게스트 페이지만)
+const navItemsGuest = [
+  {
+    name: "정책",
+    path: "/policy/search/guest",
+    icon: new URL("@/assets/navbar/policy.png", import.meta.url).href,
+    iconActive: new URL("@/assets/navbar/policy_color.png", import.meta.url)
+      .href,
   },
 ];
 
 const isActive = (path) => route.path.startsWith(path);
+
+// 로그인 여부에 따라 이동 목적지 계산
+const targetPath = (item) => {
+  const isLogin = authStore.isLogin;
+  if (item.name === "정책") {
+    // 회원 전용 vs 비회원 전용
+    return isLogin ? "/policy/main" : "/policy/search/guest";
+  }
+  // 나머지 버튼은 로그인 안 돼 있으면 게스트 게이트로
+  if (!isLogin) {
+    return { name: "guest", query: { redirect: item.path } };
+  }
+  return item.path;
+};
 </script>
 
 <style scoped>

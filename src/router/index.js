@@ -54,8 +54,9 @@ import PolicyReviewPage from '@/pages/policy/review/PolicyReviewPage.vue';
 // 비로그인 정책 조회 페이지
 import PolicySearchGuestPage from '@/pages/policy/search/PolicySearchGuestPage.vue';
 
+// 게스트 접근
 import HomeGuestPanel from '@/pages/home/HomeGuestPanel.vue';
-
+// import GuestGatePage from "@/pages/home/GuestGatePage.vue";
 const routes = [
   //
   // ─── 인증 관련 ──────────────────────────────────────
@@ -155,68 +156,83 @@ const routes = [
 
       // 정책 추천 플로우
       {
-        path: 'policy/intro',
-        name: 'policyTypeIntro',
+        path: "policy",
+        name: "policyTypeIntro",
         component: PolicyTypeIntro,
       },
-      { path: 'policy', name: 'policyIntroForm', component: PolicyIntroForm },
-      { path: 'policy/main', name: 'policyMain', component: PolicyMainTab },
       {
-        path: 'policy/quiz/step1',
-        name: 'policyQuizStep1',
+        path: "policy/form",
+        name: "policyIntroForm",
+        component: PolicyIntroForm,
+      },
+      { path: "policy/main", name: "policyMain", component: PolicyMainTab },
+      {
+        path: "policy/quiz/step1",
+        name: "policyQuizStep1",
         component: PolicyQuizStep1,
       },
       {
-        path: 'policy/quiz/step2',
-        name: 'policyQuizStep2',
+        path: "policy/quiz/step2",
+        name: "policyQuizStep2",
         component: PolicyQuizStep2,
       },
       {
-        path: 'policy/quiz/step3',
-        name: 'policyQuizStep3',
+        path: "policy/quiz/step3",
+        name: "policyQuizStep3",
         component: PolicyQuizStep3,
       },
       {
-        path: 'policy/quiz/step4',
-        name: 'policyQuizStep4',
+        path: "policy/quiz/step4",
+        name: "policyQuizStep4",
         component: PolicyQuizStep4,
       },
       {
-        path: 'policy/quiz/step5',
-        name: 'policyQuizStep5',
+        path: "policy/quiz/step5",
+        name: "policyQuizStep5",
         component: PolicyQuizStep5,
       },
       {
-        path: 'policy/quiz/result',
-        name: 'policyResultSummary',
+        path: "policy/quiz/result",
+        name: "policyResultSummary",
         component: PolicyResultSummary,
       },
       {
-        path: 'policy/:policyId',
-        name: 'policyDetail',
+        path: "policy/:policyId",
+        name: "policyDetail",
         component: PolicyDetailPage,
         props: true,
       },
       {
-        path: '/policy/:policyId/reviews',
-        name: 'policyReviewPage',
+        path: "/policy/:policyId/reviews",
+        name: "policyReviewPage",
         component: PolicyReviewPage,
       },
       {
-        path: 'policy/search',
-        name: 'policySearch',
+        path: "policy/search",
+        name: "policySearch",
         component: PolicySearchPage,
       },
       {
-        path: 'policy/search/result',
-        name: 'policySearchResult',
+        path: "policy/search/result",
+        name: "policySearchResult",
         component: PolicySearchResult,
       },
       // 비로그인 정책 조회 페이지
       {
-        path: 'policy/search/guest',
-        name: 'policySearchGuest',
+        path: "policy/search/guest",
+        name: "policySearchGuest",
         component: PolicySearchGuestPage,
+      },
+
+      // 게스트 패널
+      {
+        path: "/guest",
+        name: "guest",
+        component: HomeGuestPanel, // 단독 페이지로 사용
+        props: {
+          loginRouteName: "login",
+          signupRouteName: "signUpEmailRequest",
+        },
       },
     ],
   },
@@ -273,27 +289,27 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // 🛠️ 제승 추가: 정책 메인 접근 전 조건 체크 네비게이션 가드
-  if (to.path === '/policy' || to.path === '/policy/main') {
+  if (to.path === "/policy" || to.path === "/policy/main") {
     try {
       // 수정: policyAPI 사용
       const res = await policyAPI.getUserPolicy();
       if (res.data && Object.keys(res.data).length > 0) {
         // 조건이 있으면 /policy/main 으로만 진입 허용
-        if (to.path !== '/policy/main') {
-          return next('/policy/main');
+        if (to.path !== "/policy/main") {
+          return next("/policy/main");
         }
         return next();
       } else {
         // 조건이 없으면 /policy 로만 진입 허용
-        if (to.path !== '/policy') {
-          return next('/policy');
+        if (to.path !== "/policy") {
+          return next("/policy");
         }
         return next();
       }
     } catch (e) {
       // 에러 시 정책 인트로로 이동
-      if (to.path !== '/policy') {
-        return next('/policy');
+      if (to.path !== "/policy") {
+        return next("/policy");
       }
       return next();
     }
@@ -321,6 +337,9 @@ router.beforeEach(async (to, from, next) => {
     '/policy/search',
     '/policy/search/result',
     '/policy/search/guest',
+
+    // 게스트페이지
+    '/guest',
   ];
 
   const authRequired = !publicPages.includes(to.path);
@@ -329,17 +348,26 @@ router.beforeEach(async (to, from, next) => {
     `라우터 이동: ${from.path} → ${to.path}, 로그인 상태: ${authStore.isLogin}, 인증 필요: ${authRequired}`
   );
 
-  // 👸🏻 은진
+  // 🎵 유정
   if (authRequired && !authStore.isLogin) {
-    // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-    console.log('인증되지 않은 접근 - 로그인 페이지로 리다이렉트');
-    return next({ path: '/', query: { error: 'auth_required' } });
-  }
-
-  if (to.path === '/' && authStore.isLogin) {
-    // 이미 로그인한 사용자가 로그인 페이지에 접근하는 경우 홈으로 리다이렉트
-    console.log('이미 로그인된 사용자 - 홈으로 리다이렉트');
-    return next('/home');
+    // 정책 관련 URL을 회원용 경로로 직접 치고 들어오면 비회원 전용으로
+    if (to.path.startsWith('/policy')) {
+      if (
+        to.name === 'policySearchGuest' ||
+        to.name === 'policySearch' ||
+        to.name === 'policySearchResult'
+      ) {
+        return next(); // 비회원 정책 페이지들은 통과
+      }
+      return next({
+        name: 'policySearchGuest',
+        query: { redirect: to.fullPath },
+      });
+    }
+    // 그 외는 로그인 유도: 게스트 게이트 페이지로
+    if (to.name !== 'guest') {
+      return next({ name: 'guest', query: { redirect: to.fullPath } });
+    }
   }
 
   next();

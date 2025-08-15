@@ -92,7 +92,19 @@ function go(i) {
 }
 
 async function fetchTop3Policies() {
-  const res = await policyAPI.getTop3Views();
+  // 사용자 정책 정보 조회
+  let hasUserPolicyType = false;
+  try {
+    const userPolicyRes = await policyAPI.getUserPolicy();
+    hasUserPolicyType = !!(
+      userPolicyRes?.data && Object.keys(userPolicyRes.data).length > 0
+    );
+  } catch (e) {
+    hasUserPolicyType = false;
+  }
+  const res = hasUserPolicyType
+    ? await policyAPI.getTop3Views()
+    : await policyAPI.getTop3ViewsAll();
   const banners = [banner1, banner2, banner3];
   const introBanner = {
     policyId: null,

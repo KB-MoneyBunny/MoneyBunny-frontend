@@ -1,11 +1,11 @@
 <script setup>
-import { useRouter, useRoute } from 'vue-router';
-import { ref, reactive, computed, onMounted } from 'vue';
-import axios from 'axios';
+import { useRouter, useRoute } from "vue-router";
+import { ref, reactive, computed, onMounted } from "vue";
+import axios from "axios";
 
-import ServiceTermsModal from './components/ServiceTermsModal.vue';
-import PrivacyTermsModal from './components/PrivacyTermsModal.vue';
-import MarketingTermsModal from './components/MarketingTermsModal.vue';
+import ServiceTermsModal from "./components/ServiceTermsModal.vue";
+import PrivacyTermsModal from "./components/PrivacyTermsModal.vue";
+import MarketingTermsModal from "./components/MarketingTermsModal.vue";
 
 // 👸🏻(은진) : 약관동의 모달창
 const showTermsModal = ref(false);
@@ -20,30 +20,30 @@ const openMarketingModal = () => (showMarketingModal.value = true);
 // 🎵(유정) 마이페이지 - 프사 연동을 위한 로직 변경
 const profileImages = [
   {
-    key: 'sprout',
+    key: "sprout",
     url: new URL(
-      '@/assets/images/icons/profile/profile_edit_sprout.png',
+      "@/assets/images/icons/profile/profile_edit_sprout.png",
       import.meta.url
     ).href,
   },
   {
-    key: 'beard',
+    key: "beard",
     url: new URL(
-      '@/assets/images/icons/profile/profile_edit_beard.png',
+      "@/assets/images/icons/profile/profile_edit_beard.png",
       import.meta.url
     ).href,
   },
   {
-    key: 'eyelash',
+    key: "eyelash",
     url: new URL(
-      '@/assets/images/icons/profile/profile_edit_eyelash.png',
+      "@/assets/images/icons/profile/profile_edit_eyelash.png",
       import.meta.url
     ).href,
   },
   {
-    key: 'carrot',
+    key: "carrot",
     url: new URL(
-      '@/assets/images/icons/profile/profile_edit_carrot.png',
+      "@/assets/images/icons/profile/profile_edit_carrot.png",
       import.meta.url
     ).href,
   },
@@ -51,13 +51,21 @@ const profileImages = [
 
 const selectedImageKey = ref(profileImages[0].key); // 초기값: "sprout"
 
+// 선택한 프로필 키를 백엔드 imageId(0~3)로 매핑
+const imageIdMap = {
+  sprout: 0,
+  beard: 1,
+  eyelash: 2,
+  carrot: 3,
+};
+
 // 👁️ 비밀번호 보기/숨기기 아이콘
 const eyeView = new URL(
-  '@/assets/images/icons/signup/eye_view.png',
+  "@/assets/images/icons/signup/eye_view.png",
   import.meta.url
 ).href;
 const eyeHide = new URL(
-  '@/assets/images/icons/signup/eye_hide.png',
+  "@/assets/images/icons/signup/eye_hide.png",
   import.meta.url
 ).href;
 
@@ -65,19 +73,39 @@ const eyeHide = new URL(
 const route = useRoute(); // 이메일 받아오기 위한 route
 
 const selectedImage = ref(profileImages[0]);
-const name = ref('');
-const username = ref('');
-const email = ref('');
-const password = ref('');
-const confirmPassword = ref('');
+const name = ref("");
+const username = ref("");
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
 // 안내/에러 메시지
-const usernameMsg = ref('');
-const idStatusType = ref(''); // 'error' | 'success'
-const passwordMsg = ref('');
-const confirmStatusType = ref(''); // 'error' | 'success'
+// 아이디
+const usernameMsg = ref("");
+const idStatusType = ref(""); // 'error' | 'success'
+
+// 이름
+const nameMsg = ref("");
+const nameStatusType = ref(""); // 'error' | 'success'
+const nameTouched = ref(false);
+const isComposingName = ref(false); // 이름 입력 관련
+
+const onNameInput = () => {
+  if (isComposingName.value) return;
+  validateName(); // 입력할 때마다 검사 -> 조건 만족 시 nameMsg 즉시 비워짐
+};
+const onNameBlur = () => {
+  nameTouched.value = true; // 스타일에 쓰고 있으면 유지
+  validateName(); // 포커스 빠질 때 최종 검증
+};
+
+// 비밀번호
+const pwFormatMsg = ref(""); // 형식 안내
+const pwFormatStatus = ref(""); // 'error' | 'success' (형식)
+const pwMatchMsg = ref(""); // 일치 안내
+const pwMatchStatus = ref(""); // 'error' | 'success' (일치)
 
 // 약관 체크
 const agreement = reactive({
@@ -100,47 +128,87 @@ const handleAllAgree = () => {
 const pwRule =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?]).{8,}$/;
 const emailRule = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const nameRule = /^[가-힣a-zA-Z\s]{2,20}$/;
+// const nameRule = /^[가-힣a-zA-Z\s]{2,20}$/;
+
+// 완성형(AC00-D7A3) + 현대 자모(1100-11FF) + 호환 자모(3130-318F) + 영문 + 공백, 2~20자
+const nameRule = /^[\uAC00-\uD7A3\u1100-\u11FF\u3130-\u318Fa-zA-Z\s]{2,20}$/;
+
 // 이름 유효성 검사 정규식
 const isValidName = computed(() => nameRule.test(name.value));
 
+const validateName = () => {
+  // 한글 입력값을 NFC로 정규화해서 완성형 기준으로 검사
+  const nameCheck = (name.value || "").normalize("NFC").trim();
+
+  if (!nameCheck) {
+    nameMsg.value = "이름을 입력하세요.";
+    nameStatusType.value = "error";
+    return;
+  }
+
+  if (!nameRule.test(nameCheck)) {
+    nameMsg.value = "이름은 한글/영문 2~20자만 가능합니다.";
+    nameStatusType.value = "error";
+    return;
+  }
+
+  // 조건 만족: 즉시 메시지 숨김
+  nameMsg.value = "";
+  nameStatusType.value = "";
+};
+
 // 아이디 중복확인
 const checkUsername = async () => {
-  usernameMsg.value = '';
-  idStatusType.value = '';
+  usernameMsg.value = "";
+  idStatusType.value = "";
   if (!username.value || username.value.length < 6) {
-    usernameMsg.value = '아이디는 6자 이상 입력해야 합니다.';
-    idStatusType.value = 'error';
+    usernameMsg.value = "아이디는 6자 이상 입력해야 합니다.";
+    idStatusType.value = "error";
     return;
   }
   try {
     const res = await axios.get(`/api/member/checkusername/${username.value}`);
     if (res.data === true) {
-      usernameMsg.value = '이미 사용 중인 아이디입니다.';
-      idStatusType.value = 'error';
+      usernameMsg.value = "이미 사용 중인 아이디입니다.";
+      idStatusType.value = "error";
     } else {
-      usernameMsg.value = '사용 가능한 아이디입니다!';
-      idStatusType.value = 'success';
+      usernameMsg.value = "사용 가능한 아이디입니다.";
+      idStatusType.value = "success";
     }
   } catch {
-    usernameMsg.value = '아이디 확인 중 오류가 발생했습니다.';
-    idStatusType.value = 'error';
+    usernameMsg.value = "아이디 확인 중 오류가 발생했습니다.";
+    idStatusType.value = "error";
   }
 };
 
 // 비밀번호 일치 검사
 const validatePassword = () => {
-  if (!password.value || !confirmPassword.value) {
-    passwordMsg.value = '';
-    confirmStatusType.value = '';
-    return;
-  }
-  if (password.value !== confirmPassword.value) {
-    passwordMsg.value = '비밀번호가 서로 일치하지 않습니다.';
-    confirmStatusType.value = 'error';
+  // 형식 검사
+  if (password.value) {
+    if (!pwRule.test(password.value)) {
+      pwFormatMsg.value = "8자 이상, 영문/숫자/특수문자 모두 포함해야 합니다.";
+      pwFormatStatus.value = "error";
+    } else {
+      pwFormatMsg.value = "사용 가능한 비밀번호 형식입니다."; // 성공 문구
+      pwFormatStatus.value = "success";
+    }
   } else {
-    passwordMsg.value = '';
-    confirmStatusType.value = 'success';
+    pwFormatMsg.value = "";
+    pwFormatStatus.value = "";
+  }
+
+  // 일치 검사
+  if (password.value && confirmPassword.value) {
+    if (password.value !== confirmPassword.value) {
+      pwMatchMsg.value = "비밀번호가 서로 일치하지 않습니다.";
+      pwMatchStatus.value = "error";
+    } else {
+      pwMatchMsg.value = "비밀번호가 일치합니다."; // 성공 문구
+      pwMatchStatus.value = "success";
+    }
+  } else {
+    pwMatchMsg.value = "";
+    pwMatchStatus.value = "";
   }
 };
 
@@ -148,9 +216,9 @@ const validatePassword = () => {
 const canSignUp = computed(() => {
   return (
     selectedImage.value &&
-    name.value.trim().length > 0 &&
+    isValidName.value &&
     username.value.length >= 6 &&
-    idStatusType.value === 'success' &&
+    idStatusType.value === "success" &&
     email.value.trim().length > 0 &&
     emailRule.test(email.value) &&
     pwRule.test(password.value) &&
@@ -165,7 +233,7 @@ const router = useRouter();
 const showToast = ref(false);
 
 const goBack = () => router.back();
-const goLogin = () => router.push('/');
+const goLogin = () => router.push("/");
 
 // 회원가입 처리 (API는 실제 적용시 추가)
 // 🎵(유정)
@@ -178,21 +246,23 @@ const handleSignUp = async () => {
       loginId: username.value,
       email: email.value,
       password: password.value,
+      profileImageId: imageIdMap[selectedImageKey.value], // 프로필 이미지 저장
     };
 
-    await axios.post('/api/member/join', payload);
-
-    // 여기서 localStorage에 저장
-
-    localStorage.setItem('avatarKey', selectedImageKey.value);
+    await axios.post("/api/member/join", payload);
 
     showToast.value = true;
     setTimeout(() => {
       showToast.value = false;
-      goLogin(); // 예: 로그인 페이지로 이동
+      // goLogin(); // 예: 로그인 페이지로 이동
+      // 회원가입 후 로그인 페이지로 이동하되, redirect 유지
+      router.replace({
+        name: "login",
+        query: { redirect: route.query.redirect?.toString() || "/home" },
+      });
     }, 1200);
   } catch (err) {
-    alert(err.response?.data || '회원가입 중 오류가 발생했습니다.');
+    alert(err.response?.data || "회원가입 중 오류가 발생했습니다.");
   }
 };
 
@@ -260,22 +330,32 @@ const onAgreeMarketing = () => {
           <input
             type="text"
             v-model="name"
-            :class="{ error: !isValidName && name }"
+            :class="{ error: nameTouched && nameStatusType === 'error' }"
             placeholder="이름을 입력하세요"
+            @compositionstart="isComposingName = true"
+            @compositionend="
+              isComposingName = false;
+              validateName();
+            "
+            @input="onNameInput"
+            @blur="onNameBlur"
           />
+
+          <!-- 에러 메시지: validateName이 에러일 때만 -->
+          <!-- 에러 메시지: 에러일 때만 -->
           <p
-            v-if="name"
-            class="font-10 idStatusMsg"
-            :class="{
-              error: !isValidName,
-              success: isValidName,
-            }"
+            v-if="nameStatusType === 'error'"
+            class="nameStatusMsg font-10 error"
           >
-            {{
-              isValidName
-                ? '사용 가능한 이름입니다!'
-                : '이름은 2~20자 한글/영문만 입력해주세요.'
-            }}
+            {{ nameMsg }}
+          </p>
+
+          <!-- 가이드 메시지: 값이 비었거나 2글자 미만일 때만 -->
+          <p
+            v-else-if="!name || name.length < 2"
+            class="requireMsg font-10 font-light"
+          >
+            이름은 한글·영문 2~20자만 입력 가능합니다.
           </p>
         </div>
         <!-- 아이디 -->
@@ -337,8 +417,19 @@ const onAgreeMarketing = () => {
               @click="showPassword = !showPassword"
             />
           </div>
-          <p class="font-10 font-light">8자 이상, 영문/숫자/특수문자 포함</p>
+          <!-- <p class="font-10 font-light">8자 이상, 영문/숫자/특수문자 포함</p> -->
+          <p
+            v-if="pwFormatMsg"
+            class="pwStatusMsg font-10"
+            :class="{
+              error: pwFormatStatus === 'error',
+              success: pwFormatStatus === 'success',
+            }"
+          >
+            {{ pwFormatMsg }}
+          </p>
         </div>
+
         <!-- 비밀번호 확인 -->
         <div class="formGroup">
           <label class="font-13 font-bold">비밀번호 확인</label>
@@ -358,16 +449,17 @@ const onAgreeMarketing = () => {
             />
           </div>
           <p
-            v-if="passwordMsg"
+            v-if="pwMatchMsg"
             class="pwStatusMsg font-10"
             :class="{
-              error: confirmStatusType === 'error',
-              success: confirmStatusType === 'success',
+              error: pwMatchStatus === 'error',
+              success: pwMatchStatus === 'success',
             }"
           >
-            {{ passwordMsg }}
+            {{ pwMatchMsg }}
           </p>
         </div>
+
         <div class="agreementGroup font-11">
           <label class="checkboxRow">
             <input
@@ -614,7 +706,7 @@ input:focus {
   cursor: pointer;
   user-select: none;
 }
-.checkboxRow input[type='checkbox'] {
+.checkboxRow input[type="checkbox"] {
   accent-color: var(--base-blue-dark);
   width: 14px;
   height: 14px;
@@ -715,5 +807,16 @@ input:focus {
 }
 .agreeText.clickable.checked {
   color: var(--base-blue-dark); /* 체크 시 네이비 강조 */
+}
+/* 이름 처리 안내 메시지 */
+.nameStatusMsg {
+  margin-top: 3px;
+  margin-left: 5px;
+}
+.nameStatusMsg.error {
+  color: var(--alert-strong);
+}
+.nameStatusMsg.success {
+  color: var(--success-text);
 }
 </style>

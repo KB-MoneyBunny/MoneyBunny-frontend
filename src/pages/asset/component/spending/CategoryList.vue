@@ -25,6 +25,7 @@
 <script setup>
 import { computed } from 'vue';
 import CategoryItem from './CategoryItem.vue';
+import SpendingNodata from './SpendingNodata.vue';
 
 // Props 정의
 const props = defineProps({
