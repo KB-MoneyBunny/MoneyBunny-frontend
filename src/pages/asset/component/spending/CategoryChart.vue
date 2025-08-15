@@ -267,7 +267,6 @@ const formatBarAmount = (amount) => {
   font-weight: bold;
 }
 
-<<<<<<< HEAD
 .no-data {
   height: 110px;
   display: flex;
@@ -281,8 +280,6 @@ const formatBarAmount = (amount) => {
   margin: 0;
 }
 
-=======
->>>>>>> origin/dev
 /* 반응형 처리 */
 @media (max-width: 375px) {
   .chart-bars {

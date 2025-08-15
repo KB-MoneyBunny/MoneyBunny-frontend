@@ -1,13 +1,8 @@
 <template>
   <div class="overview-card" @click="goToAccountTab">
     <!-- 타이틀 -->
-<<<<<<< HEAD
     <div class="title-row" @click="goToAccountTab">
       <div>계좌 현황</div>
-=======
-    <div class="title-row">
-      <h3>계좌 현황</h3>
->>>>>>> origin/dev
       <div class="arrow">
         <img
           src="@/assets/images/icons/common/arrow_right.png"
@@ -50,19 +45,9 @@ const goToAccountTab = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-<<<<<<< HEAD
   font-weight: bold;
   font-size: 0.9rem;
   color: var(--base-blue-dark);
-=======
-  /* cursor 제거 - 상위 카드에서 처리 */
-}
-
-.title-row h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-title, #111827);
->>>>>>> origin/dev
 }
 
 .arrow-icon {

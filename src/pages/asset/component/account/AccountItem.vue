@@ -285,11 +285,7 @@ const toggleBalanceVisibility = () => {
 .account-number {
   font-size: 0.65rem;
   color: var(--text-lightgray);
-<<<<<<< HEAD
   margin: 0 0 0.35rem 0;
-=======
-  margin: 0;
->>>>>>> origin/dev
   /* 긴 계좌번호 말줄임표 처리 */
   white-space: nowrap;
   overflow: hidden;
