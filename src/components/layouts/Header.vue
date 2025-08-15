@@ -17,7 +17,7 @@
             class="logo-img"
           />
           <div v-if="unreadCount > 0" class="notification-badge">
-            {{ unreadCount > 9 ? '9+' : unreadCount }}
+            {{ unreadCount > 9 ? "9+" : unreadCount }}
           </div>
         </div>
       </RouterLink>
@@ -26,9 +26,10 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import { useNotificationStore } from '@/stores/notification';
+import { onMounted, computed, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useNotificationStore } from "@/stores/notification";
+import { useAuthStore } from "@/stores/auth";
 
 // 💪(상일) 알림 스토어 및 라우트 사용
 const route = useRoute();
@@ -36,11 +37,19 @@ const notificationStore = useNotificationStore();
 const unreadCount = computed(() => notificationStore.unreadCount);
 const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 
+// 🎵(유정) 로그인 여부 확인
+const auth = useAuthStore();
+const isLoggedIn = computed(() => auth.isLogin);
+
 // 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회 - 특정 라우트에서만
 onMounted(async () => {
+  // 🎵(유정)
+  // 비로그인: 알림 API 호출 X
+  if (!isLoggedIn.value) return;
+
   // 💪(상일) 미읽은 알림 개수가 필요한 페이지만 체크 (policy 메인만 포함)
-  const targetRoutes = ['/home', '/asset', '/mypage'];
-  const exactRoutes = ['/policy', '/policy/main'];
+  const targetRoutes = ["/home", "/asset", "/mypage"];
+  const exactRoutes = ["/policy", "/policy/main"];
   if (
     targetRoutes.some((routePath) => route.path.startsWith(routePath)) ||
     exactRoutes.includes(route.path)
@@ -48,11 +57,11 @@ onMounted(async () => {
     try {
       await notificationStore.fetchUnreadCount();
       console.log(
-        '🔔 Header: 미읽은 알림 개수 조회 완료',
+        "🔔 Header: 미읽은 알림 개수 조회 완료",
         notificationStore.unreadCount
       );
     } catch (error) {
-      console.error('❌ Header: 미읽은 알림 개수 조회 실패', error);
+      console.error("❌ Header: 미읽은 알림 개수 조회 실패", error);
     }
   }
 });
