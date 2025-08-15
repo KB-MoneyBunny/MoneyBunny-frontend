@@ -113,6 +113,13 @@ const clearErrorMessage = () => {
   }
 };
 
+const goGuestSearchPage = () => {
+  router.push({
+    name: "policySearchGuest",
+    query: { redirect: route.query.redirect?.toString() || "/home" },
+  });
+};
+
 // 💪(상일) URL 파라미터로 전달된 에러 메시지 처리
 onMounted(() => {
   // ✅ 이미 로그인 상태로 /login 접근한 경우: redirect 목적지로
@@ -198,6 +205,15 @@ watch(errorMessage, () => {
         >
           <span v-if="isLoading">로그인 중...</span>
           <span v-else>로그인</span>
+        </button>
+
+        <button
+          class="loginButton font-14"
+          @click="goGuestSearchPage"
+          :disabled="isLoading"
+        >
+          <span v-if="isLoading">로그인 중...</span>
+          <span v-else>비회원 로그인</span>
         </button>
 
         <div class="loginLink font-11">
