@@ -90,6 +90,16 @@ const idStatusType = ref(""); // 'error' | 'success'
 const nameMsg = ref("");
 const nameStatusType = ref(""); // 'error' | 'success'
 const nameTouched = ref(false);
+const isComposingName = ref(false); // 이름 입력 관련
+
+const onNameInput = () => {
+  if (isComposingName.value) return;
+  validateName(); // 입력할 때마다 검사 -> 조건 만족 시 nameMsg 즉시 비워짐
+};
+const onNameBlur = () => {
+  nameTouched.value = true; // 스타일에 쓰고 있으면 유지
+  validateName(); // 포커스 빠질 때 최종 검증
+};
 
 // 비밀번호
 const pwFormatMsg = ref(""); // 형식 안내
@@ -118,28 +128,33 @@ const handleAllAgree = () => {
 const pwRule =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?]).{8,}$/;
 const emailRule = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const nameRule = /^[가-힣a-zA-Z\s]{2,20}$/;
+// const nameRule = /^[가-힣a-zA-Z\s]{2,20}$/;
+
+// 완성형(AC00-D7A3) + 현대 자모(1100-11FF) + 호환 자모(3130-318F) + 영문 + 공백, 2~20자
+const nameRule = /^[\uAC00-\uD7A3\u1100-\u11FF\u3130-\u318Fa-zA-Z\s]{2,20}$/;
+
 // 이름 유효성 검사 정규식
 const isValidName = computed(() => nameRule.test(name.value));
 
 const validateName = () => {
-  const v = name.value.trim();
+  // 한글 입력값을 NFC로 정규화해서 완성형 기준으로 검사
+  const nameCheck = (name.value || "").normalize("NFC").trim();
 
-  if (!v) {
+  if (!nameCheck) {
     nameMsg.value = "이름을 입력하세요.";
     nameStatusType.value = "error";
     return;
   }
 
-  // 2~20자, 한글/영문/공백 허용 (nameRule 이미 선언됨)
-  if (!nameRule.test(v)) {
+  if (!nameRule.test(nameCheck)) {
     nameMsg.value = "이름은 한글/영문 2~20자만 가능합니다.";
     nameStatusType.value = "error";
     return;
   }
 
-  nameMsg.value = "사용 가능한 이름입니다.";
-  nameStatusType.value = "success";
+  // 조건 만족: 즉시 메시지 숨김
+  nameMsg.value = "";
+  nameStatusType.value = "";
 };
 
 // 아이디 중복확인
@@ -168,13 +183,13 @@ const checkUsername = async () => {
 
 // 비밀번호 일치 검사
 const validatePassword = () => {
-  // 1) 형식 검사 (password 값 있을 때만)
+  // 형식 검사
   if (password.value) {
     if (!pwRule.test(password.value)) {
       pwFormatMsg.value = "8자 이상, 영문/숫자/특수문자 모두 포함해야 합니다.";
       pwFormatStatus.value = "error";
     } else {
-      pwFormatMsg.value = "사용 가능한 비밀번호 형식입니다.";
+      pwFormatMsg.value = "사용 가능한 비밀번호 형식입니다."; // 성공 문구
       pwFormatStatus.value = "success";
     }
   } else {
@@ -182,17 +197,16 @@ const validatePassword = () => {
     pwFormatStatus.value = "";
   }
 
-  // 2) 일치 검사 (둘 다 있을 때만)
+  // 일치 검사
   if (password.value && confirmPassword.value) {
     if (password.value !== confirmPassword.value) {
       pwMatchMsg.value = "비밀번호가 서로 일치하지 않습니다.";
       pwMatchStatus.value = "error";
     } else {
-      pwMatchMsg.value = "비밀번호가 일치합니다.";
+      pwMatchMsg.value = "비밀번호가 일치합니다."; // 성공 문구
       pwMatchStatus.value = "success";
     }
   } else {
-    // 하나라도 비었으면 일치 메시지 비우기
     pwMatchMsg.value = "";
     pwMatchStatus.value = "";
   }
@@ -316,26 +330,32 @@ const onAgreeMarketing = () => {
           <input
             type="text"
             v-model="name"
-            :class="{ error: nameTouched && !isValidName && name }"
+            :class="{ error: nameTouched && nameStatusType === 'error' }"
             placeholder="이름을 입력하세요"
-            @input="
-              nameTouched = true;
+            @compositionstart="isComposingName = true"
+            @compositionend="
+              isComposingName = false;
               validateName();
             "
-            @blur="
-              nameTouched = true;
-              validateName();
-            "
+            @input="onNameInput"
+            @blur="onNameBlur"
           />
+
+          <!-- 에러 메시지: validateName이 에러일 때만 -->
+          <!-- 에러 메시지: 에러일 때만 -->
           <p
-            v-if="nameTouched && nameMsg"
-            class="nameStatusMsg font-10"
-            :class="{
-              error: nameStatusType === 'error',
-              success: nameStatusType === 'success',
-            }"
+            v-if="nameStatusType === 'error'"
+            class="nameStatusMsg font-10 error"
           >
             {{ nameMsg }}
+          </p>
+
+          <!-- 가이드 메시지: 값이 비었거나 2글자 미만일 때만 -->
+          <p
+            v-else-if="!name || name.length < 2"
+            class="requireMsg font-10 font-light"
+          >
+            이름은 한글·영문 2~20자만 입력 가능합니다.
           </p>
         </div>
         <!-- 아이디 -->
