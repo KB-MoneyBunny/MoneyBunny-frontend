@@ -113,11 +113,9 @@ const clearErrorMessage = () => {
   }
 };
 
-const goGuestSearchPage = () => {
-  router.push({
-    name: "policySearchGuest",
-    query: { redirect: route.query.redirect?.toString() || "/home" },
-  });
+const goGuestPolicyPage = () => {
+  // 게스트는 정책 메인으로 바로 이동
+  router.push({ name: "policyMain" });
 };
 
 // 💪(상일) URL 파라미터로 전달된 에러 메시지 처리
@@ -209,7 +207,7 @@ watch(errorMessage, () => {
 
         <button
           class="loginButton font-14"
-          @click="goGuestSearchPage"
+          @click="goGuestPolicyPage"
           :disabled="isLoading"
         >
           <span v-if="isLoading">로그인 중...</span>
