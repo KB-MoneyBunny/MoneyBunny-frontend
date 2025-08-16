@@ -99,7 +99,6 @@ const handleCardAdded = (newCard) => {
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-top: 1rem;
 }
 
 /* 전체보기 버튼 */

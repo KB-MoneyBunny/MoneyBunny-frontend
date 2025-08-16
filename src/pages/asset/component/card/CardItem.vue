@@ -177,7 +177,7 @@ const toggleAmountVisibility = () => {
 }
 
 .card-name {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: bold;
   color: var(--text-darkgray);
   white-space: nowrap;
@@ -229,7 +229,7 @@ const toggleAmountVisibility = () => {
 }
 
 .card-number {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   color: var(--text-lightgray);
   margin: 0 0 0.35rem 0;
   white-space: nowrap;
@@ -240,7 +240,7 @@ const toggleAmountVisibility = () => {
 
 /* 카드 금액 스타일 */
 .card-amount {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: bold;
   color: var(--base-blue-dark);
   /* margin-top: 5px; */

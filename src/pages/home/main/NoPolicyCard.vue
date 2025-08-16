@@ -29,40 +29,40 @@ function goToQuiz() {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1rem;
-  border-radius: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
   background-color: white;
 }
 
 .bunny-img {
   width: 90px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
 }
 
 .main-text {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   color: var(--base-blue-dark);
 }
 
 .sub-text {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-lightgray);
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .start-btn {
   background-color: var(--base-blue-dark);
   color: white;
   padding: 0.5rem 1.25rem;
-  border-radius: 0.5rem;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .see-all {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-bluegray);
   text-decoration: underline;
   cursor: pointer;

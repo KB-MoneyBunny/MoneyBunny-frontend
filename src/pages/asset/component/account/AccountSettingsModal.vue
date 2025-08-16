@@ -79,14 +79,22 @@
 
           <!-- 잔액 숨김 토글 -->
           <div class="setting-item toggle-item">
-            <span class="setting-text">잔액 숨기기</span>
-            <label class="toggle-switch">
+            <div class="setting-left">
+              <span class="setting-text">금액 숨기기</span>
+              <!-- <small class="setting-hint">{{
+                hideAmount ? '숨김 적용됨' : '현재 표시 중'
+              }}</small> -->
+            </div>
+
+            <label class="toggle-switch ios" aria-label="금액 숨기기">
               <input
                 type="checkbox"
-                v-model="hideBalance"
-                @change="handleToggleBalance"
+                v-model="hideAmount"
+                @change="handleToggleAmount"
               />
-              <span class="toggle-slider"></span>
+              <span class="toggle-slider"
+                ><span class="toggle-knob"></span
+              ></span>
             </label>
           </div>
 
@@ -126,8 +134,8 @@ import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
 import copyIcon from '@/assets/images/icons/signup/copy.png';
 import editIcon from '@/assets/images/icons/mypage/edit.png';
-import emptyStarIcon from '@/assets/images/icons/common/empty_star.png';
-import fillStarIcon from '@/assets/images/icons/common/fill_star.png';
+import emptyStarIcon from '@/assets/images/icons/asset/star1.png';
+import fillStarIcon from '@/assets/images/icons/asset/star.png';
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -256,7 +264,7 @@ const cancelEdit = () => {
   max-width: 390px;
   background: #fff;
   border-radius: 1.25rem 1.25rem 0 0;
-  padding: 1.25rem;
+  padding: 16px;
   animation: slideUp 0.3s ease-out;
   max-height: 70vh;
   overflow-y: auto;
@@ -281,9 +289,9 @@ const cancelEdit = () => {
 .account-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--input-outline);
 }
 .bank-logo {
@@ -299,7 +307,7 @@ const cancelEdit = () => {
   font-size: 0.9rem;
   font-weight: bold;
   color: var(--base-blue-dark);
-  margin: 0 0 0.25rem;
+  margin: 0 0 2px;
 }
 .account-number {
   font-size: 0.75rem;
@@ -311,14 +319,17 @@ const cancelEdit = () => {
 .settings-options {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 12px;
 }
 .section-group {
   display: flex;
   flex-direction: column;
   gap: 0;
-  border-radius: 0.75rem;
+  border-radius: 12px;
   overflow: hidden;
+}
+.section-group .setting-item + .setting-item {
+  border-top: 1px solid var(--input-outline);
 }
 .setting-item {
   display: flex;
@@ -370,8 +381,8 @@ const cancelEdit = () => {
 }
 
 .star-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
 }
 
@@ -450,44 +461,45 @@ const cancelEdit = () => {
 }
 
 /* ===== 토글 ===== */
-.toggle-item {
+/* 좌측 라벨+힌트 묶음 */
+.setting-left {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 2px;
 }
-.toggle-switch {
+.setting-hint {
+  font-size: 0.72rem;
+  color: var(--text-lightgray);
+}
+
+.toggle-switch.ios {
   position: relative;
-  display: inline-block;
   width: 40px;
   height: 24px;
 }
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.toggle-switch.ios input {
+  display: none;
 }
-.toggle-slider {
+.toggle-switch.ios .toggle-slider {
   position: absolute;
   inset: 0;
-  background-color: var(--input-disabled-1);
-  border-radius: 31px;
+  background: #d5d9e3;
+  border-radius: 24px;
 }
-.toggle-slider:before {
-  content: '';
+.toggle-switch.ios .toggle-knob {
   position: absolute;
-  height: 20px;
-  width: 20px;
+  top: 2px;
   left: 2px;
-  bottom: 2px;
-  background-color: #fff;
-  transition: 0.3s;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+  background: #fff;
 }
-input:checked + .toggle-slider {
-  background-color: var(--base-blue-dark);
+.toggle-switch.ios input:checked + .toggle-slider {
+  background: var(--base-blue-dark);
 }
-input:checked + .toggle-slider:before {
-  transform: translateX(20px);
+.toggle-switch.ios input:checked + .toggle-slider .toggle-knob {
+  transform: translateX(16px);
 }
 
 /* ===== 닫기 버튼 ===== */
