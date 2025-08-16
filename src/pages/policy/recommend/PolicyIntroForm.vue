@@ -44,11 +44,12 @@ const isFormValid = computed(() => {
 
 const goToPolicyQuiz1 = () => {
   if (!isFormValid.value) return;
+  // 성별을 지역명에 포함시켜 전달
   policyQuizStore.setBasicInfo({
     year: birth.value.year,
     month: birth.value.month,
     day: birth.value.day,
-    region: address.value,
+    region: gender.value ? `${address.value} ${gender.value}` : address.value,
   });
   router.push({ name: 'policyQuizStep1' });
 };

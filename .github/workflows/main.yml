@@ -26,7 +26,7 @@ jobs:
           destination-github-username: sangil6372
           destination-repository-name: MoneyBunny-frontend
           user-email: ${{ secrets.EMAIL }}
-          commit-message: ${{ github.event.commits[0].message }}
+          commit-message: "${{ github.event.head_commit.message || 'chore: deploy frontend build' }}"
           target-branch: main
           
       - name: Test get variable exported by push-to-another-repository
