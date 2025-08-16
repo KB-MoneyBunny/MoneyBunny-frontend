@@ -5,7 +5,7 @@
       <div class="admin-access-area" @click="handleAdminAccess"></div>
 
       <RouterLink to="/home" class="logo-link">
-        <div class="logo-text font-28 font-extrabold">MoneyBunny</div>
+        <div class="logo-text font-30 font-extrabold">MoneyBunny</div>
       </RouterLink>
       <!--💪(상일) 알림 이동 (미읽은 개수 배지 포함)-->
       <RouterLink
@@ -170,8 +170,8 @@ const handleAdminAccess = async () => {
 }
 
 .logo-text {
-  font-size: clamp(20px, 5.5vw, 28px);
-  line-height: 1;
+  font-size: clamp(24px, 6vw, 34px);
+  line-height: 1.2;
   color: var(--base-blue-dark);
 
   letter-spacing: -0.03em;

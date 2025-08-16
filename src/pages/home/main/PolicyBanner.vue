@@ -116,7 +116,7 @@ function onCtaClick() {
   display: flex;
   align-items: center;
   /* gap: 12px; */
-  min-height: 138px;
+  min-height: 140px;
   width: 100%;
   isolation: isolate;
   box-sizing: border-box;
@@ -158,9 +158,9 @@ function onCtaClick() {
   color: var(--base-blue-dark);
 }
 .title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
-  margin: 2px 0 6px;
+  margin: 0 0 5px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

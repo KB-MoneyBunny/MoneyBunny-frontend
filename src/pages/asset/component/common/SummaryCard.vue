@@ -168,6 +168,8 @@ const formatSubValue = (subInfo) => {
 /* 비교 텍스트용 (+417,500원(+20%) 등) */
 .summary-right-value.comparison-text {
   font-size: 0.775rem;
+  line-height: 1.3;
+  white-space: normal;
 }
 
 .summary-right-value.positive,
@@ -181,7 +183,7 @@ const formatSubValue = (subInfo) => {
 
 /* 서브 값에도 같은 규칙 적용 */
 .sub-value {
-  font-weight: 700;
+  font-weight: bold;
   word-break: keep-all;
   overflow-wrap: break-word;
   line-height: 1.3;
