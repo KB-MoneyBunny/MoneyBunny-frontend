@@ -100,12 +100,24 @@ export const adminAPI = {
     return apiClient.post('/api/push/admin/tokens/cleanup')
   },
 
+  sendAllNotifications() {
+    return apiClient.post('/api/push/admin/send-all')
+  },
+
   // 💪(상일) 리뷰 관리 API들
   getAllReviews() {
     return apiClient.get('/api/policy-interaction/review/all')
   },
 
+  getPolicyReviews(policyId) {
+    return apiClient.get(`/api/policy-interaction/review/${policyId}/list`)
+  },
+
   deleteReviewsByPolicyId(policyId) {
     return apiClient.delete(`/api/policy-interaction/review/admin/${policyId}`)
+  },
+
+  deleteSingleReview(reviewId) {
+    return apiClient.delete(`/api/policy-interaction/review/admin/single/${reviewId}`)
   }
 }

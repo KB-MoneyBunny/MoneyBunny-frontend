@@ -124,8 +124,33 @@
           </div>
         </div>
 
+        <!-- 💪(상일) GPT 서브 탭 메뉴 -->
+        <div class="prompt-sub-tabs">
+          <button
+            class="sub-tab-button"
+            :class="{ active: activePromptTab === 'conditions' }"
+            @click="activePromptTab = 'conditions'"
+          >
+            조건 관리
+          </button>
+          <button
+            class="sub-tab-button"
+            :class="{ active: activePromptTab === 'examples' }"
+            @click="activePromptTab = 'examples'"
+          >
+            예시 관리
+          </button>
+          <button
+            class="sub-tab-button"
+            :class="{ active: activePromptTab === 'rules' }"
+            @click="activePromptTab = 'rules'"
+          >
+            계산 규칙
+          </button>
+        </div>
+
         <!-- 조건 관리 섹션 -->
-        <div class="admin-card">
+        <div class="admin-card" v-if="activePromptTab === 'conditions'">
           <div class="card-header-vertical">
             <h3>프롬프트 조건 관리</h3>
             <p>GPT 프롬프트에 사용될 조건들을 관리합니다.</p>
@@ -242,7 +267,7 @@
         </div>
 
         <!-- 예시 관리 섹션 -->
-        <div class="admin-card">
+        <div class="admin-card" v-if="activePromptTab === 'examples'">
           <div class="card-header-vertical">
             <h3>프롬프트 예시 관리</h3>
             <p>GPT 프롬프트 생성 시 사용될 예시들을 관리합니다.</p>
@@ -360,7 +385,7 @@
         </div>
 
         <!-- 계산 규칙 관리 섹션 -->
-        <div class="admin-card">
+        <div class="admin-card" v-if="activePromptTab === 'rules'">
           <div class="card-header-vertical">
             <h3>계산 규칙 관리</h3>
             <p>프롬프트에서 사용할 계산 공식과 규칙들을 관리합니다.</p>
@@ -387,19 +412,8 @@
             >
               <div class="rule-content">
                 <h4>
-                  {{ rule.ruleName || rule.ruleText || "규칙 " + rule.id }}
+                  {{ rule.ruleText || "규칙 " + rule.id }}
                 </h4>
-                <div class="rule-meta">
-                  <span
-                    :class="[
-                      'status-badge',
-                      rule.isActive ? 'active' : 'inactive',
-                    ]"
-                    v-if="rule.hasOwnProperty('isActive')"
-                  >
-                    {{ rule.isActive ? "활성" : "비활성" }}
-                  </span>
-                </div>
               </div>
               <div class="rule-divider"></div>
               <div class="rule-actions">
@@ -411,16 +425,6 @@
                 </button>
               </div>
               <div class="rule-details">
-                <div class="detail-row" v-if="rule.formula">
-                  <span class="detail-label">공식:</span>
-                  <span class="detail-value formula-text">{{
-                    rule.formula
-                  }}</span>
-                </div>
-                <div class="detail-row" v-if="rule.description">
-                  <span class="detail-label">설명:</span>
-                  <span class="detail-value">{{ rule.description }}</span>
-                </div>
                 <div class="detail-row" v-if="rule.createdAt">
                   <span class="detail-label">생성일:</span>
                   <span class="detail-value">{{
@@ -446,101 +450,229 @@
 
       <!-- 💪(상일) 리뷰 관리 탭 -->
       <div v-if="activeTab === 'review'" class="review-management">
-        <div class="admin-card">
-          <div class="card-header-vertical">
-            <h3>리뷰 관리</h3>
-            <p>모든 사용자 리뷰를 조회하고 관리합니다.</p>
-            <div class="header-actions" style="margin-top: 12px">
+        <!-- 리뷰 서브 탭 네비게이션 -->
+        <div class="review-sub-tabs">
+          <button
+            class="sub-tab-button"
+            :class="{ active: activeReviewTab === 'all' }"
+            @click="activeReviewTab = 'all'"
+          >
+            전체 리뷰 조회
+          </button>
+          <button
+            class="sub-tab-button"
+            :class="{ active: activeReviewTab === 'policy' }"
+            @click="activeReviewTab = 'policy'"
+          >
+            개별 리뷰 조회
+          </button>
+        </div>
+
+        <!-- 전체 리뷰 조회 섹션 -->
+        <div v-if="activeReviewTab === 'all'">
+          <div class="admin-card">
+            <div class="card-header-vertical">
+              <h3>전체 리뷰 조회</h3>
+              <p>시스템에 등록된 모든 리뷰를 조회하고 관리합니다.</p>
+            </div>
+            <div class="card-actions">
               <button
-                class="btn-refresh"
+                class="btn-sync"
                 @click="fetchAllReviews"
                 :disabled="loading.reviews"
               >
-                {{ loading.reviews ? "로딩 중..." : "새로고침" }}
+                {{ loading.reviews ? "조회 중..." : "전체 리뷰 조회" }}
               </button>
             </div>
           </div>
 
-          <!-- 리뷰 목록 -->
-          <div class="reviews-table" v-if="allReviews.length > 0">
-            <div
-              class="review-item"
-              v-for="review in allReviews"
-              :key="review.reviewId"
-            >
-              <div class="review-content">
-                <div class="review-header">
-                  <h4>{{ review.content || "리뷰 내용 없음" }}</h4>
-                  <div class="review-meta">
-                    <span class="review-user">{{ review.userName }}</span>
-                    <span :class="['benefit-status', getBenefitStatusClass(review.benefitStatus)]">
-                      {{ getBenefitStatusLabel(review.benefitStatus) }}
-                    </span>
-                    <span class="like-count">👍 {{ review.likeCount || 0 }}</span>
+          <!-- 전체 리뷰 목록 -->
+          <div class="admin-card" v-if="allReviews.length > 0">
+            <div class="card-header-vertical">
+              <h3>전체 리뷰 목록</h3>
+              <p>총 {{ allReviews.length }}개의 리뷰가 있습니다.</p>
+            </div>
+
+            <div class="reviews-table">
+              <div
+                class="review-item"
+                v-for="review in allReviews"
+                :key="review.reviewId"
+              >
+                <div class="review-content">
+                  <div class="review-header">
+                    <h4>{{ review.content || "리뷰 내용 없음" }}</h4>
+                    <div class="review-meta">
+                      <span class="review-user">{{ review.userName }}</span>
+                      <span class="policy-id">정책 ID: {{ review.policyId }}</span>
+                      <span :class="['benefit-status', getBenefitStatusClass(review.benefitStatus)]">
+                        {{ getBenefitStatusLabel(review.benefitStatus) }}
+                      </span>
+                      <span class="like-count">👍 {{ review.likeCount || 0 }}</span>
+                    </div>
+                  </div>
+                  <div class="review-details">
+                    <div class="detail-row">
+                      <span class="detail-label">작성일:</span>
+                      <span class="detail-value">{{ formatDate(review.createdAt) }}</span>
+                    </div>
+                    <div class="detail-row" v-if="review.updatedAt !== review.createdAt">
+                      <span class="detail-label">수정일:</span>
+                      <span class="detail-value">{{ formatDate(review.updatedAt) }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">사용자 ID:</span>
+                      <span class="detail-value">{{ review.userId }}</span>
+                    </div>
                   </div>
                 </div>
-                <div class="review-details">
-                  <div class="detail-row">
-                    <span class="detail-label">작성일:</span>
-                    <span class="detail-value">{{ formatDate(review.createdAt) }}</span>
-                  </div>
-                  <div class="detail-row" v-if="review.updatedAt !== review.createdAt">
-                    <span class="detail-label">수정일:</span>
-                    <span class="detail-value">{{ formatDate(review.updatedAt) }}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">사용자 ID:</span>
-                    <span class="detail-value">{{ review.userId }}</span>
-                  </div>
-                  <div class="detail-row" v-if="review.policyId">
-                    <span class="detail-label">정책 ID:</span>
-                    <span class="detail-value">{{ review.policyId }}</span>
-                  </div>
+                <div class="review-divider"></div>
+                <div class="review-actions">
+                  <button
+                    class="btn-delete-small btn-delete-single"
+                    @click="deleteSingleReview(review)"
+                    :disabled="loading.singleReviewDelete"
+                  >
+                    {{ loading.singleReviewDelete ? "삭제 중..." : "개별 삭제" }}
+                  </button>
                 </div>
               </div>
-              <div class="review-divider"></div>
-              <div class="review-actions">
+            </div>
+          </div>
+
+          <!-- 조회 결과 없음 -->
+          <div class="admin-card" v-else-if="!loading.reviews && allReviews.length === 0">
+            <div class="no-data">
+              <p>등록된 리뷰가 없습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 정책별 리뷰 조회 섹션 -->
+        <div v-if="activeReviewTab === 'policy'">
+          <!-- 정책 ID 입력 섹션 -->
+          <div class="admin-card">
+            <div class="card-header-vertical">
+              <h3>정책별 리뷰 관리</h3>
+              <p>특정 정책의 리뷰들을 조회하고 관리합니다.</p>
+            </div>
+            <div class="policy-search-section">
+              <div class="search-input-group">
+                <input
+                  type="number"
+                  v-model="selectedPolicyId"
+                  placeholder="정책 ID를 입력하세요"
+                  class="policy-id-input"
+                  @keyup.enter="fetchPolicyReviews"
+                />
                 <button
-                  class="btn-delete-small"
-                  @click="deleteReviewAdmin(review)"
-                  :disabled="loading.reviewDelete"
+                  class="btn-sync"
+                  @click="fetchPolicyReviews"
+                  :disabled="!selectedPolicyId || loading.policyReviews"
                 >
-                  {{ loading.reviewDelete ? "삭제 중..." : "삭제" }}
+                  {{ loading.policyReviews ? "조회 중" : "조회" }}
                 </button>
               </div>
             </div>
           </div>
 
-          <div v-else-if="!loading.reviews" class="no-data">
-            <p>등록된 리뷰가 없습니다.</p>
+          <!-- 정책 리뷰 결과 섹션 -->
+          <div class="admin-card" v-if="policyReviews.length > 0">
+            <div class="card-header-vertical">
+              <div class="policy-info">
+                <h3>정책 ID: {{ selectedPolicyId }}</h3>
+                <p>총 {{ policyReviews.length }}개의 리뷰가 있습니다.</p>
+              </div>
+              <div class="header-actions" style="margin-top: 12px">
+                <button
+                  class="btn-delete-all-policy"
+                  @click="deleteAllPolicyReviews"
+                  :disabled="loading.reviewDelete"
+                >
+                  {{ loading.reviewDelete ? "삭제 중..." : "모든 리뷰 삭제" }}
+                </button>
+                <hr></hr>
+              </div>
+            </div>
+
+            <!-- 리뷰 목록 -->
+            <div class="reviews-table">
+              <div
+                class="review-item"
+                v-for="review in policyReviews"
+                :key="review.reviewId"
+              >
+                <div class="review-content">
+                  <div class="review-header">
+                    <h4>{{ review.content || "리뷰 내용 없음" }}</h4>
+                    <div class="review-meta">
+                      <span class="review-user">{{ review.userName }}</span>
+                      <span :class="['benefit-status', getBenefitStatusClass(review.benefitStatus)]">
+                        {{ getBenefitStatusLabel(review.benefitStatus) }}
+                      </span>
+                      <span class="like-count">👍 {{ review.likeCount || 0 }}</span>
+                    </div>
+                  </div>
+                  <div class="review-details">
+                    <div class="detail-row">
+                      <span class="detail-label">작성일:</span>
+                      <span class="detail-value">{{ formatDate(review.createdAt) }}</span>
+                    </div>
+                    <div class="detail-row" v-if="review.updatedAt !== review.createdAt">
+                      <span class="detail-label">수정일:</span>
+                      <span class="detail-value">{{ formatDate(review.updatedAt) }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">사용자 ID:</span>
+                      <span class="detail-value">{{ review.userId }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-divider"></div>
+                <div class="review-actions">
+                  <button
+                    class="btn-delete-small btn-delete-single"
+                    @click="deleteSingleReview(review)"
+                    :disabled="loading.singleReviewDelete"
+                  >
+                    {{ loading.singleReviewDelete ? "삭제 중..." : "개별 삭제" }}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div v-else class="loading-state">리뷰 목록을 불러오는 중...</div>
+          <!-- 조회 결과 없음 -->
+          <div class="admin-card" v-else-if="selectedPolicyId && !loading.policyReviews && policyReviews.length === 0">
+            <div class="no-data">
+              <p>정책 ID {{ selectedPolicyId }}에 대한 리뷰가 없습니다.</p>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- 알림 발송 탭 -->
       <div v-if="activeTab === 'notification'" class="notification-management">
-        <div class="admin-cards">
-          <!-- 테스트 알림 -->
-          <div class="admin-card">
-            <div class="card-header-vertical">
-              <h3>테스트 알림</h3>
-              <p>전체 사용자에게 테스트 알림을 발송합니다.</p>
-            </div>
-            <div class="card-actions">
-              <button
-                class="btn-test"
-                @click="sendTestNotification"
-                :disabled="loading.testNotification"
-              >
-                {{
-                  loading.testNotification ? "노송 중..." : "테스트 알림 발송"
-                }}
-              </button>
-            </div>
-          </div>
+        <!-- 💪(상일) 알림 서브 탭 메뉴 -->
+        <div class="notification-sub-tabs">
+          <button
+            class="sub-tab-button"
+            :class="{ active: activeNotificationTab === 'individual' }"
+            @click="activeNotificationTab = 'individual'"
+          >
+            개별 발송
+          </button>
+          <button
+            class="sub-tab-button"
+            :class="{ active: activeNotificationTab === 'management' }"
+            @click="activeNotificationTab = 'management'"
+          >
+            관리 도구
+          </button>
+        </div>
 
+        <!-- 개별 발송 탭 -->
+        <div class="admin-cards" v-if="activeNotificationTab === 'individual'">
           <!-- 북마크 정책 알림 -->
           <div class="admin-card">
             <div class="card-header-vertical">
@@ -549,7 +681,7 @@
             </div>
             <div class="card-actions">
               <button
-                class="btn-notification"
+                class="btn-bookmark"
                 @click="sendBookmarkNotification"
                 :disabled="loading.bookmarkNotification"
               >
@@ -572,7 +704,7 @@
             </div>
             <div class="card-actions">
               <button
-                class="btn-notification"
+                class="btn-new-policy"
                 @click="sendNewPolicyNotification"
                 :disabled="loading.newPolicyNotification"
               >
@@ -593,7 +725,7 @@
             </div>
             <div class="card-actions">
               <button
-                class="btn-notification"
+                class="btn-top3"
                 @click="sendTop3Notification"
                 :disabled="loading.top3Notification"
               >
@@ -610,7 +742,7 @@
             </div>
             <div class="card-actions">
               <button
-                class="btn-notification"
+                class="btn-feedback"
                 @click="sendFeedbackNotification"
                 :disabled="loading.feedbackNotification"
               >
@@ -618,6 +750,49 @@
                   loading.feedbackNotification
                     ? "발솤 중..."
                     : "피드백 알림 발송"
+                }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 관리 도구 탭 -->
+        <div class="admin-cards" v-if="activeNotificationTab === 'management'">
+          <!-- 테스트 알림 -->
+          <div class="admin-card">
+            <div class="card-header-vertical">
+              <h3>테스트 알림</h3>
+              <p>전체 사용자에게 테스트 알림을 발송합니다.</p>
+            </div>
+            <div class="card-actions">
+              <button
+                class="btn-test"
+                @click="sendTestNotification"
+                :disabled="loading.testNotification"
+              >
+                {{
+                  loading.testNotification ? "노송 중..." : "테스트 알림 발송"
+                }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 모든 알림 발송 -->
+          <div class="admin-card">
+            <div class="card-header-vertical">
+              <h3>모든 알림 발송</h3>
+              <p>북마크, 신규 정책, TOP3, 피드백 알림을 모두 한번에 발송합니다.</p>
+            </div>
+            <div class="card-actions">
+              <button
+                class="btn-notification"
+                @click="sendAllNotifications"
+                :disabled="loading.allNotifications"
+              >
+                {{
+                  loading.allNotifications
+                    ? "발송 중..."
+                    : "모든 알림 발송"
                 }}
               </button>
             </div>
@@ -770,42 +945,13 @@
 
         <form @submit.prevent="saveRule">
           <div class="form-group">
-            <label>규칙 명</label>
-            <input
-              type="text"
-              v-model="ruleForm.ruleName"
-              placeholder="예: 중위소득 계산 공식"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>계산 공식</label>
+            <label>계산 규칙</label>
             <textarea
-              v-model="ruleForm.formula"
-              placeholder="예: (income / median_income) * 100"
+              v-model="ruleForm.ruleText"
+              placeholder="예: 월별 정기 지원은 지급 기간을 곱해 총액으로 계산"
               rows="3"
               required
             ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>설명</label>
-            <textarea
-              v-model="ruleForm.description"
-              placeholder="이 규칙에 대한 설명을 입력하세요"
-              rows="2"
-            ></textarea>
-          </div>
-
-          <div class="form-group-toggle">
-            <label class="toggle-label">
-              <span>활성 상태</span>
-              <div class="toggle-switch">
-                <input type="checkbox" v-model="ruleForm.isActive" />
-                <span class="toggle-slider"></span>
-              </div>
-            </label>
           </div>
 
           <div class="modal-actions-mobile">
@@ -837,6 +983,15 @@ import { adminAPI } from "@/api/admin";
 // 💪(상일) 탭 관리
 const activeTab = ref("sync");
 
+// 💪(상일) GPT 서브 탭 관리
+const activePromptTab = ref("conditions"); // conditions, examples, rules
+
+// 💪(상일) 알림 서브 탭 관리
+const activeNotificationTab = ref("individual"); // individual, management
+
+// 💪(상일) 리뷰 서브 탭 관리
+const activeReviewTab = ref("all"); // all, policy
+
 // 💪(상일) 로딩 상태 관리
 const loading = reactive({
   policy: false,
@@ -855,8 +1010,11 @@ const loading = reactive({
   top3Notification: false,
   feedbackNotification: false,
   tokenCleanup: false,
+  allNotifications: false,
   reviews: false,
+  policyReviews: false,
   reviewDelete: false,
+  singleReviewDelete: false,
 });
 
 // 💪(상일) 결과 메시지 상태 관리
@@ -875,6 +1033,8 @@ const previewResult = ref("");
 
 // 💪(상일) 리뷰 관련 데이터
 const allReviews = ref([]);
+const policyReviews = ref([]);
+const selectedPolicyId = ref('');
 
 // 💪(상일) 필터 상태 관리
 const conditionFilter = ref("POSITIVE"); // POSITIVE, NEGATIVE
@@ -900,10 +1060,7 @@ const exampleForm = reactive({
 });
 
 const ruleForm = reactive({
-  ruleName: "",
-  formula: "",
-  description: "",
-  isActive: true,
+  ruleText: "",
 });
 
 // 💪(상일) 기존 동기화 함수들
@@ -1178,6 +1335,21 @@ const cleanupTokens = async () => {
   }
 };
 
+const sendAllNotifications = async () => {
+  loading.allNotifications = true;
+  results.notification = "";
+
+  try {
+    const response = await adminAPI.sendAllNotifications();
+    results.notification = response.data;
+  } catch (error) {
+    console.error("모든 알림 발송 오류:", error);
+    results.notification = "모든 알림 발송 중 오류가 발생했습니다.";
+  } finally {
+    loading.allNotifications = false;
+  }
+};
+
 // 💪(상일) 유틸리티 함수들
 const truncateText = (text, maxLength) => {
   if (!text) return "";
@@ -1282,10 +1454,7 @@ const closeRuleModal = () => {
 
 const resetRuleForm = () => {
   Object.assign(ruleForm, {
-    ruleName: "",
-    formula: "",
-    description: "",
-    isActive: true,
+    ruleText: "",
   });
 };
 
@@ -1353,6 +1522,70 @@ const deleteReviewAdmin = async (review) => {
   } catch (error) {
     console.error("리뷰 삭제 오류:", error);
     alert("리뷰 삭제 중 오류가 발생했습니다.");
+  } finally {
+    loading.reviewDelete = false;
+  }
+};
+
+const deleteSingleReview = async (review) => {
+  if (!confirm(`이 리뷰만 삭제하시겠습니까?\n작성자: ${review.userName}\n내용: ${review.content || '내용 없음'}`)) return;
+  
+  if (!review.reviewId) {
+    alert("리뷰 ID가 없어서 삭제할 수 없습니다.");
+    return;
+  }
+  
+  loading.singleReviewDelete = true;
+  
+  try {
+    await adminAPI.deleteSingleReview(review.reviewId);
+    await fetchAllReviews(); // 목록 새로고침
+    alert("리뷰가 삭제되었습니다.");
+  } catch (error) {
+    console.error("개별 리뷰 삭제 오류:", error);
+    alert("개별 리뷰 삭제 중 오류가 발생했습니다.");
+  } finally {
+    loading.singleReviewDelete = false;
+  }
+};
+
+const fetchPolicyReviews = async () => {
+  if (!selectedPolicyId.value) {
+    alert("정책 ID를 입력해주세요.");
+    return;
+  }
+  
+  loading.policyReviews = true;
+  policyReviews.value = [];
+  
+  try {
+    const response = await adminAPI.getPolicyReviews(selectedPolicyId.value);
+    policyReviews.value = response.data;
+  } catch (error) {
+    console.error("정책별 리뷰 조회 오류:", error);
+    alert("정책별 리뷰 조회 중 오류가 발생했습니다.");
+  } finally {
+    loading.policyReviews = false;
+  }
+};
+
+const deleteAllPolicyReviews = async () => {
+  if (!selectedPolicyId.value) {
+    alert("정책 ID가 선택되지 않았습니다.");
+    return;
+  }
+  
+  if (!confirm(`정책 ID ${selectedPolicyId.value}의 모든 리뷰를 삭제하시겠습니까?\n(총 ${policyReviews.value.length}개 리뷰가 삭제됩니다)`)) return;
+  
+  loading.reviewDelete = true;
+  
+  try {
+    await adminAPI.deleteReviewsByPolicyId(selectedPolicyId.value);
+    policyReviews.value = [];
+    alert(`정책 ID ${selectedPolicyId.value}의 모든 리뷰가 삭제되었습니다.`);
+  } catch (error) {
+    console.error("정책별 모든 리뷰 삭제 오류:", error);
+    alert("정책별 모든 리뷰 삭제 중 오류가 발생했습니다.");
   } finally {
     loading.reviewDelete = false;
   }
@@ -2261,6 +2494,44 @@ onMounted(() => {
   word-break: break-all;
 }
 
+/* 💪(상일) 서브탭 공통 스타일 */
+.prompt-sub-tabs,
+.notification-sub-tabs,
+.review-sub-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 10px 0;
+  background: #f1f3f5;
+  padding: 3px;
+  border-radius: 4px;
+}
+
+.sub-tab-button {
+  flex: 1;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  color: #868e96;
+  text-transform: uppercase;
+}
+
+.sub-tab-button.active {
+  background: white;
+  color: #212529;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.sub-tab-button:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.4);
+  color: #495057;
+}
+
 /* 💪(상일) 리뷰 테이블 스타일 */
 .reviews-table {
   display: flex;
@@ -2316,6 +2587,16 @@ onMounted(() => {
   font-weight: 500;
 }
 
+.policy-id {
+  display: inline-block;
+  background: #17a2b8;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
 .benefit-status {
   display: inline-block;
   color: white;
@@ -2352,6 +2633,32 @@ onMounted(() => {
   font-weight: 500;
 }
 
+.review-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  min-width: 60px;
+}
+
+.detail-value {
+  font-size: 13px;
+  color: #495057;
+  font-weight: 500;
+}
+
 .review-divider {
   height: 1px;
   background: #e9ecef;
@@ -2365,11 +2672,88 @@ onMounted(() => {
   align-items: center;
 }
 
-.review-details {
+.policy-search-section {
+  margin-top: 16px;
+}
+
+.search-input-group {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 8px;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-input-group .btn-sync {
+  width: auto;
+  white-space: nowrap;
+}
+
+.policy-id-input {
+  flex: 1;
+  max-width: 180px;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+
+.btn-delete-all-policy {
+  background: #dc3545;
+  color: white;
+  border: 1px solid #dc3545;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete-all-policy:hover:not(:disabled) {
+  background: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-delete-all-policy:disabled {
+  background: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-delete-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.btn-delete-policy {
+  background: #ffc107;
+  color: #212529;
+  border-color: #ffc107;
+}
+
+.btn-delete-policy:hover:not(:disabled) {
+  background: #e0a800;
+  border-color: #d39e00;
+}
+
+.btn-delete-single {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.btn-delete-single:hover:not(:disabled) {
+  background: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-delete-small:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .condition-cards-container {
@@ -2577,6 +2961,103 @@ input:checked + .toggle-slider:before {
 .btn-save-mobile:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+
+/* 💪(상일) 개별 발송 버튼 색상 스타일 */
+.btn-bookmark,
+.btn-new-policy,
+.btn-top3,
+.btn-feedback {
+  width: 100%;
+  padding: 12px 24px;
+  border: 1px solid;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+/* 북마크 알림 - 파란색 */
+.btn-bookmark {
+  background: white;
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-bookmark:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+}
+
+/* 신규 정책 알림 - 주황색 */
+.btn-new-policy {
+  background: white;
+  color: #fd7e14;
+  border-color: #fd7e14;
+}
+
+.btn-new-policy:hover:not(:disabled) {
+  background: #fd7e14;
+  color: white;
+}
+
+/* TOP3 알림 - 보라색 */
+.btn-top3 {
+  background: white;
+  color: #6f42c1;
+  border-color: #6f42c1;
+}
+
+.btn-top3:hover:not(:disabled) {
+  background: #6f42c1;
+  color: white;
+}
+
+/* 피드백 알림 - 청록색 */
+.btn-feedback {
+  background: white;
+  color: #20c997;
+  border-color: #20c997;
+}
+
+.btn-feedback:hover:not(:disabled) {
+  background: #20c997;
+  color: white;
+}
+
+.btn-bookmark:disabled,
+.btn-new-policy:disabled,
+.btn-top3:disabled,
+.btn-feedback:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 💪(상일) 리뷰 삭제 버튼 색상 구분 */
+.btn-delete-single {
+  background: white;
+  color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-delete-single:hover:not(:disabled) {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-delete-all {
+  background: white;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-delete-all:hover:not(:disabled) {
+  background: #dc3545;
+  color: white;
 }
 
 /* 💪(상일) 반응형 디스플레이 제어 */
