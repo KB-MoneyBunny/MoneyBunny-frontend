@@ -1,6 +1,9 @@
 <template>
   <header class="top-header">
     <div class="header-inner">
+      <!-- 💪(상일) 숨겨진 관리자 접근 영역 -->
+      <div class="admin-access-area" @click="handleAdminAccess"></div>
+
       <RouterLink to="/home" class="logo-link">
         <div class="logo-text font-28 font-extrabold">MoneyBunny</div>
       </RouterLink>
@@ -26,20 +29,26 @@
 </template>
 
 <script setup>
-import { onMounted, computed, watch } from "vue";
-import { useRoute } from "vue-router";
+import { onMounted, computed, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useNotificationStore } from "@/stores/notification";
 import { useAuthStore } from "@/stores/auth";
 
 // 💪(상일) 알림 스토어 및 라우트 사용
 const route = useRoute();
+const router = useRouter();
 const notificationStore = useNotificationStore();
+const authStore = useAuthStore();
 const unreadCount = computed(() => notificationStore.unreadCount);
 const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 
 // 🎵(유정) 로그인 여부 확인
 const auth = useAuthStore();
 const isLoggedIn = computed(() => auth.isLogin);
+
+// 💪(상일) 관리자 페이지 접근을 위한 클릭 카운터
+const clickCount = ref(0);
+const clickTimeout = ref(null);
 
 // 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회 - 특정 라우트에서만
 onMounted(async () => {
@@ -65,6 +74,59 @@ onMounted(async () => {
     }
   }
 });
+
+// 💪(상일) 숨겨진 관리자 접근 영역 클릭 핸들러
+const handleAdminAccess = async () => {
+  clickCount.value++;
+
+  // 기존 타임아웃 클리어
+  if (clickTimeout.value) {
+    clearTimeout(clickTimeout.value);
+  }
+
+  // 5번 클릭 달성 시 이메일 확인 후 관리자 페이지로 이동
+  if (clickCount.value >= 5) {
+    clickCount.value = 0;
+
+    // 💪(상일) 로그인 상태 확인
+    if (!authStore.isLogin) {
+      console.warn("로그인이 필요합니다.");
+      return;
+    }
+
+    // 💪(상일) API로 현재 사용자 정보 가져와서 이메일 확인
+    try {
+      const response = await fetch("/api/member/information", {
+        headers: {
+          Authorization: `Bearer ${authStore.getToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn("사용자 정보를 가져올 수 없습니다.");
+        return;
+      }
+
+      const userData = await response.json();
+      if (userData.email !== "sangil6372@naver.com") {
+        console.warn("관리자 페이지 접근 권한이 없습니다.");
+        return;
+      }
+
+      router.push("/admin");
+    } catch (error) {
+      console.error("사용자 정보 조회 실패:", error);
+      return;
+    }
+
+    return;
+  }
+
+  // 2초 후 클릭 카운터 리셋
+  clickTimeout.value = setTimeout(() => {
+    clickCount.value = 0;
+  }, 2000);
+};
 </script>
 
 <style scoped>
@@ -192,5 +254,19 @@ onMounted(async () => {
 
 .notification-link.shake {
   animation: shake 0.5s ease-in-out;
+}
+
+/* 💪(상일) 숨겨진 관리자 접근 영역 */
+.admin-access-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 60px;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1001;
+  /* 개발 시에만 보이게 하려면 아래 주석 해제 */
+  /* background: rgba(255, 0, 0, 0.1); */
 }
 </style>

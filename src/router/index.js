@@ -52,6 +52,9 @@ import PolicySearchPage from "@/pages/policy/search/PolicySearchPage.vue";
 import PolicySearchResult from "@/pages/policy/search/PolicySearchResult.vue";
 import PolicyReviewPage from "@/pages/policy/review/PolicyReviewPage.vue";
 
+// 💪(상일) 관리자 페이지 import
+import AdminPage from "@/pages/admin/AdminPage.vue";
+
 // 비로그인 정책 조회 페이지
 import PolicySearchGuestPage from "@/pages/policy/search/PolicySearchGuestPage.vue";
 
@@ -222,6 +225,12 @@ const routes = [
         path: "policy/search/result",
         name: "policySearchResult",
         component: PolicySearchResult,
+      },
+      // 💪(상일) 관리자 페이지 라우트
+      {
+        path: "admin",
+        name: "admin",
+        component: AdminPage,
       },
       // 비로그인 정책 조회 페이지
       {
