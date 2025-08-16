@@ -1,8 +1,7 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import AttendanceCheckModal from "./AttendanceCheckModal.vue";
+import { ref, onMounted, watch, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const showToast = ref(false);
 
@@ -12,23 +11,28 @@ const authStore = useAuthStore();
 
 // 돌아갈 목적지: 쿼리의 redirect가 있으면 그걸, 없으면 /home
 const redirectTarget = computed(
-  () => route.query.redirect?.toString() || "/home"
+  () => route.query.redirect?.toString() || '/home'
 );
 
 const showModal = ref(false);
-const id = ref("");
-const password = ref("");
+const id = ref('');
+const password = ref('');
 const isLoading = ref(false);
-const errorMessage = ref("");
+const errorMessage = ref('');
 const showPassword = ref(false);
 
 // 👁️ 비밀번호 보기/숨기기 아이콘
 const eyeView = new URL(
-  "@/assets/images/icons/signup/eye_view.png",
+  '@/assets/images/icons/signup/eye_view.png',
   import.meta.url
 ).href;
 const eyeHide = new URL(
-  "@/assets/images/icons/signup/eye_hide.png",
+  '@/assets/images/icons/signup/eye_hide.png',
+  import.meta.url
+).href;
+
+const guestIcon = new URL(
+  '@/assets/images/icons/signup/user.png',
   import.meta.url
 ).href;
 
@@ -36,20 +40,20 @@ const eyeHide = new URL(
 const handleLogin = async () => {
   // 입력값 검증
   if (!id.value.trim()) {
-    errorMessage.value = "아이디를 입력해주세요.";
+    errorMessage.value = '아이디를 입력해주세요.';
     return;
   }
   if (!password.value.trim()) {
-    errorMessage.value = "비밀번호를 입력해주세요.";
+    errorMessage.value = '비밀번호를 입력해주세요.';
     return;
   }
 
   try {
     isLoading.value = true;
-    errorMessage.value = "";
+    errorMessage.value = '';
 
     // auth store의 login 메서드 호출
-    console.log("로그인 시도:", id.value.trim());
+    console.log('로그인 시도:', id.value.trim());
     await authStore.login({
       username: id.value.trim(),
       password: password.value,
@@ -66,19 +70,19 @@ const handleLogin = async () => {
       router.replace(redirectTarget.value);
     }, 1200); // 1.2초 보여주고 홈으로
   } catch (error) {
-    console.error("로그인 에러:", error);
+    console.error('로그인 에러:', error);
 
     // 에러 상태별 메시지 처리
     if (error.response?.status === 401) {
-      errorMessage.value = "아이디 또는 비밀번호가 잘못되었습니다.";
+      errorMessage.value = '아이디 또는 비밀번호가 잘못되었습니다.';
     } else if (error.response?.status >= 500) {
       errorMessage.value =
-        "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
-    } else if (error.code === "ECONNABORTED") {
+        '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    } else if (error.code === 'ECONNABORTED') {
       errorMessage.value =
-        "요청 시간이 초과되었습니다. 네트워크를 확인해주세요.";
+        '요청 시간이 초과되었습니다. 네트워크를 확인해주세요.';
     } else {
-      errorMessage.value = "로그인에 실패했습니다. 다시 시도해주세요.";
+      errorMessage.value = '로그인에 실패했습니다. 다시 시도해주세요.';
     }
   } finally {
     isLoading.value = false;
@@ -94,12 +98,12 @@ const handleLogin = async () => {
 const closeModal = () => {
   showModal.value = false;
   // 출석체크 모달 닫힌 후 홈으로 이동
-  router.push("/home");
+  router.push('/home');
 };
 
 // 엔터키 입력 처리
 const handleKeyPress = (event) => {
-  if (event.key === "Enter" && !isLoading.value) {
+  if (event.key === 'Enter' && !isLoading.value) {
     handleLogin();
   }
 };
@@ -108,14 +112,14 @@ const handleKeyPress = (event) => {
 const clearErrorMessage = () => {
   if (errorMessage.value) {
     setTimeout(() => {
-      errorMessage.value = "";
+      errorMessage.value = '';
     }, 3000);
   }
 };
 
 const goGuestPolicyPage = () => {
   // 게스트는 정책 메인으로 바로 이동
-  router.push({ name: "policyMain" });
+  router.push({ name: 'policyMain' });
 };
 
 // 💪(상일) URL 파라미터로 전달된 에러 메시지 처리
@@ -126,12 +130,12 @@ onMounted(() => {
     return;
   }
 
-  if (route.query.error === "auth_required") {
-    errorMessage.value = "로그인이 필요한 페이지입니다.";
-  } else if (route.query.error === "login_required") {
-    errorMessage.value = "세션이 만료되었습니다. 다시 로그인해주세요.";
-  } else if (route.query.error === "token_expired") {
-    errorMessage.value = "JWT 토큰이 만료되었습니다. 다시 로그인해주세요.";
+  if (route.query.error === 'auth_required') {
+    errorMessage.value = '로그인이 필요한 페이지입니다.';
+  } else if (route.query.error === 'login_required') {
+    errorMessage.value = '세션이 만료되었습니다. 다시 로그인해주세요.';
+  } else if (route.query.error === 'token_expired') {
+    errorMessage.value = 'JWT 토큰이 만료되었습니다. 다시 로그인해주세요.';
   }
 });
 
@@ -205,13 +209,20 @@ watch(errorMessage, () => {
           <span v-else>로그인</span>
         </button>
 
+        <div class="divider">
+          <span class="divider-line"></span>
+          <span class="divider-text">또는</span>
+          <span class="divider-line"></span>
+        </div>
+
         <button
-          class="loginButton font-14"
+          class="guestButton"
+          type="button"
           @click="goGuestPolicyPage"
           :disabled="isLoading"
         >
-          <span v-if="isLoading">로그인 중...</span>
-          <span v-else>비회원 로그인</span>
+          <img :src="guestIcon" alt="" class="guestIcon" />
+          <span class="guestText">비회원 로그인</span>
         </button>
 
         <div class="loginLink font-11">
@@ -244,9 +255,6 @@ watch(errorMessage, () => {
         </div>
       </div>
     </div>
-
-    <!-- ✅ 출석체크 모달 -->
-    <!-- <AttendanceCheckModal v-if="showModal" @close="closeModal" /> -->
   </div>
 </template>
 
@@ -356,8 +364,8 @@ input:focus {
   width: 100%;
   background-color: var(--base-blue-dark);
   color: white;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 6px;
   border: none;
   margin-top: 6px;
   cursor: pointer;
@@ -427,5 +435,58 @@ input:disabled {
   text-align: center;
   box-sizing: border-box;
   white-space: nowrap;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+  width: 100%;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--input-outline);
+}
+
+.divider-text {
+  margin: 0 10px;
+  font-size: 11px;
+  color: var(--text-bluegray);
+  white-space: nowrap;
+}
+
+.guestButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #fff;
+  color: var(--base-blue-dark);
+  border: 1.5px solid var(--input-outline);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.guestButton:disabled {
+  background-color: #f5f5f5;
+  color: #9aa5b1;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+}
+
+.guestIcon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.guestText {
+  font-size: 14px;
 }
 </style>

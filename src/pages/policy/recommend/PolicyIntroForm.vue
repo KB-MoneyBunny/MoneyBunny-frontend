@@ -9,6 +9,8 @@ import { usePolicyQuizStore } from '@/stores/policyQuizStore';
 const router = useRouter();
 const policyQuizStore = usePolicyQuizStore();
 
+const gender = ref(''); // '남성' | '여성' | ''
+
 const birth = ref({ year: '', month: '', day: '' });
 const address = ref('');
 const openDropdown = ref(null); // 열려 있는 드롭다운 id 저장
@@ -85,6 +87,26 @@ onMounted(() => {
 
   <div class="introContainer">
     <section class="formSection">
+      <label class="label font-15">성별을 선택해주세요</label>
+      <div class="genderGroup">
+        <button
+          type="button"
+          class="genderBtn"
+          :class="{ active: gender === '남성' }"
+          @click="gender = '남성'"
+        >
+          남성
+        </button>
+        <button
+          type="button"
+          class="genderBtn"
+          :class="{ active: gender === '여성' }"
+          @click="gender = '여성'"
+        >
+          여성
+        </button>
+      </div>
+
       <label class="label font-15">생년월일을 입력해주세요</label>
       <div class="birthSelects">
         <Dropdown
@@ -235,13 +257,36 @@ onMounted(() => {
 }
 
 .arrowIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
 }
 
 .selectedAddress {
   margin-top: 6px;
   color: var(--text-bluegray);
+}
+
+.genderGroup {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.genderBtn {
+  flex: 1;
+  height: 38px;
+  border: 1px solid var(--input-bg-2);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-login);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.genderBtn.active {
+  background: var(--base-blue-dark);
+  color: #fff;
+  border: 1px solid var(--base-blue-dark);
 }
 </style>
