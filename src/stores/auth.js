@@ -14,11 +14,12 @@ import { usePolicyMatchingStore } from "@/stores/policyMatchingStore";
 // 초기 상태 템플릿
 const initState = {
   token: "", // JWT 접근 토큰
-  user: {
-    username: "", // 사용자 ID
-    email: "", // 이메일
-    roles: [], // 권한 목록
-  },
+  // user: {
+  //   username: "", // 사용자 ID
+  //   email: "", // 이메일
+  //   roles: [], // 권한 목록
+  // },
+  user: null, // 서버 응답으로만 채움
 
   avatarTimestamp: Date.now(),
   // (1) 아바타 이미지 경로에 추가할 쿼리스트링값(타임스탬프)
@@ -28,10 +29,23 @@ const initState = {
 export const useAuthStore = defineStore("auth", () => {
   const state = ref({ ...initState });
 
+  const isValidJWT = (t) =>
+    typeof t === "string" &&
+    /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(t);
+
+  const forceGuest = () => {
+    state.value.user = null;
+    state.value.token = "";
+    localStorage.removeItem("auth");
+  };
+
   // Computed 속성들
-  const isLogin = computed(() => !!state.value.user.username); // 로그인 여부
-  const username = computed(() => state.value.user.username); // 사용자명
-  const email = computed(() => state.value.user.email); // 이메일
+  // const isLogin = computed(() => !!state.value.user.username); // 로그인 여부
+  // const username = computed(() => state.value.user.username); // 사용자명
+  // const email = computed(() => state.value.user.email); // 이메일
+  const isLogin = computed(() => !!state.value.user?.username);
+  const username = computed(() => state.value.user?.username || "");
+  const email = computed(() => state.value.user?.email || "");
 
   // isLogin 사용자명 존재 여부로 로그인 상태 판단
   // username, email 반응형 데이터로 컴포넌트에서 자동 업데이트
@@ -39,7 +53,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   // (2) 로그인 여부에 따라 아바타 이미지 다운로드 주소 변경
   const avatarUrl = computed(() =>
-    state.value.user.username // 사용자명이 있다면 == 로그인 상태라면
+    state.value.user?.username // 사용자명이 있다면 == 로그인 상태라면
       ? `/api/member/${state.value.user.username}/avatar?t=${state.value.avatarTimestamp}`
       : null
   );
@@ -49,7 +63,13 @@ export const useAuthStore = defineStore("auth", () => {
   // (3) 아바타 업데이트 액션 추가
   const updateAvatar = () => {
     state.value.avatarTimestamp = Date.now();
-    localStorage.setItem("auth", JSON.stringify(state.value));
+    // localStorage.setItem("auth", JSON.stringify(state.value));
+    if (state.value.token) {
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ token: state.value.token })
+      );
+    }
   };
 
   // 로그인 액션
@@ -70,14 +90,34 @@ export const useAuthStore = defineStore("auth", () => {
     // 💪(상일) AuthResultDTO 응답 구조에 맞춰 상태 업데이트
     // 응답 형태: { token: "JWT토큰", user: { loginId, email, createdAt } }
     state.value.token = data.accessToken;
-    state.value.user = {
-      username: data.username,
-      email: "", // email은 응답에 없으므로 빈 값 또는 별도 API로 보완
-      roles: [data.role], // role을 배열로 감싸서 roles로 매핑
-    };
+    // state.value.user = {
+    //   username: data.username,
+    //   email: "", // email은 응답에 없으므로 빈 값 또는 별도 API로 보완
+    //   roles: [data.role], // role을 배열로 감싸서 roles로 매핑
+    // };
+
+    localStorage.setItem("auth", JSON.stringify({ token: state.value.token }));
+    await fetchUser(); // 서버 검증 정보로 하이드레이트
 
     // localStorage에 상태 저장
-    localStorage.setItem("auth", JSON.stringify(state.value));
+    // localStorage.setItem("auth", JSON.stringify(state.value));
+  };
+
+  const fetchUser = async () => {
+    if (!state.value.token) {
+      state.value.user = null;
+      return;
+    }
+    try {
+      const { data } = await axios.get("/api/auth/me", {
+        headers: { Authorization: `Bearer ${state.value.token}` },
+      });
+      state.value.user = data; // { username, email, roles, ... }
+    } catch (e) {
+      console.warn("fetchUser 실패", e?.response?.status, e?.response?.data);
+      // 토큰이 변조/만료 등으로 401 나면 서버 로그아웃 호출 없이 즉시 게스트 폴백
+      forceGuest();
+    }
   };
 
   // 로그아웃 액션
@@ -183,15 +223,36 @@ export const useAuthStore = defineStore("auth", () => {
   const load = () => {
     const auth = localStorage.getItem("auth");
     if (auth != null) {
-      state.value = JSON.parse(auth); // JSON 문자열을 객체로 변환
-      console.log(state.value);
+      try {
+        const parsed = JSON.parse(auth);
+        const t = parsed?.token || "";
+        if (isValidJWT(t)) {
+          // 정상적인 JWT 모양이면만 채택
+          state.value.token = t;
+          // 과거 포맷 정리: 로컬엔 토큰만 저장
+          localStorage.setItem("auth", JSON.stringify({ token: t }));
+        } else {
+          console.warn("[auth] invalid token in localStorage → force guest");
+          forceGuest(); // 이상한 문자열/깨진 JSON이면 즉시 게스트
+        }
+      } catch {
+        // JSON 파싱조차 안되면 게스트
+        forceGuest();
+      }
     }
+    // 토큰 있으면 서버에서 사용자 정보 하이드레이트 시도
+    if (state.value.token) fetchUser();
   };
 
   // 프로필 변경 후 로컬 상태 동기화 액션
   const changeProfile = (member) => {
-    state.value.user.email = member.email; // 이메일 업데이트
-    localStorage.setItem("auth", JSON.stringify(state.value)); // 로컬스토리지 동기화
+    if (state.value.user) state.value.user.email = member.email;
+    if (state.value.token) {
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ token: state.value.token })
+      );
+    }
   };
 
   // 스토어 초기화 시 자동 실행
@@ -208,6 +269,7 @@ export const useAuthStore = defineStore("auth", () => {
     getToken,
     isTokenExpired, // 토큰 만료 확인 함수 추가
     changeProfile,
+    fetchUser,
 
     // avatar 관련
     avatarUrl,
