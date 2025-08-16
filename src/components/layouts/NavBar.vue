@@ -57,28 +57,18 @@ const navItems = [
     iconActive: new URL("@/assets/navbar/User_color.png", import.meta.url).href,
   },
 ];
-// 게스트 전용 내비(정책 게스트 페이지만)
-const navItemsGuest = [
-  {
-    name: "정책",
-    path: "/policy/search/guest",
-    icon: new URL("@/assets/navbar/policy.png", import.meta.url).href,
-    iconActive: new URL("@/assets/navbar/policy_color.png", import.meta.url)
-      .href,
-  },
-];
 
 const isActive = (path) => route.path.startsWith(path);
 
 // 로그인 여부에 따라 이동 목적지 계산
 const targetPath = (item) => {
-  const isLogin = authStore.isLogin;
   if (item.name === "정책") {
-    // 회원 전용 vs 비회원 전용
-    return isLogin ? "/policy/main" : "/policy/search/guest";
+    return authStore.isLogin
+      ? { name: "policyMain" }
+      : { name: "policyGuestMainTab" };
   }
-  // 나머지 버튼은 로그인 안 돼 있으면 게스트 게이트로
-  if (!isLogin) {
+  // 나머지는 기존 정책 유지 (게스트면 게스트 게이트)
+  if (!authStore.isLogin) {
     return { name: "guest", query: { redirect: item.path } };
   }
   return item.path;
