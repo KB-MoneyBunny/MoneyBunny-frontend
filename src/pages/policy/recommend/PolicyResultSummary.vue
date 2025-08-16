@@ -33,7 +33,7 @@
     </div>
 
     <section class="recommendSection">
-      <h3 class="font-16 font-bold">추천 정책 미리보기</h3>
+      <div class="font-16 font-bold">추천 정책 미리보기</div>
       <div
         class="policyCard"
         v-for="policy in previewPolicies.slice(0, 2)"
@@ -50,11 +50,6 @@
           </template>
           <template v-else> 상시 </template>
         </p>
-        <!--
-        <div class="tag">{{ policy.tag }}</div>
-        <p class="desc">{{ policy.description }}</p>
-        <p class="match">매칭도: {{ policy.match }}</p>
-        -->
       </div>
     </section>
 

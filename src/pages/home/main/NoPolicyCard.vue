@@ -10,11 +10,18 @@
     <p class="sub-text">
       간단한 유형 검사를 통해<br />나에게 딱 맞는 정책을 찾아보세요!
     </p>
-    <button class="start-btn" @click="$emit('start-quiz')">
-      유형 검사 시작하기 →
-    </button>
+    <button class="start-btn" @click="goToQuiz">유형 검사 시작하기 →</button>
   </div>
 </template>
+
+<script setup>
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+function goToQuiz() {
+  router.push({ name: 'policyTypeIntro' });
+}
+</script>
 
 <style scoped>
 .no-policy-card {

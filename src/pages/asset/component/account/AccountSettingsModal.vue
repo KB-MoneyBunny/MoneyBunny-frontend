@@ -124,7 +124,7 @@
 import { ref, nextTick, onUnmounted, watch } from 'vue';
 import { getBankLogoByCode } from '@/assets/utils/bankLogoMap.js';
 import { getBankName } from '@/assets/utils/bankCodeMap.js';
-import copyIcon from '@/assets/images/icons/common/copy.png';
+import copyIcon from '@/assets/images/icons/signup/copy.png';
 import editIcon from '@/assets/images/icons/mypage/edit.png';
 import emptyStarIcon from '@/assets/images/icons/common/empty_star.png';
 import fillStarIcon from '@/assets/images/icons/common/fill_star.png';
@@ -253,7 +253,7 @@ const cancelEdit = () => {
 /* ===== 바텀시트 컨테이너 ===== */
 .modal-content {
   width: 100%;
-  max-width: 474px;
+  max-width: 390px;
   background: #fff;
   border-radius: 1.25rem 1.25rem 0 0;
   padding: 1.25rem;
@@ -296,13 +296,13 @@ const cancelEdit = () => {
   flex: 1;
 }
 .account-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: bold;
   color: var(--base-blue-dark);
   margin: 0 0 0.25rem;
 }
 .account-number {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--text-lightgray);
   margin: 0;
 }
@@ -317,7 +317,6 @@ const cancelEdit = () => {
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: var(--input-bg-1);
   border-radius: 0.75rem;
   overflow: hidden;
 }
@@ -325,13 +324,12 @@ const cancelEdit = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.875rem 1rem;
+  padding: 1rem;
   background: none;
   border: none;
   border-bottom: 1px solid var(--input-outline);
   text-align: left;
   width: 100%;
-  min-height: 3.25rem;
   -webkit-tap-highlight-color: transparent;
 }
 .section-group .setting-item:last-child {
@@ -342,24 +340,23 @@ const cancelEdit = () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 .setting-text {
-  font-size: 0.9375rem;
-  font-weight: 500;
+  font-size: 0.85rem;
   color: var(--base-blue-dark);
   line-height: 1.4;
 }
 
 /* 현재 상태 텍스트 */
 .current-status {
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
   color: var(--text-green);
   line-height: 1.3;
 }
 
 .current-value {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--text-lightgray);
   line-height: 1.3;
 }
@@ -373,20 +370,19 @@ const cancelEdit = () => {
 }
 
 .star-icon {
-  width: 18px;
-  height: 18px;
-  transition: all 0.3s ease;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
 /* 호버/활성화 시 별 아이콘 확대 효과 */
 .setting-item:not(:disabled):active .star-icon {
-  transform: scale(1.1);
+  /* transform: scale(1.1); */
 }
 
 /* 대표 계좌인 경우 비활성화 스타일 */
 .setting-item:disabled {
-  opacity: 0.5;
+  /* opacity: 0.5; */
   cursor: not-allowed;
 }
 
@@ -403,13 +399,13 @@ const cancelEdit = () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.375rem;
   border: none;
   background: none;
 }
+
 .setting-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   opacity: 0.92;
 }
@@ -418,30 +414,29 @@ const cancelEdit = () => {
 .inline-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 .nickname-inline-input {
+  margin-top: 3px;
   flex: 1;
   min-width: 0;
-  padding: 0.5rem 0.625rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--input-outline);
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
-  background: var(--input-bg-2);
+  border-radius: 6px;
+  font-size: 0.8rem;
 }
 .nickname-inline-input:focus {
   outline: none;
-  border-color: var(--base-blue-dark);
+  border-color: var(--input-bg-3);
   background: #fff;
 }
 .chip-btn {
-  padding: 0.45rem 0.6rem;
-  border-radius: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
   border: 1px solid var(--input-outline);
   background: var(--input-bg-1);
   color: var(--text-darkgray);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.75rem;
 }
 .chip-btn.primary {
   background: var(--base-blue-dark);
@@ -463,8 +458,8 @@ const cancelEdit = () => {
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 51px;
-  height: 31px;
+  width: 40px;
+  height: 24px;
 }
 .toggle-switch input {
   opacity: 0;
@@ -475,14 +470,13 @@ const cancelEdit = () => {
   position: absolute;
   inset: 0;
   background-color: var(--input-disabled-1);
-  transition: 0.3s;
   border-radius: 31px;
 }
 .toggle-slider:before {
   content: '';
   position: absolute;
-  height: 27px;
-  width: 27px;
+  height: 20px;
+  width: 20px;
   left: 2px;
   bottom: 2px;
   background-color: #fff;
@@ -499,20 +493,16 @@ input:checked + .toggle-slider:before {
 /* ===== 닫기 버튼 ===== */
 .close-button {
   width: 100%;
-  padding: 0.875rem;
+  padding: 0.8rem;
   margin-top: 1rem;
   background: var(--base-blue-dark);
   border: none;
-  border-radius: 0.75rem;
+  border-radius: 6px;
   color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: 'NanumSquareNeo', sans-serif;
-  transition: transform 0.2s ease, background 0.2s ease;
+  font-size: 0.9rem;
   -webkit-tap-highlight-color: transparent;
 }
 .close-button:active {
   background: var(--base-lavender);
-  transform: scale(0.98);
 }
 </style>
