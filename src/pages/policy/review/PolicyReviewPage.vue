@@ -11,19 +11,19 @@
 
       <!-- 💪(상일) 혜택 상태 탭 (알림 센터 스타일) -->
       <div class="tab-switcher">
-        <button 
+        <button
           :class="['tab-button', { active: benefitFilter === 'all' }]"
           @click="setBenefitFilter('all')"
         >
           전체
         </button>
-        <button 
+        <button
           :class="['tab-button', { active: benefitFilter === 'received' }]"
           @click="setBenefitFilter('received')"
         >
           혜택자
         </button>
-        <button 
+        <button
           :class="['tab-button', { active: benefitFilter === 'not_eligible' }]"
           @click="setBenefitFilter('not_eligible')"
         >
@@ -33,14 +33,14 @@
 
       <!-- 정렬 필터 텍스트 -->
       <div class="sortTextRow">
-        <span 
+        <span
           :class="['sortText', { active: sortOrder === 'recommended' }]"
           @click="setSortOrder('recommended')"
         >
           추천순
         </span>
         <span class="divider">·</span>
-        <span 
+        <span
           :class="['sortText', { active: sortOrder === 'latest' }]"
           @click="setSortOrder('latest')"
         >
@@ -55,7 +55,11 @@
       />
 
       <template v-else>
-        <section v-for="r in filteredReviews" :key="r.id" class="reviewCard card">
+        <section
+          v-for="r in filteredReviews"
+          :key="r.id"
+          class="reviewCard card"
+        >
           <div class="reviewHeader">
             <!-- 💪(상일) 프로필 이미지로 변경 -->
             <div class="avatar">
@@ -84,11 +88,12 @@
           <p class="body font-12">{{ r.content }}</p>
 
           <div class="actionRow">
-            <button
-              class="chip"
-              @click="toggleHelpful(r)"
-            >
-              <img :src="likeIcon" alt="like" :class="['chipIcon', { liked: r.helped }]" />
+            <button class="chip" @click="toggleHelpful(r)">
+              <img
+                :src="likeIcon"
+                alt="like"
+                :class="['chipIcon', { liked: r.helped }]"
+              />
               <span class="count">{{ r.helpCount || 0 }}</span>
             </button>
           </div>
@@ -103,6 +108,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useAuthStore } from "@/stores/auth"; // 비로그인
 import { useRoute, useRouter } from "vue-router";
 import likeIcon from "@/assets/images/icons/policy/like.png";
 import PolicyReviewEmpty from "./PolicyReviewEmpty.vue";
@@ -113,6 +119,8 @@ import imgSprout from "@/assets/images/icons/profile/profile_edit_sprout.png";
 import imgBeard from "@/assets/images/icons/profile/profile_edit_beard.png";
 import imgEyelash from "@/assets/images/icons/profile/profile_edit_eyelash.png";
 import imgCarrot from "@/assets/images/icons/profile/profile_edit_carrot.png";
+
+const authStore = useAuthStore(); // 비로그인
 
 const route = useRoute();
 const router = useRouter();
@@ -132,31 +140,37 @@ const reviews = ref([]);
 const totalCount = ref(0);
 
 // 💪(상일) 필터 상태
-const sortOrder = ref('latest'); // 'recommended' | 'latest'
-const benefitFilter = ref('all'); // 'all' | 'received' | 'not_eligible'
+const sortOrder = ref("latest"); // 'recommended' | 'latest'
+const benefitFilter = ref("all"); // 'all' | 'received' | 'not_eligible'
 
 // 💪(상일) 필터링된 리뷰 계산
 const filteredReviews = computed(() => {
   let filtered = [...reviews.value];
-  
+
   // 혜택 상태 필터링
-  if (benefitFilter.value !== 'all') {
+  if (benefitFilter.value !== "all") {
     const statusMap = {
-      'received': 'RECEIVED',
-      'not_eligible': 'NOT_ELIGIBLE'
+      received: "RECEIVED",
+      not_eligible: "NOT_ELIGIBLE",
     };
-    filtered = filtered.filter(r => r.benefitStatus === statusMap[benefitFilter.value]);
+    filtered = filtered.filter(
+      (r) => r.benefitStatus === statusMap[benefitFilter.value]
+    );
   }
-  
+
   // 정렬
-  if (sortOrder.value === 'recommended') {
+  if (sortOrder.value === "recommended") {
     // 좋아요 수 내림차순
     filtered.sort((a, b) => (b.helpCount || 0) - (a.helpCount || 0));
   } else {
     // 최신순 (날짜 내림차순)
-    filtered.sort((a, b) => new Date(b.date.replace(/\./g, '-')) - new Date(a.date.replace(/\./g, '-')));
+    filtered.sort(
+      (a, b) =>
+        new Date(b.date.replace(/\./g, "-")) -
+        new Date(a.date.replace(/\./g, "-"))
+    );
   }
-  
+
   return filtered;
 });
 
@@ -183,9 +197,22 @@ async function fetchReviews({ page, size }) {
   try {
     // 첫 페이지일 때만 API 호출
     if (page === 1 && allReviews.value.length === 0) {
-      const response = await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
-        policyId.value
-      );
+      // const response =
+      //   await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
+      //     policyId.value
+      //   );
+      let response;
+      if (authStore.isLogin) {
+        // 로그인: 좋아요 상태 포함 버전
+        response = await policyInteractionAPI.getPolicyReviewsWithLikeStatus(
+          policyId.value
+        );
+      } else {
+        // 게스트: 공개 리스트 호출
+        response = await policyInteractionAPI.getPolicyReviewsPublic(
+          policyId.value
+        );
+      }
       console.log("💪(상일) API 응답 데이터:", response.data);
 
       // 💪(상일) 백엔드 데이터를 프론트엔드 형식으로 변환
@@ -195,7 +222,9 @@ async function fetchReviews({ page, size }) {
         date: formatDate(review.createdAt),
         content: review.content,
         helpCount: review.likeCount || 0,
-        helped: review.isLikedByCurrentUser || false, // 💪(상일) 백엔드에서 받은 좋아요 상태
+        // helped: review.isLikedByCurrentUser || false, // 💪(상일) 백엔드에서 받은 좋아요 상태
+        // 게스트는 isLikedByCurrentUser 없음 → false 처리
+        helped: Boolean(review.isLikedByCurrentUser) && authStore.isLogin,
         benefitStatus: review.benefitStatus,
         userId: review.userId,
         profileImageId: review.profileImageId,
@@ -224,6 +253,38 @@ async function fetchReviews({ page, size }) {
       data: error.response?.data,
       config: error.config,
     });
+
+    // 인터셉터 때문에 error.response가 비어있을 수도 있어서,
+    // 게스트라면 공개 API로 한 번 더 재시도
+    if (!authStore.isLogin) {
+      try {
+        const response = await policyInteractionAPI.getPolicyReviewsPublic(
+          policyId.value
+        );
+        allReviews.value = response.data.map((review) => ({
+          id: review.reviewId,
+          nickname: review.userName || "익명",
+          date: formatDate(review.createdAt),
+          content: review.content,
+          helpCount: review.likeCount || 0,
+          helped: false,
+          benefitStatus: review.benefitStatus,
+          userId: review.userId,
+          profileImageId: review.profileImageId,
+          reviewId: review.reviewId,
+          isLoading: false,
+        }));
+        const start = (page - 1) * size;
+        const end = start + size;
+        return {
+          items: allReviews.value.slice(start, end),
+          total: allReviews.value.length,
+          policyTitle: "정책 리뷰",
+        };
+      } catch (e) {
+        console.warn("게스트 공개 엔드포인트 재시도도 실패:", e);
+      }
+    }
 
     // 💪(상일) 에러 타입별 처리
     if (error.response?.status === 500) {
@@ -531,7 +592,6 @@ const setBenefitFilter = (filter) => {
   border-radius: 6px;
   padding: 6px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .tab-button {
@@ -543,8 +603,7 @@ const setBenefitFilter = (filter) => {
   color: #777;
   cursor: pointer;
   position: relative;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 13px;
 }
 
 .tab-button.active {
@@ -557,17 +616,16 @@ const setBenefitFilter = (filter) => {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 12px;
   color: var(--text-bluegray);
-  margin: 12px 0;
-  padding: 0 12px;
+  margin: 10px 0;
+  padding: 0 10px;
 }
 
 .sortText {
   cursor: pointer;
-  transition: color 0.2s;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .sortText:hover {

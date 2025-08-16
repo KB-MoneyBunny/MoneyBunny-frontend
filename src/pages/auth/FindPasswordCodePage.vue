@@ -1,17 +1,17 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 const route = useRoute();
 
-const loginId = ref(route.query.loginId || '');
-const email = ref(route.query.email || '');
+const loginId = ref(route.query.loginId || "");
+const email = ref(route.query.email || "");
 
-const code = ref('');
-const errorMessage = ref('');
-const successMessage = ref('');
+const code = ref("");
+const errorMessage = ref("");
+const successMessage = ref("");
 
 const showToast = ref(false);
 
@@ -20,44 +20,97 @@ const timeLeft = ref(time);
 let timerInterval = null;
 const isExpired = computed(() => timeLeft.value === 0);
 
+// 상태 초기화 (필요 시 재사용)
+const resetState = () => {
+  errorMessage.value = "";
+  successMessage.value = "";
+  code.value = "";
+  timeLeft.value = time;
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+};
+
 const handleVerify = async () => {
   if (isExpired.value) {
-    errorMessage.value = '인증 시간이 만료되었습니다. 다시 시도해주세요.';
+    errorMessage.value = "인증 시간이 만료되었습니다. 다시 시도해주세요.";
     return;
   }
   if (!code.value) {
-    errorMessage.value = '인증코드를 입력해주세요.';
+    errorMessage.value = "인증코드를 입력해주세요.";
     return;
   }
   try {
-    const response = await axios.post('/api/auth/verify', {
+    const response = await axios.post("/api/auth/verify", {
       email: email.value,
       code: code.value,
     });
-    if (response.data === 'verified') {
+    if (response.data === "verified") {
       // successMessage.value = "인증에 성공했습니다!";
       // 토스트 or 성공메시지 보여주고 이동
       showToast.value = true;
       setTimeout(() => {
         showToast.value = false;
         router.push({
-          path: '/resetPassword',
+          path: "/resetPassword",
           query: { loginId: loginId.value },
         });
       }, 1200);
     }
   } catch (err) {
-    errorMessage.value = '인증코드가 올바르지 않습니다.';
+    errorMessage.value = "인증코드가 올바르지 않습니다.";
+  }
+};
+
+// 인증코드 재전송 (만료되었을 때만 허용)
+const resendCode = async () => {
+  if (!email.value) {
+    errorMessage.value = "이메일 정보가 없습니다.";
+    return;
+  }
+  if (!isExpired.value) return; // 안전 가드
+
+  try {
+    await axios.post("/api/auth/send-find-password-code", {
+      email: email.value,
+      loginId: loginId.value,
+    });
+
+    // // 메시지/타이머 리셋
+    // errorMessage.value = "";
+    // successMessage.value = "인증코드를 재전송했습니다.";
+    // setTimeout(() => (successMessage.value = ""), 2000);
+
+    // 기존 메시지 대신 토스트 표시
+    errorMessage.value = "";
+    successMessage.value = "인증코드를 재전송했습니다.";
+    showToast.value = true;
+    setTimeout(() => {
+      showToast.value = false;
+      successMessage.value = "";
+    }, 2000);
+
+    // 타이머 재시작
+    if (timerInterval) clearInterval(timerInterval);
+    timeLeft.value = time;
+    startTimer();
+  } catch (err) {
+    errorMessage.value =
+      "재전송 실패: " +
+      (err.response?.data?.message || "잠시 후 다시 시도해주세요");
   }
 };
 
 const startTimer = () => {
+  if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--;
     } else {
       clearInterval(timerInterval);
-      errorMessage.value = '인증 시간이 만료되었습니다. 다시 시도해주세요.';
+      timerInterval = null;
+      errorMessage.value = "인증 시간이 만료되었습니다. 다시 시도해주세요.";
     }
   }, 1000);
 };
@@ -70,8 +123,8 @@ onBeforeUnmount(() => {
 });
 
 const formattedTime = computed(() => {
-  const minutes = String(Math.floor(timeLeft.value / 60)).padStart(2, '0');
-  const seconds = String(timeLeft.value % 60).padStart(2, '0');
+  const minutes = String(Math.floor(timeLeft.value / 60)).padStart(2, "0");
+  const seconds = String(timeLeft.value % 60).padStart(2, "0");
   return `${minutes}:${seconds}`;
 });
 </script>
@@ -84,11 +137,17 @@ const formattedTime = computed(() => {
         alt="login-bunny"
         class="bunnyImage"
       />
-      <transition name="fade">
+      <!-- <transition name="fade">
         <div v-if="showToast" class="toastMsg">
           인증 성공! 비밀번호를 재설정해주세요.
         </div>
+      </transition> -->
+      <transition name="fade">
+        <div v-if="showToast" class="toastMsg">
+          {{ successMessage }}
+        </div>
       </transition>
+
       <div class="card">
         <div class="title font-24 font-extrabold">MoneyBunny</div>
         <p class="subtitle font-13">인증코드를 입력해주세요</p>
@@ -98,9 +157,9 @@ const formattedTime = computed(() => {
           {{ errorMessage }}
         </div>
         <!-- 성공 메시지 -->
-        <div v-if="successMessage" class="successMessage font-11">
+        <!-- <div v-if="successMessage" class="successMessage font-11">
           {{ successMessage }}
-        </div>
+        </div> -->
 
         <div class="formGroup">
           <label class="font-13 font-bold">아이디</label>
@@ -148,11 +207,21 @@ const formattedTime = computed(() => {
         </div>
 
         <button
-          class="actionButton font-14"
-          @click="handleVerify"
+          class="submitButton font-14"
+          @click="verify"
           :disabled="isExpired"
+          :class="{ expired: isExpired }"
         >
-          {{ isExpired ? '인증 만료' : '인증하기' }}
+          {{ isExpired ? "인증 만료" : "인증하기" }}
+        </button>
+
+        <!-- 만료된 경우에만 보이는 재전송 버튼 -->
+        <button
+          v-if="isExpired"
+          class="actionButton font-14"
+          @click="resendCode"
+        >
+          인증코드 재전송
         </button>
 
         <div class="loginLink font-11">
@@ -161,7 +230,7 @@ const formattedTime = computed(() => {
           <a href="/">로그인</a>
         </div>
         <div class="signupLink font-11">
-          계정이 없으신가요? <a href="/signUpEmailVerify">회원가입</a>
+          계정이 없으신가요? <a href="/signUpEmailRequest">회원가입</a>
         </div>
       </div>
     </div>
@@ -308,14 +377,21 @@ input:focus {
   box-sizing: border-box;
   white-space: nowrap;
 }
-.successMessage {
-  margin-top: 8px;
-  background: #e6f8e6;
-  border: 1px solid #b8e2c0;
-  color: #297d46;
-  border-radius: 6px;
-  font-size: 13px;
-  padding: 8px 13px;
-  text-align: center;
+.submitButton {
+  width: 100%;
+  background-color: var(--base-blue-dark);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+.submitButton:disabled,
+.submitButton.expired {
+  background-color: var(--input-disabled-2);
+  cursor: not-allowed;
+  color: #fff;
 }
 </style>

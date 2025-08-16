@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useNotificationStore } from "@/stores/notification";
 import { useAuthStore } from "@/stores/auth";
@@ -42,12 +42,20 @@ const authStore = useAuthStore();
 const unreadCount = computed(() => notificationStore.unreadCount);
 const shouldShakeIcon = computed(() => notificationStore.shouldShakeIcon);
 
+// 🎵(유정) 로그인 여부 확인
+const auth = useAuthStore();
+const isLoggedIn = computed(() => auth.isLogin);
+
 // 💪(상일) 관리자 페이지 접근을 위한 클릭 카운터
 const clickCount = ref(0);
 const clickTimeout = ref(null);
 
 // 💪(상일) 컴포넌트 마운트 시 미읽은 알림 개수 조회 - 특정 라우트에서만
 onMounted(async () => {
+  // 🎵(유정)
+  // 비로그인: 알림 API 호출 X
+  if (!isLoggedIn.value) return;
+
   // 💪(상일) 미읽은 알림 개수가 필요한 페이지만 체크 (policy 메인만 포함)
   const targetRoutes = ["/home", "/asset", "/mypage"];
   const exactRoutes = ["/policy", "/policy/main"];
@@ -79,38 +87,38 @@ const handleAdminAccess = async () => {
   // 5번 클릭 달성 시 이메일 확인 후 관리자 페이지로 이동
   if (clickCount.value >= 5) {
     clickCount.value = 0;
-    
+
     // 💪(상일) 로그인 상태 확인
     if (!authStore.isLogin) {
       console.warn("로그인이 필요합니다.");
       return;
     }
-    
+
     // 💪(상일) API로 현재 사용자 정보 가져와서 이메일 확인
     try {
-      const response = await fetch('/api/member/information', {
+      const response = await fetch("/api/member/information", {
         headers: {
-          'Authorization': `Bearer ${authStore.getToken()}`
-        }
+          Authorization: `Bearer ${authStore.getToken()}`,
+        },
       });
-      
+
       if (!response.ok) {
         console.warn("사용자 정보를 가져올 수 없습니다.");
         return;
       }
-      
+
       const userData = await response.json();
       if (userData.email !== "sangil6372@naver.com") {
         console.warn("관리자 페이지 접근 권한이 없습니다.");
         return;
       }
-      
+
       router.push("/admin");
     } catch (error) {
       console.error("사용자 정보 조회 실패:", error);
       return;
     }
-    
+
     return;
   }
 
