@@ -49,26 +49,27 @@
       </div>
     </div>
 
-    <div class="recommendBox" v-if="recommendedPolicies?.length">
+    <div class="recommendBox" v-if="recommendedPolicies.length">
       <div class="recommendTitle font-16 font-bold">이런 정책은 어떠세요?</div>
-
       <div class="recList">
         <article
           v-for="p in recommendedPolicies"
           :key="p.id ?? p.policyId ?? p.title"
           class="recCard"
           role="button"
-          @click="$emit('open-policy', p)"
+          @click="goToPolicyDetail(p)"
         >
-          <div class="recBadge">{{ p.category }}</div>
+          <div class="recBadge">
+            {{ getFirstLargeCategory(p) }}
+          </div>
           <div class="recTitle font-13 font-bold">{{ p.title }}</div>
           <div class="recSubtitle font-11">
-            {{ p.benefitSummary }}
+            {{ p.policyBenefitDescription || p.benefitSummary || '' }}
           </div>
           <div class="recMeta font-11">
             신청기간 :
             <span class="recLink">
-              {{ formatPeriod(p.applyPeriod) }}
+              {{ getPolicyPeriod(p) }}
             </span>
           </div>
         </article>
@@ -113,32 +114,52 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { policyAPI } from '@/api/policy';
+
 const props = defineProps({
   searchKeyword: { type: String, default: '검색어' },
-  popularKeywords: {
-    type: Array,
-    default: () => ['청년', '주거', '창업', '취업', '대출', '지원금'],
-  },
-  // 🔹 추천 정책 데이터 (기능 영향 없이 props만 추가)
-  recommendedPolicies: {
-    type: Array,
-    default: () => [
-      {
-        id: 1,
-        category: '주택',
-        title: '고용보험 미적용자 출산급여 지원',
-        benefitSummary: '총 150만원 일시금 지급',
-        applyPeriod: '상시',
-      },
-      {
-        id: 2,
-        category: '주택',
-        title: '위기청년 자립지원(시설퇴소청소년 자립지원수당 지원)',
-        benefitSummary: '월 50만원 정기 지원',
-        applyPeriod: '상시',
-      },
-    ],
-  },
+});
+
+const router = useRouter();
+const popularKeywords = ref([]);
+const recommendedPolicies = ref([]);
+
+// 대분류 코드(여러 개면 첫 번째) 추출 함수
+function getFirstLargeCategory(policy) {
+  if (!policy.largeCategory) return '';
+  if (Array.isArray(policy.largeCategory)) {
+    return policy.largeCategory[0] || '';
+  }
+  if (typeof policy.largeCategory === 'string') {
+    return policy.largeCategory.split(',')[0]?.trim() || '';
+  }
+  return '';
+}
+
+// 신청기간 추출 및 포맷 함수
+function getPolicyPeriod(policy) {
+  // endDate 또는 applyPeriod 우선순위
+  if (policy.endDate) return formatPeriod(policy.endDate);
+  if (policy.applyPeriod) return formatPeriod(policy.applyPeriod);
+  return '상시';
+}
+
+// 인기 검색어, 인기 정책 fetch
+onMounted(async () => {
+  try {
+    const [keywordsRes, policiesRes] = await Promise.all([
+      policyAPI.getUserPolicyPopularKeywords(),
+      policyAPI.getTop3ViewsAll(),
+    ]);
+    popularKeywords.value = keywordsRes.data?.slice(0, 6) || [];
+    // 인기 정책 2개만 노출
+    recommendedPolicies.value = (policiesRes.data || []).slice(0, 2);
+  } catch (e) {
+    popularKeywords.value = [];
+    recommendedPolicies.value = [];
+  }
 });
 
 /** '상시'는 그대로, 그 외 'YYYYMMDD~YYYYMMDD' 형식만 사람이 읽기 좋게 */
@@ -149,6 +170,13 @@ const formatPeriod = (period) => {
   const fmt = (s) => `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6, 8)}`;
   return `${fmt(match[1])} ~ ${fmt(match[2])}`;
 };
+
+function goToPolicyDetail(policy) {
+  const id = policy.policyId ?? policy.id;
+  if (id) {
+    router.push({ name: 'policyDetail', params: { policyId: id } });
+  }
+}
 </script>
 
 <style scoped>
