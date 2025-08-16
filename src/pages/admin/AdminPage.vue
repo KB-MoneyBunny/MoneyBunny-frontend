@@ -566,7 +566,7 @@
                   @keyup.enter="fetchPolicyReviews"
                 />
                 <button
-                  class="btn-sync"
+                  class="btn-search-policy"
                   @click="fetchPolicyReviews"
                   :disabled="!selectedPolicyId || loading.policyReviews"
                 >
@@ -2290,10 +2290,11 @@ onMounted(() => {
 
 .btn-edit-small,
 .btn-delete-small {
-  padding: 4px 8px;
+  padding: 5px 14px;
   border: 1px solid;
   border-radius: 2px;
-  font-size: 11px;
+  margin-bottom: 5px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -2678,22 +2679,50 @@ onMounted(() => {
 
 .search-input-group {
   display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.search-input-group .btn-sync {
-  width: auto;
-  white-space: nowrap;
+  gap: 8px;
+  align-items: stretch;
 }
 
 .policy-id-input {
   flex: 1;
-  max-width: 180px;
-  padding: 8px 12px;
+  max-width: 200px;
+  padding: 10px 12px;
   border: 1px solid #ced4da;
   border-radius: 4px;
   font-size: 14px;
+  height: 38px;
+  box-sizing: border-box;
+}
+
+.policy-id-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.btn-search-policy {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  height: 38px;
+  box-sizing: border-box;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-search-policy:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btn-search-policy:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 
@@ -2720,14 +2749,6 @@ onMounted(() => {
   opacity: 0.6;
 }
 
-.btn-delete-small {
-  padding: 6px 12px;
-  font-size: 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid;
-}
 
 .btn-delete-policy {
   background: #ffc107;
