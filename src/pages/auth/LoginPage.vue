@@ -420,17 +420,17 @@ input:disabled {
 
 .toastMsg {
   position: absolute;
-  top: -54px;
+  /* top: -54px; */
+  top: 25%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
   background: var(--base-blue-dark);
   color: #fff;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
-  min-width: 250px;
-  max-width: 350px;
+  width: 250px;
   pointer-events: none;
   text-align: center;
   box-sizing: border-box;

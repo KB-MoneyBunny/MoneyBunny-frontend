@@ -173,7 +173,6 @@ onMounted(() => {
   padding: 16px;
   background-color: #fff;
   border-radius: 6px;
-  /* max-width: 360px; */
   margin-bottom: 20px;
 }
 
@@ -189,7 +188,6 @@ onMounted(() => {
   border-radius: 6px;
   padding: 16px;
   color: white;
-  /* max-width: 360px; */
   height: 100px;
   width: 100%;
 }
