@@ -99,8 +99,8 @@ onMounted(async () => {
 }
 
 .logo-text {
-  font-size: clamp(22px, 5.5vw, 30px);
-  line-height: 1;
+  font-size: clamp(24px, 6vw, 34px);
+  line-height: 1.2;
   color: var(--base-blue-dark);
 
   letter-spacing: -0.03em;

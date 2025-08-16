@@ -49,10 +49,35 @@
       </div>
     </div>
 
-    <div class="tipBox">
+    <div class="recommendBox" v-if="recommendedPolicies?.length">
+      <div class="recommendTitle font-16 font-bold">이런 정책은 어떠세요?</div>
+
+      <div class="recList">
+        <article
+          v-for="p in recommendedPolicies"
+          :key="p.id ?? p.policyId ?? p.title"
+          class="recCard"
+          role="button"
+          @click="$emit('open-policy', p)"
+        >
+          <div class="recBadge">{{ p.category }}</div>
+          <div class="recTitle font-13 font-bold">{{ p.title }}</div>
+          <div class="recSubtitle font-11">
+            {{ p.benefitSummary }}
+          </div>
+          <div class="recMeta font-11">
+            신청기간 :
+            <span class="recLink">
+              {{ formatPeriod(p.applyPeriod) }}
+            </span>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- <div class="tipBox">
       <div class="tipTitle font-16 font-bold">검색 팁</div>
       <div class="tipList">
-        <!-- 1번 항목만 설명을 줄바꿈 아래로 -->
         <div class="tipItem">
           <div class="tipRow">
             <span class="tipNum">1</span>
@@ -64,7 +89,6 @@
             유사한 의미의 다른 단어를 사용해보세요
           </div>
         </div>
-        <!-- 2번 -->
         <div class="tipItem">
           <div class="tipRow">
             <span class="tipNum">2</span>
@@ -74,7 +98,6 @@
             너무 구체적인 검색어보다 간단한 키워드 사용
           </div>
         </div>
-        <!-- 3번 -->
         <div class="tipItem">
           <div class="tipRow">
             <span class="tipNum">3</span>
@@ -85,7 +108,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -96,7 +119,36 @@ const props = defineProps({
     type: Array,
     default: () => ['청년', '주거', '창업', '취업', '대출', '지원금'],
   },
+  // 🔹 추천 정책 데이터 (기능 영향 없이 props만 추가)
+  recommendedPolicies: {
+    type: Array,
+    default: () => [
+      {
+        id: 1,
+        category: '주택',
+        title: '고용보험 미적용자 출산급여 지원',
+        benefitSummary: '총 150만원 일시금 지급',
+        applyPeriod: '상시',
+      },
+      {
+        id: 2,
+        category: '주택',
+        title: '위기청년 자립지원(시설퇴소청소년 자립지원수당 지원)',
+        benefitSummary: '월 50만원 정기 지원',
+        applyPeriod: '상시',
+      },
+    ],
+  },
 });
+
+/** '상시'는 그대로, 그 외 'YYYYMMDD~YYYYMMDD' 형식만 사람이 읽기 좋게 */
+const formatPeriod = (period) => {
+  if (!period || period === '상시') return '상시';
+  const match = String(period).match(/^(\d{8})\s*~\s*(\d{8})$/);
+  if (!match) return period;
+  const fmt = (s) => `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6, 8)}`;
+  return `${fmt(match[1])} ~ ${fmt(match[2])}`;
+};
 </script>
 
 <style scoped>
@@ -134,7 +186,8 @@ const props = defineProps({
   text-align: center;
 }
 .tipBox,
-.popularBox {
+.popularBox,
+.recommendBox {
   background: var(--white, #fff);
   border-radius: 12px;
   padding: 20px;
@@ -144,7 +197,8 @@ const props = defineProps({
   margin-bottom: 12px;
 }
 .tipTitle,
-.popularTitle {
+.popularTitle,
+.recommendTitle {
   color: var(--text-title, #232a3a);
   margin-bottom: 12px;
 }
@@ -162,10 +216,6 @@ const props = defineProps({
   gap: 8px;
 }
 .tipNum {
-  /* background: var(--input-bg-2, #f0f2fa); */
-  /* border-radius: 50%; */
-  /* width: 16px; */
-  /* height: 16px; */
   color: var(--text-bluegray);
   display: flex;
   align-items: center;
@@ -218,5 +268,44 @@ const props = defineProps({
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.recList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recCard {
+  border: 1px solid var(--input-bg-1);
+  background: #fff;
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.recBadge {
+  display: inline-block;
+  background: var(--input-bg-2);
+  color: var(--text-bluegray);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+.recTitle {
+  color: var(--text-title);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.recSubtitle {
+  color: var(--text-bluegray);
+  margin-bottom: 8px;
+}
+.recMeta {
+  color: var(--text-bluegray);
+}
+.recLink {
+  color: var(--base-blue-dark);
 }
 </style>
