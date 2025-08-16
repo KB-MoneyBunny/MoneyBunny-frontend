@@ -13,21 +13,25 @@ import { usePolicyMatchingStore } from "@/stores/policyMatchingStore";
 
 // 초기 상태 템플릿
 const initState = {
-  token: "", // JWT 접근 토큰
-  // user: {
-  //   username: "", // 사용자 ID
-  //   email: "", // 이메일
-  //   roles: [], // 권한 목록
-  // },
-  user: null, // 서버 응답으로만 채움
-
+  token: "", // access token
+  refreshToken: "", //  refresh token (메모리 전용; localStorage 저장 금지)
+  user: null,
   avatarTimestamp: Date.now(),
-  // (1) 아바타 이미지 경로에 추가할 쿼리스트링값(타임스탬프)
 };
 
 // 스토어 정의
 export const useAuthStore = defineStore("auth", () => {
   const state = ref({ ...initState });
+
+  // access 토큰은 로컬스토리지에도 백업, refresh는 메모리 전용
+  const setToken = (t) => {
+    state.value.token = t || "";
+    if (t) localStorage.setItem("auth", JSON.stringify({ token: t }));
+    else localStorage.removeItem("auth");
+  };
+  const setRefreshToken = (rt) => {
+    state.value.refreshToken = rt || "";
+  };
 
   const isValidJWT = (t) =>
     typeof t === "string" &&
@@ -86,21 +90,9 @@ export const useAuthStore = defineStore("auth", () => {
       username: member.username,
       password: member.password,
     });
-
-    // 💪(상일) AuthResultDTO 응답 구조에 맞춰 상태 업데이트
-    // 응답 형태: { token: "JWT토큰", user: { loginId, email, createdAt } }
-    state.value.token = data.accessToken;
-    // state.value.user = {
-    //   username: data.username,
-    //   email: "", // email은 응답에 없으므로 빈 값 또는 별도 API로 보완
-    //   roles: [data.role], // role을 배열로 감싸서 roles로 매핑
-    // };
-
-    localStorage.setItem("auth", JSON.stringify({ token: state.value.token }));
-    await fetchUser(); // 서버 검증 정보로 하이드레이트
-
-    // localStorage에 상태 저장
-    // localStorage.setItem("auth", JSON.stringify(state.value));
+    setToken(data.accessToken);
+    if (data.refreshToken) setRefreshToken(data.refreshToken); // 메모리 전용 저장
+    await fetchUser();
   };
 
   const fetchUser = async () => {
@@ -118,6 +110,15 @@ export const useAuthStore = defineStore("auth", () => {
       // 토큰이 변조/만료 등으로 401 나면 서버 로그아웃 호출 없이 즉시 게스트 폴백
       forceGuest();
     }
+  };
+  const refreshAccessToken = async () => {
+    if (!state.value.refreshToken) throw new Error("No refresh token");
+    const { data } = await axios.post("/api/auth/refresh", null, {
+      headers: { Authorization: `Bearer ${state.value.refreshToken}` },
+    });
+    setToken(data.accessToken);
+    if (data.refreshToken) setRefreshToken(data.refreshToken); // 회전 시 갱신
+    return state.value.token;
   };
 
   // 로그아웃 액션
@@ -193,6 +194,9 @@ export const useAuthStore = defineStore("auth", () => {
         console.log("[Logout] FCM 토큰 영구 보존");
       }
 
+      // 토큰 없애기
+      setToken(null);
+      setRefreshToken(null);
       state.value = { ...initState };
       console.log("[Logout] 로컬 상태 초기화 완료 (FCM 토큰만 보존)");
     }
@@ -227,10 +231,7 @@ export const useAuthStore = defineStore("auth", () => {
         const parsed = JSON.parse(auth);
         const t = parsed?.token || "";
         if (isValidJWT(t)) {
-          // 정상적인 JWT 모양이면만 채택
-          state.value.token = t;
-          // 과거 포맷 정리: 로컬엔 토큰만 저장
-          localStorage.setItem("auth", JSON.stringify({ token: t }));
+          setToken(t); // 포맷 정규화
         } else {
           console.warn("[auth] invalid token in localStorage → force guest");
           forceGuest(); // 이상한 문자열/깨진 JSON이면 즉시 게스트
@@ -270,6 +271,7 @@ export const useAuthStore = defineStore("auth", () => {
     isTokenExpired, // 토큰 만료 확인 함수 추가
     changeProfile,
     fetchUser,
+    refreshAccessToken,
 
     // avatar 관련
     avatarUrl,
