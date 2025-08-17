@@ -109,7 +109,10 @@ const authStore = useAuthStore(); // 로그아웃 시킬 때 사용
 
 // 로그인 정보 & 토큰
 const loginId = ref("");
-const tokenRef = ref("");
+const getAuthHeaders = () => {
+  const t = authStore.getToken?.() || authStore.state?.token || "";
+  return t ? { Authorization: `Bearer ${t}` } : {};
+};
 
 // 현재 비밀번호 검증 상태
 const currentPassword = ref("");
@@ -131,13 +134,13 @@ const showToast = ref(false);
 const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 // 로컬스토리지에서 auth 정보 로드
-onMounted(() => {
-  const saved = localStorage.getItem("auth");
-  if (saved) {
-    const { token, user } = JSON.parse(saved);
-    tokenRef.value = token;
-    loginId.value = user?.username || "";
+// Pinia에서 유저/토큰 로드
+onMounted(async () => {
+  if (!authStore.state?.user?.username && authStore.state?.token) {
+    // 토큰만 있을 때 유저 정보 하이드레이트
+    await authStore.fetchUser().catch(() => {});
   }
+  loginId.value = authStore.state?.user?.username || "";
 });
 
 // 실시간 유효성 검사
@@ -159,6 +162,15 @@ async function checkCurrentPassword() {
     currentValid.value = currentError.value = false;
     return;
   }
+
+  // Pinia에서 유저/토큰 로드
+  onMounted(async () => {
+    if (!authStore.state?.user?.username && authStore.state?.token) {
+      // 토큰만 있을 때 유저 정보 하이드레이트
+      await authStore.fetchUser().catch(() => {});
+    }
+    loginId.value = authStore.state?.user?.username || "";
+  });
 
   // 401 등 상태를 예외로 던지지 않고 모두 then()으로 처리
   const res = await axios
@@ -210,7 +222,7 @@ const handleChangePassword = async () => {
     await axios.post(
       "/api/auth/reset-password",
       { loginId: loginId.value, password: newPassword.value },
-      { headers: { Authorization: `Bearer ${tokenRef.value}` } }
+      { headers: getAuthHeaders() }
     );
     console.log("password changed");
     showToast.value = true;

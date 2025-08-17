@@ -11,10 +11,14 @@ import { useAssetStore } from "@/stores/asset";
 import { usePolicyQuizStore } from "@/stores/policyQuizStore";
 import { usePolicyMatchingStore } from "@/stores/policyMatchingStore";
 
+// 세션 스토리지
+const STORAGE = sessionStorage;
+const STORAGE_KEY = "auth";
+
 // 초기 상태 템플릿
 const initState = {
-  token: "", // access token
-  refreshToken: "", //  refresh token (메모리 전용; localStorage 저장 금지)
+  token: "", // access token(세션 스토리지)
+  refreshToken: "", //  refresh token (메모리 전용)
   user: null,
   avatarTimestamp: Date.now(),
 };
@@ -23,14 +27,23 @@ const initState = {
 export const useAuthStore = defineStore("auth", () => {
   const state = ref({ ...initState });
 
-  // access 토큰은 로컬스토리지에도 백업, refresh는 메모리 전용
-  const setToken = (t) => {
-    state.value.token = t || "";
-    if (t) localStorage.setItem("auth", JSON.stringify({ token: t }));
-    else localStorage.removeItem("auth");
+  const saveAuth = (token) => {
+    if (!token) {
+      STORAGE.removeItem(STORAGE_KEY);
+      return;
+    }
+    STORAGE.setItem(STORAGE_KEY, JSON.stringify({ token }));
   };
-  const setRefreshToken = (rt) => {
-    state.value.refreshToken = rt || "";
+
+  const loadAuth = () => {
+    try {
+      const raw = STORAGE.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.token || null;
+    } catch {
+      return null;
+    }
   };
 
   const isValidJWT = (t) =>
@@ -40,13 +53,10 @@ export const useAuthStore = defineStore("auth", () => {
   const forceGuest = () => {
     state.value.user = null;
     state.value.token = "";
-    localStorage.removeItem("auth");
+    STORAGE.removeItem(STORAGE_KEY); // 세션에서만 제거
   };
 
   // Computed 속성들
-  // const isLogin = computed(() => !!state.value.user.username); // 로그인 여부
-  // const username = computed(() => state.value.user.username); // 사용자명
-  // const email = computed(() => state.value.user.email); // 이메일
   const isLogin = computed(() => !!state.value.user?.username);
   const username = computed(() => state.value.user?.username || "");
   const email = computed(() => state.value.user?.email || "");
@@ -55,36 +65,29 @@ export const useAuthStore = defineStore("auth", () => {
   // username, email 반응형 데이터로 컴포넌트에서 자동 업데이트
   // !! 연산자로 boolean 타입 변환 보장
 
-  // (2) 로그인 여부에 따라 아바타 이미지 다운로드 주소 변경
+  // 로그인 여부에 따라 아바타 이미지 다운로드 주소 변경
   const avatarUrl = computed(() =>
     state.value.user?.username // 사용자명이 있다면 == 로그인 상태라면
       ? `/api/member/${state.value.user.username}/avatar?t=${state.value.avatarTimestamp}`
       : null
   );
 
-  // 액션 메서드 작성 영역
+  const setToken = (t) => {
+    state.value.token = t || "";
+    saveAuth(state.value.token); // 세션 저장
+  };
 
-  // (3) 아바타 업데이트 액션 추가
+  const setRefreshToken = (rt) => {
+    state.value.refreshToken = rt || "";
+  };
+
+  // 아바타 업데이트 액션 추가
   const updateAvatar = () => {
-    state.value.avatarTimestamp = Date.now();
-    // localStorage.setItem("auth", JSON.stringify(state.value));
-    if (state.value.token) {
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({ token: state.value.token })
-      );
-    }
+    state.value.avatarTimestamp = Date.now(); // 저장소 조작 X
   };
 
   // 로그인 액션
   const login = async (member) => {
-    // 임시 테스트용 로그인 (실제 API 호출 전) <- 주석 처리
-    // state.value.token = 'test token';
-    // state.value.user = {
-    //   username: member.username,
-    //   email: member.username + '@test.com',
-    // };
-
     // 💪(상일) 백엔드 MemberController의 정확한 엔드포인트 사용
     const { data } = await axios.post("/api/auth/login", {
       username: member.username,
@@ -182,11 +185,11 @@ export const useAuthStore = defineStore("auth", () => {
         console.warn("[Logout] 일부 스토어 초기화 실패:", storeError);
       }
 
+      // 세션 스토리지만 정리
+      STORAGE.removeItem(STORAGE_KEY);
+
       // 💪(상일) FCM 토큰만 보존하고 나머지는 초기화
       const fcmToken = localStorage.getItem("fcm_token");
-
-      // localStorage 완전 초기화
-      localStorage.clear();
 
       // FCM 토큰만 영구 보존 (로그아웃 후에도 알림 수신을 위해)
       if (fcmToken) {
@@ -223,37 +226,31 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   // 상태 복원 로직
-  // - localStorage에 인증 정보(auth)가 저장되어 있을 경우 상태 복원
   const load = () => {
-    const auth = localStorage.getItem("auth");
-    if (auth != null) {
+    const legacy = localStorage.getItem("auth");
+    if (legacy && !STORAGE.getItem(STORAGE_KEY)) {
       try {
-        const parsed = JSON.parse(auth);
-        const t = parsed?.token || "";
-        if (isValidJWT(t)) {
-          setToken(t); // 포맷 정규화
-        } else {
-          console.warn("[auth] invalid token in localStorage → force guest");
-          forceGuest(); // 이상한 문자열/깨진 JSON이면 즉시 게스트
+        const parsed = JSON.parse(legacy);
+        if (parsed?.token) {
+          STORAGE.setItem(STORAGE_KEY, JSON.stringify({ token: parsed.token }));
         }
-      } catch {
-        // JSON 파싱조차 안되면 게스트
-        forceGuest();
-      }
+      } catch {}
+      localStorage.removeItem("auth"); // 과거 값 제거
     }
-    // 토큰 있으면 서버에서 사용자 정보 하이드레이트 시도
-    if (state.value.token) fetchUser();
+
+    // 세션에서 복원
+    const t = loadAuth();
+    if (t && isValidJWT(t)) {
+      setToken(t);
+      fetchUser();
+    } else {
+      forceGuest();
+    }
   };
 
   // 프로필 변경 후 로컬 상태 동기화 액션
   const changeProfile = (member) => {
     if (state.value.user) state.value.user.email = member.email;
-    if (state.value.token) {
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({ token: state.value.token })
-      );
-    }
   };
 
   // 스토어 초기화 시 자동 실행

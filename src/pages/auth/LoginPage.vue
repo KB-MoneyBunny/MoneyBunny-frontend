@@ -6,7 +6,7 @@ import AttendanceCheckModal from "./AttendanceCheckModal.vue";
 // 💪(상일) FCM 토큰 관리 및 알림 설정용 import 추가
 import { fcmTokenManager, TOKEN_STATES } from "@/firebase/FCMTokenManager";
 import { useNotificationStore } from "@/stores/notification";
-
+import axios from "axios";
 const showToast = ref(false);
 
 const router = useRouter();
@@ -17,28 +17,28 @@ const notificationStore = useNotificationStore();
 
 // 돌아갈 목적지: 쿼리의 redirect가 있으면 그걸, 없으면 /home
 const redirectTarget = computed(
-  () => route.query.redirect?.toString() || '/home'
+  () => route.query.redirect?.toString() || "/home"
 );
 
 const showModal = ref(false);
-const id = ref('');
-const password = ref('');
+const id = ref("");
+const password = ref("");
 const isLoading = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref("");
 const showPassword = ref(false);
 
 // 👁️ 비밀번호 보기/숨기기 아이콘
 const eyeView = new URL(
-  '@/assets/images/icons/signup/eye_view.png',
+  "@/assets/images/icons/signup/eye_view.png",
   import.meta.url
 ).href;
 const eyeHide = new URL(
-  '@/assets/images/icons/signup/eye_hide.png',
+  "@/assets/images/icons/signup/eye_hide.png",
   import.meta.url
 ).href;
 
 const guestIcon = new URL(
-  '@/assets/images/icons/signup/user.png',
+  "@/assets/images/icons/signup/user.png",
   import.meta.url
 ).href;
 
@@ -46,21 +46,23 @@ const guestIcon = new URL(
 const requestNotificationAfterLogin = async () => {
   try {
     // 브라우저 알림 지원 확인
-    if (!('Notification' in window)) {
-      console.log('이 브라우저는 알림을 지원하지 않습니다.');
+    if (!("Notification" in window)) {
+      console.log("이 브라우저는 알림을 지원하지 않습니다.");
       return;
     }
 
     const tokenState = fcmTokenManager.getTokenState();
-    
+
     // default 상태에서만 자동 권한 요청 (granted/denied는 사용자 의도 존중)
-    if (tokenState === TOKEN_STATES.NEED_PERMISSION && 
-        Notification.permission === "default") {
-      console.log('🔔 로그인 후 알림 권한 자동 요청 시작');
-      
+    if (
+      tokenState === TOKEN_STATES.NEED_PERMISSION &&
+      Notification.permission === "default"
+    ) {
+      console.log("🔔 로그인 후 알림 권한 자동 요청 시작");
+
       // FCM 토큰 발급 (권한 요청 포함)
       const token = await fcmTokenManager.getValidToken();
-      
+
       // 초기 구독 설정 (모든 알림 false로 시작)
       const initialSubscription = {
         token,
@@ -69,15 +71,15 @@ const requestNotificationAfterLogin = async () => {
         isActiveNewPolicy: false,
         isActiveFeedback: false,
       };
-      
+
       await notificationStore.updateSubscription(initialSubscription);
-      console.log('✅ 로그인 후 알림 권한 요청 및 초기 구독 완료');
+      console.log("✅ 로그인 후 알림 권한 요청 및 초기 구독 완료");
     } else {
-      console.log('알림 권한 자동 요청 건너뜀 - 상태:', tokenState);
+      console.log("알림 권한 자동 요청 건너뜀 - 상태:", tokenState);
     }
   } catch (error) {
     // 권한 거부 또는 기타 오류 시에도 로그인 진행에는 영향 없음
-    console.log('로그인 후 알림 권한 요청 실패:', error.message);
+    console.log("로그인 후 알림 권한 요청 실패:", error.message);
   }
 };
 
@@ -85,25 +87,33 @@ const requestNotificationAfterLogin = async () => {
 const handleLogin = async () => {
   // 입력값 검증
   if (!id.value.trim()) {
-    errorMessage.value = '아이디를 입력해주세요.';
+    errorMessage.value = "아이디를 입력해주세요.";
     return;
   }
   if (!password.value.trim()) {
-    errorMessage.value = '비밀번호를 입력해주세요.';
+    errorMessage.value = "비밀번호를 입력해주세요.";
     return;
   }
 
   try {
     isLoading.value = true;
-    errorMessage.value = '';
+    errorMessage.value = "";
 
     // auth store의 login 메서드 호출
-    console.log('로그인 시도:', id.value.trim());
+    console.log("로그인 시도:", id.value.trim());
     await authStore.login({
       username: id.value.trim(),
       password: password.value,
     });
 
+    // 토큰/유저 꺼내서 세션 저장 + axios 헤더 설정
+    const token = authStore.getToken?.() || authStore.state?.token || "";
+    const user = authStore.getUser?.() || authStore.state?.user || null;
+    sessionStorage.setItem(
+      "auth",
+      JSON.stringify({ token, user, ts: Date.now() })
+    );
+    if (token) axios.defaults.headers.common.Authorization = `Bearer ${token}`;
     // 💪(상일) 로그인 성공 후 알림 권한 자동 요청
     await requestNotificationAfterLogin();
 
@@ -118,19 +128,19 @@ const handleLogin = async () => {
       router.replace(redirectTarget.value);
     }, 1200); // 1.2초 보여주고 홈으로
   } catch (error) {
-    console.error('로그인 에러:', error);
+    console.error("로그인 에러:", error);
 
     // 에러 상태별 메시지 처리
     if (error.response?.status === 401) {
-      errorMessage.value = '아이디 또는 비밀번호가 잘못되었습니다.';
+      errorMessage.value = "아이디 또는 비밀번호가 잘못되었습니다.";
     } else if (error.response?.status >= 500) {
       errorMessage.value =
-        '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
-    } else if (error.code === 'ECONNABORTED') {
+        "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+    } else if (error.code === "ECONNABORTED") {
       errorMessage.value =
-        '요청 시간이 초과되었습니다. 네트워크를 확인해주세요.';
+        "요청 시간이 초과되었습니다. 네트워크를 확인해주세요.";
     } else {
-      errorMessage.value = '로그인에 실패했습니다. 다시 시도해주세요.';
+      errorMessage.value = "로그인에 실패했습니다. 다시 시도해주세요.";
     }
   } finally {
     isLoading.value = false;
@@ -146,12 +156,12 @@ const handleLogin = async () => {
 const closeModal = () => {
   showModal.value = false;
   // 출석체크 모달 닫힌 후 홈으로 이동
-  router.push('/home');
+  router.push("/home");
 };
 
 // 엔터키 입력 처리
 const handleKeyPress = (event) => {
-  if (event.key === 'Enter' && !isLoading.value) {
+  if (event.key === "Enter" && !isLoading.value) {
     handleLogin();
   }
 };
@@ -160,30 +170,39 @@ const handleKeyPress = (event) => {
 const clearErrorMessage = () => {
   if (errorMessage.value) {
     setTimeout(() => {
-      errorMessage.value = '';
+      errorMessage.value = "";
     }, 3000);
   }
 };
 
 const goGuestPolicyPage = () => {
   // 게스트는 정책 메인으로 바로 이동
-  router.push({ name: 'policyMain' });
+  router.push({ name: "policyMain" });
 };
 
 // 💪(상일) URL 파라미터로 전달된 에러 메시지 처리
 onMounted(() => {
-  // ✅ 이미 로그인 상태로 /login 접근한 경우: redirect 목적지로
+  // 세션에 토큰 있으면 axios 헤더만 복구
+  const saved = sessionStorage.getItem("auth");
+  if (saved) {
+    try {
+      const { token } = JSON.parse(saved) || {};
+      if (token)
+        axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    } catch {}
+  }
+  // 이미 로그인 상태로 /login 접근한 경우: redirect 목적지로
   if (authStore.isLogin) {
     router.replace(redirectTarget.value);
     return;
   }
 
-  if (route.query.error === 'auth_required') {
-    errorMessage.value = '로그인이 필요한 페이지입니다.';
-  } else if (route.query.error === 'login_required') {
-    errorMessage.value = '세션이 만료되었습니다. 다시 로그인해주세요.';
-  } else if (route.query.error === 'token_expired') {
-    errorMessage.value = 'JWT 토큰이 만료되었습니다. 다시 로그인해주세요.';
+  if (route.query.error === "auth_required") {
+    errorMessage.value = "로그인이 필요한 페이지입니다.";
+  } else if (route.query.error === "login_required") {
+    errorMessage.value = "세션이 만료되었습니다. 다시 로그인해주세요.";
+  } else if (route.query.error === "token_expired") {
+    errorMessage.value = "JWT 토큰이 만료되었습니다. 다시 로그인해주세요.";
   }
 });
 

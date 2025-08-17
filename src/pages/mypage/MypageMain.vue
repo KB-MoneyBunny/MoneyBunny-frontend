@@ -35,6 +35,7 @@ import { storeToRefs } from "pinia";
 import { useBookmarkStore } from "@/stores/bookmark";
 import { useApplicationStore } from "@/stores/application";
 import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
 
 // 컴포넌트 import
 import MypageProfileCard from "./common/MypageProfileCard.vue";
@@ -79,16 +80,13 @@ const pickerRef = ref(null);
 // 초기값
 const tempImage = ref(0);
 
-// 🔐 토큰 헤더 헬퍼 (없으면 빈 헤더)
+// store 이용
+const authStore = useAuthStore();
+
+// 토큰 헤더 헬퍼 (없으면 빈 헤더)
 const getAuthHeaders = () => {
-  try {
-    const saved = localStorage.getItem("auth");
-    const parsed = saved ? JSON.parse(saved) : {};
-    const token = parsed.token || parsed.accessToken || parsed.access_token;
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  } catch {
-    return {};
-  }
+  const token = authStore.getToken?.() || authStore.state?.token || "";
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 // 열기
@@ -159,7 +157,7 @@ const changeTab = (tab) => {
   if (tab === "bookmark" && bookmarks.value.length === 0) {
     fetchBookmarks();
   }
-  
+
   // 신청 정책 탭으로 전환 시 데이터 로드
   if (tab === "application") {
     fetchApplications();
@@ -173,13 +171,13 @@ const handleUpdate = (data) => {
 // 💪(상일) 컴포넌트 마운트 시 북마크 데이터 미리 로드
 // 🎵(유정) 프로필 호출
 onMounted(async () => {
-  // auth 토큰 꺼내기 (share 컴포넌트 참고)
-  const savedAuth = localStorage.getItem("auth");
-  const parsed = savedAuth ? JSON.parse(savedAuth) : {};
-  const token = parsed.token; // 로그인할 때 저장한 객체에 token 프로퍼티가 있어야 함
-
-  // 헤더 세팅
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const headers = getAuthHeaders();
+  if (!headers.Authorization) {
+    console.warn("로그인 필요: /api/member/information 호출 스킵");
+    // 필요 시 리다이렉트/안내
+    // router.push('/login')
+    return;
+  }
 
   // 프로필 API 호출
   try {
