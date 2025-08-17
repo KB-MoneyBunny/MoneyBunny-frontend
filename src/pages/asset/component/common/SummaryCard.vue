@@ -194,7 +194,7 @@ const formatSubValue = (subInfo) => {
 }
 
 /* 좌/우 얇은 구분선 */
-.summary-card::after {
+/* .summary-card::after {
   content: '';
   position: absolute;
   right: calc(160px + 1.5rem);
@@ -203,22 +203,22 @@ const formatSubValue = (subInfo) => {
   width: 1px;
   background: rgba(255, 255, 255, 0.14);
   border-radius: 1px;
-}
+} */
 
 /* 모바일 */
 @media (max-width: 420px) {
   .summary-card {
     column-gap: 1rem;
-    height: auto;
+    height: 120px;
     padding: 1rem 1.1rem;
   }
   .summary-right {
     min-width: 120px;
   }
-  .summary-card::after {
+  /* .summary-card::after {
     right: calc(120px + 1.1rem);
     top: 12px;
     bottom: 12px;
-  }
+  } */
 }
 </style>

@@ -84,7 +84,7 @@ const handleAdminAccess = async () => {
     clearTimeout(clickTimeout.value);
   }
 
-  // 5번 클릭 달성 시 이메일 확인 후 관리자 페이지로 이동
+  // 5번 클릭 달성 시 관리자 페이지로 이동 (라우터 가드에서 권한 검증)
   if (clickCount.value >= 5) {
     clickCount.value = 0;
 

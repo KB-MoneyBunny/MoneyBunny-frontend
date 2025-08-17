@@ -295,10 +295,48 @@ const router = createRouter({
 
 // 인증 가드
 router.beforeEach(async (to, from, next) => {
+<<<<<<< HEAD
   // 인트로 1회 노출
   const seenIntro = localStorage.getItem('mb_seen_intro');
   if (!seenIntro && to.name !== 'intro') {
     return next({ name: 'intro' });
+=======
+  // 💪(상일) 관리자 페이지 접근 제어
+  if (to.name === "admin" || to.path === "/admin") {
+    const authStore = useAuthStore();
+    
+    // 로그인 확인
+    if (!authStore.isLogin) {
+      console.warn("관리자 페이지: 로그인 필요");
+      return next("/");
+    }
+    
+    // 사용자 이메일 확인
+    try {
+      const response = await fetch("/api/member/information", {
+        headers: {
+          Authorization: `Bearer ${authStore.getToken()}`,
+        },
+      });
+      
+      if (!response.ok) {
+        console.warn("관리자 페이지: 사용자 정보 조회 실패");
+        return next("/home");
+      }
+      
+      const userData = await response.json();
+      if (userData.email !== "sangil6372@naver.com") {
+        console.warn("관리자 페이지: 접근 권한 없음");
+        return next("/home");
+      }
+      
+      // 권한 있는 사용자는 통과
+      return next();
+    } catch (error) {
+      console.error("관리자 페이지 권한 확인 실패:", error);
+      return next("/home");
+    }
+>>>>>>> origin/dev
   }
 
   // 리뷰 페이지는 비로그인 허용
@@ -332,7 +370,7 @@ router.beforeEach(async (to, from, next) => {
     }
     // 로그인: 기존 로직 유지 (설문 유무에 따라 /policy vs /policy/main 라우팅)
     try {
-      const res = await policyAPI.getUserPolicy();
+      const res = await policyAPI.getUserPolicy(true); // 캐시 무효화
       if (res.data && Object.keys(res.data).length > 0) {
         if (to.path !== '/policy/main') return next('/policy/main');
         return next();
