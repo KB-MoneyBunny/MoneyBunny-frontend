@@ -110,7 +110,7 @@ const monthlyExpenseDisplay = computed(() =>
 }
 
 /* 좌/우 얇은 구분선 */
-.total-asset-card::after {
+/* .total-asset-card::after {
   content: '';
   position: absolute;
   right: calc(160px + 1.5rem);
@@ -119,23 +119,23 @@ const monthlyExpenseDisplay = computed(() =>
   width: 1px;
   background: rgba(255, 255, 255, 0.14);
   border-radius: 1px;
-}
+} */
 
 /* 모바일 */
 @media (max-width: 420px) {
   .total-asset-card {
     grid-template-columns: 1fr auto;
     column-gap: 1rem;
-    height: auto;
+    height: 120px;
     padding: 1rem 1.1rem;
   }
   .asset-right {
     min-width: 120px;
   }
-  .total-asset-card::after {
+  /* .total-asset-card::after {
     right: calc(120px + 1.1rem);
     top: 12px;
     bottom: 12px;
-  }
+  } */
 }
 </style>
