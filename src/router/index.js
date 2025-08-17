@@ -109,24 +109,11 @@ const routes = [
     component: FindPasswordCodePage,
   },
   {
-    path: '/resetPassword',
-    name: 'resetPassword',
-    component: ResetPasswordPage,
-  },
-  {
     path: '/signUpEmailCode',
     name: 'signUpEmailCode',
     component: SignUpEmailCodePage,
   },
   //
-  // ─── 마이페이지 ─────────────────────────────────────
-  { path: '/mypage/settings', name: 'myPageSettings', component: SettingMain },
-  {
-    path: '/mypage/settings/changePassword',
-    name: 'changePassword',
-    component: ChangePassword,
-  },
-
   // ─── 기본 레이아웃 하위 라우트 ─────────
   {
     path: '/',
@@ -295,12 +282,12 @@ const router = createRouter({
 
 // 인증 가드
 router.beforeEach(async (to, from, next) => {
-<<<<<<< HEAD
   // 인트로 1회 노출
   const seenIntro = localStorage.getItem('mb_seen_intro');
   if (!seenIntro && to.name !== 'intro') {
     return next({ name: 'intro' });
-=======
+  }
+
   // 💪(상일) 관리자 페이지 접근 제어
   if (to.name === "admin" || to.path === "/admin") {
     const authStore = useAuthStore();
@@ -336,7 +323,6 @@ router.beforeEach(async (to, from, next) => {
       console.error("관리자 페이지 권한 확인 실패:", error);
       return next("/home");
     }
->>>>>>> origin/dev
   }
 
   // 리뷰 페이지는 비로그인 허용
