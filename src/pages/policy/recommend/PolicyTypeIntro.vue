@@ -71,7 +71,7 @@ const startTest = () => {
       <div class="noticeBox">
         <div class="infoRow">
           <img :src="stopwatchIcon" alt="" class="infoIcon" />
-          <span class="font-12"><strong>소요 시간 :</strong> 약 2–3분</span>
+          <span class="font-12"><strong>소요 시간 :</strong> 약 1–2분</span>
         </div>
         <div class="infoRow">
           <img :src="padlockIcon" alt="" class="infoIcon" />
