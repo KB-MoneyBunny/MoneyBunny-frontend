@@ -1,21 +1,16 @@
 <template>
   <div class="onboarding">
-    <!-- 상단: 스킵 -->
     <button class="skip" @click="emit('skip')">건너뛰기</button>
 
-    <!-- 슬라이더 -->
     <div class="slides" ref="slidesEl" @scroll.passive="onScroll">
       <section class="slide" v-for="(s, i) in slides" :key="i">
-        <!-- 가운데 컨텐츠 (뷰포트 중앙 정렬) -->
         <div class="copy">
-          <!-- 토끼 이미지를 모든 슬라이드에 고정 -->
           <img :src="bunny" alt="머니버니" class="bunny-img" />
 
           <div class="title" v-html="s.title"></div>
           <p class="desc" v-for="(line, li) in s.desc" :key="li">{{ line }}</p>
         </div>
 
-        <!-- 하단 미리보기 -->
         <div class="preview">
           <img
             v-if="shots[i]"
@@ -28,7 +23,6 @@
       </section>
     </div>
 
-    <!-- 인디케이터 -->
     <div class="dots">
       <span
         v-for="(s, i) in slides"
@@ -38,27 +32,26 @@
         @click="go(i)"
       />
     </div>
-
-    <!-- 하단 CTA (마지막 슬라이드에서만 표시) -->
-    <button
+    <button class="cta" @click="onCta()">{{ ctaLabel }}</button>
+    <!-- <button
       v-if="index === slides.length - 1"
       class="cta"
       @click="emit('done')"
     >
       시작하기
-    </button>
+    </button> -->
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 
-/** 기본 스크린샷 세팅 (경로 제공해준 그대로) */
 import screenshot1 from '@/assets/images/icons/intro/screenshot1.png';
 import screenshot2 from '@/assets/images/icons/intro/screenshot2.png';
 import screenshot3 from '@/assets/images/icons/intro/screenshot3.png';
 
-import bunny from '@/assets/images/icons/bunny/main_bunny.png';
+import bunny from '@/assets/images/icons/bunny/glasses_bunny.png';
+// import bunny from '@/assets/images/icons/bunny/main_bunny.png';
 
 const props = defineProps({
   screenshots: {
@@ -77,11 +70,11 @@ const shots = computed(() => {
 
 const slides = [
   {
-    title: '숨은 자산과 정책,<br/>머니버니가 정확히 찾아드립니다',
+    title: '숨은 자산과 정책,<br/>MoneyBunny 가 정확히 찾아드립니다',
     desc: ['개인 맞춤형 자산 관리와 정책 추천 서비스'],
   },
   {
-    title: '흩어진 내 자산과 놓친 혜택<br/>머니버니에서 한 번에 확인하세요',
+    title: '흩어진 내 자산과 놓친 혜택<br/>MoneyBunny 에서 한 번에 확인하세요',
     desc: ['자산 통합 관리 & 정부 혜택 알림'],
   },
   {
@@ -113,12 +106,23 @@ onMounted(() => {
   nextTick(() => go(0));
 });
 
-/** 화면 회전/리사이즈 시 현재 페이지 유지 */
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => go(index.value), 120);
 });
+
+const ctaLabel = computed(() =>
+  index.value < slides.length - 1 ? '다음' : '시작하기'
+);
+
+const onCta = () => {
+  if (index.value < slides.length - 1) {
+    go(index.value + 1);
+  } else {
+    emit('done');
+  }
+};
 </script>
 
 <style scoped>
@@ -162,8 +166,8 @@ window.addEventListener('resize', () => {
 .slide {
   scroll-snap-align: start;
   display: grid;
-  grid-template-rows: auto auto; /* 위: 카피, 아래: 미리보기(고정 높이) */
-  padding: 65px 0 90px; /* 좌우 패딩 제거 = 꽉 차게 */
+  grid-template-rows: auto auto;
+  padding: 65px 0 90px;
   box-sizing: border-box;
 }
 
@@ -172,13 +176,14 @@ window.addEventListener('resize', () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 3px;
   text-align: center;
 }
 .bunny-img {
-  width: 68px;
-  height: 68px;
+  width: 75px;
+  height: 75px;
   object-fit: contain;
+  /* margin-bottom: 5px; */
 }
 
 .title {
@@ -186,6 +191,7 @@ window.addEventListener('resize', () => {
   line-height: 1.35;
   font-weight: bold;
   letter-spacing: -0.2px;
+  margin-bottom: 7px;
 }
 .desc {
   opacity: 0.85;
@@ -194,7 +200,6 @@ window.addEventListener('resize', () => {
   margin-bottom: 10px;
 }
 
-/* 하단 미리보기 */
 .preview {
   min-height: 420px;
   display: flex;
@@ -220,7 +225,6 @@ window.addEventListener('resize', () => {
   object-position: top;
 }
 
-/* 인디케이터 */
 .dots {
   position: absolute;
   top: 18px;
@@ -244,17 +248,23 @@ window.addEventListener('resize', () => {
 /* CTA */
 .cta {
   position: absolute;
-  left: 16px;
-  right: 16px;
+  left: 8px;
+  right: 8px;
   bottom: max(16px, env(safe-area-inset-bottom));
-  height: 44px;
+  height: 55px;
   border-radius: 6px;
   border: 0;
   color: #fff;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(6px);
+  background: #24374d;
 }
-.cta:active {
-  transform: scale(0.99);
+.onboarding::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.3));
+  pointer-events: none;
 }
 </style>
