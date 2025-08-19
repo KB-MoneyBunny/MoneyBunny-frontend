@@ -14,16 +14,16 @@ function isAuthPath(url = "") {
   return url.includes("/api/auth/");
 }
 
-// 요청 인터셉터: 토큰 부착 + 사전 만료 체크(가능하면 선제 refresh)
+// 요청 인터셉터: 토큰 부착 + CSRF 토큰 부착 + 사전 만료 체크
 axios.interceptors.request.use(
   async (config) => {
     const auth = useAuthStore();
 
     // /api/auth/* 요청은 건너뜀
     if (!isAuthPath(config.url)) {
-      // 토큰이 곧 만료(또는 만료)면 선제적으로 refresh 시도
+      // 토큰이 곧 만료되면 선제적으로 refresh 시도 (Cookie 기반이므로 refreshToken 체크 제거)
       try {
-        if (auth.isTokenExpired() && auth.state.refreshToken) {
+        if (auth.isTokenExpired()) {
           if (isRefreshing) {
             // 이미 다른 요청이 갱신 중이면 대기
             await new Promise((resolve, reject) => {
@@ -47,12 +47,20 @@ axios.interceptors.request.use(
       }
     }
 
-    // 항상 최신 access 토큰 부착
+    // 헤더 초기화
+    config.headers = config.headers || {};
+    
+    // Access Token 부착
     const token = auth.state.token;
-    if (token) {
-      config.headers = config.headers || {};
+    if (token && !isAuthPath(config.url)) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // CSRF Token 부착 (모든 POST, PUT, DELETE 요청에)
+    if (['post', 'put', 'delete', 'patch'].includes(config.method?.toLowerCase()) && auth.state.csrfToken) {
+      config.headers['X-CSRF-Token'] = auth.state.csrfToken;
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
@@ -83,6 +91,12 @@ axios.interceptors.response.use(
           resolve: (newToken) => {
             original.headers = original.headers || {};
             original.headers.Authorization = `Bearer ${newToken}`;
+            
+            // CSRF 토큰도 다시 설정
+            if (['post', 'put', 'delete', 'patch'].includes(original.method?.toLowerCase()) && auth.state.csrfToken) {
+              original.headers['X-CSRF-Token'] = auth.state.csrfToken;
+            }
+            
             original._retry = true;
             resolve(axios(original));
           },
@@ -98,6 +112,12 @@ axios.interceptors.response.use(
 
       original.headers = original.headers || {};
       original.headers.Authorization = `Bearer ${auth.state.token}`;
+      
+      // CSRF 토큰도 다시 설정
+      if (['post', 'put', 'delete', 'patch'].includes(original.method?.toLowerCase()) && auth.state.csrfToken) {
+        original.headers['X-CSRF-Token'] = auth.state.csrfToken;
+      }
+      
       original._retry = true;
       return axios(original);
     } catch (e) {

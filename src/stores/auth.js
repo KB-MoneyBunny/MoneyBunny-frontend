@@ -9,11 +9,11 @@ import { useAssetStore } from "@/stores/asset";
 import { usePolicyQuizStore } from "@/stores/policyQuizStore";
 import { usePolicyMatchingStore } from "@/stores/policyMatchingStore";
 
-// 로컬 저장: token만, user/refreshToken은 메모리 전용
+// 새로운 인증 방식: Access Token(메모리), Refresh Token(Cookie), CSRF Token(localStorage)
 const initState = {
-  token: "",
-  refreshToken: "", // 메모리 전용
-  user: null, // 메모리 전용
+  token: "",        // Access Token (메모리 전용)
+  user: null,       // 사용자 정보 (메모리 전용)
+  csrfToken: "",   // CSRF Token (localStorage)
 };
 
 export const useAuthStore = defineStore("auth", () => {
@@ -27,15 +27,24 @@ export const useAuthStore = defineStore("auth", () => {
 
   // 로그인
   const login = async (member) => {
-    const { data } = await axios.post("/api/auth/login", {
+    const response = await axios.post("/api/auth/login", {
       username: member.username,
       password: member.password,
     });
 
-    state.value.token = data.accessToken || data.token || "";
-    state.value.refreshToken = data.refreshToken || ""; // 메모리 전용
+    const { data } = response;
+    
+    // Access Token 메모리에 저장
+    state.value.token = data.accessToken || "";
 
-    // 사용자 정보는 메모리에만
+    // CSRF Token localStorage에 저장 (응답 Body에서 추출)
+    const csrfToken = data.csrfToken || response.headers['x-csrf-token'];
+    if (csrfToken) {
+      state.value.csrfToken = csrfToken;
+      localStorage.setItem('csrfToken', csrfToken);
+    }
+
+    // 사용자 정보는 메모리에만 (Refresh Token은 Cookie로 자동 설정)
     state.value.user = {
       username: data.username || member.username || "",
       email: data.email || "",
@@ -43,33 +52,31 @@ export const useAuthStore = defineStore("auth", () => {
         ? data.roles
         : [data.role].filter(Boolean),
     };
-
-    // 로컬에는 token만 저장
-    localStorage.setItem(
-      "auth",
-      JSON.stringify({
-        token: state.value.token,
-      })
-    );
   };
 
-  // Access Token 재발급 (refresh 사용)
+  // Access Token 재발급 (Cookie의 Refresh Token 사용)
   const refreshAccessToken = async () => {
-    if (!state.value.refreshToken) throw new Error("NO_REFRESH_TOKEN");
+    // Cookie에서 Refresh Token 자동 전송, CSRF 토큰 헤더 추가
+    const headers = {};
+    if (state.value.csrfToken) {
+      headers['X-CSRF-Token'] = state.value.csrfToken;
+    }
+    
     const { data } = await axios.post(
       "/api/auth/refresh",
       {},
-      { headers: { Authorization: `Bearer ${state.value.refreshToken}` } }
+      { headers }
     );
+    
+    // Access Token과 사용자 정보 업데이트
     state.value.token = data.accessToken || "";
-
-    // 로컬에는 token만 저장
-    localStorage.setItem(
-      "auth",
-      JSON.stringify({
-        token: state.value.token,
-      })
-    );
+    if (data.username && data.email !== undefined) {
+      state.value.user = {
+        username: data.username,
+        email: data.email || "",
+        roles: [data.role].filter(Boolean),
+      };
+    }
   };
 
   // 로그아웃
@@ -77,10 +84,16 @@ export const useAuthStore = defineStore("auth", () => {
     const access = state.value.token;
     if (access) {
       try {
+        const headers = { Authorization: `Bearer ${access}` };
+        // CSRF 토큰 추가
+        if (state.value.csrfToken) {
+          headers['X-CSRF-Token'] = state.value.csrfToken;
+        }
+        
         await axios.post(
           "/api/auth/logout",
           {},
-          { headers: { Authorization: `Bearer ${access}` } }
+          { headers }
         );
       } catch (err) {
         console.error("로그아웃 API 실패:", err);
@@ -92,18 +105,18 @@ export const useAuthStore = defineStore("auth", () => {
       const notification = useNotificationStore();
       notification.resetStore?.();
       const asset = useAssetStore();
-      asset.$reset?.();
+      asset.$reset();
       asset.clearSummary?.();
-      usePolicyQuizStore().$reset?.();
-      usePolicyMatchingStore().$reset?.();
+      usePolicyQuizStore().$reset();
+      usePolicyMatchingStore().$reset();
     } catch (e) {
       console.error("스토어 초기화 실패:", e);
     }
 
+    // FCM 토큰은 유지, CSRF 토큰은 삭제
     const fcmToken = localStorage.getItem("fcm_token");
-    localStorage.clear();
-    if (fcmToken) localStorage.setItem("fcm_token", fcmToken);
-
+    localStorage.removeItem("csrfToken");
+    
     state.value = { ...initState };
   };
 
@@ -121,17 +134,25 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
-  // 로컬에서 token만 복원
-  const load = () => {
+  // 새로고침 시 localStorage에서 CSRF 토큰 복원 및 토큰 재발급 시도
+  const load = async () => {
+    // 먼저 CSRF 토큰 복원
+    const savedCsrfToken = localStorage.getItem('csrfToken');
+    state.value.csrfToken = savedCsrfToken || "";
+
+    // CSRF 토큰이 없으면 토큰 재발급 시도하지 않음 (로그인 필요)
+    if (!savedCsrfToken) {
+      return;
+    }
+
     try {
-      const raw = localStorage.getItem("auth");
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      state.value.token = parsed.token || "";
-      state.value.refreshToken = ""; // 새로고침 후엔 알 수 없음(메모리 전용)
-      state.value.user = null; // 필요시 /api/auth/me로 채우세요
-    } catch {
+      // Cookie에 Refresh Token이 있다면 Access Token 재발급 시도 (사용자 정보도 함께 복원)
+      await refreshAccessToken();
+    } catch (error) {
+      // Refresh Token이 없거나 만료된 경우 초기 상태로 리셋하되 CSRF 토큰은 유지
+      const csrfToken = state.value.csrfToken; // 현재 CSRF 토큰 백업
       state.value = { ...initState };
+      state.value.csrfToken = csrfToken; // CSRF 토큰 복원
     }
   };
 
@@ -140,17 +161,16 @@ export const useAuthStore = defineStore("auth", () => {
       state.value.user = { username: "", email: "", roles: [] };
     }
     state.value.user.email = member.email ?? state.value.user.email ?? "";
-    // 로컬 저장은 token만
-    localStorage.setItem(
-      "auth",
-      JSON.stringify({
-        token: state.value.token,
-      })
-    );
+    // 메모리에만 저장, localStorage 사용하지 않음
   };
 
-  // 초기화
-  load();
+  // 초기화 플래그 추가
+  const _isInitialized = ref(false);
+  
+  // 초기화 (비동기)
+  load().finally(() => {
+    _isInitialized.value = true;
+  });
 
   return {
     state,
@@ -163,5 +183,6 @@ export const useAuthStore = defineStore("auth", () => {
     isTokenExpired,
     changeProfile,
     refreshAccessToken,
+    _isInitialized,
   };
 });
