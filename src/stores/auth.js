@@ -1,187 +1,167 @@
+// src/stores/auth.js
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-import { FCMTokenManager } from "@/firebase/FCMTokenManager";
+import axios from "axios";
 
-import axios from "axios"; // axios 임포트 // <- 추가
-
-// 다른 Pinia 스토어들 import
 import { useBookmarkStore } from "@/stores/bookmark";
 import { useNotificationStore } from "@/stores/notification";
 import { useAssetStore } from "@/stores/asset";
 import { usePolicyQuizStore } from "@/stores/policyQuizStore";
 import { usePolicyMatchingStore } from "@/stores/policyMatchingStore";
 
-// 초기 상태 템플릿
+// 로컬 저장: token만, user/refreshToken은 메모리 전용
 const initState = {
-  token: "", // JWT 접근 토큰
-  user: {
-    username: "", // 사용자 ID
-    email: "", // 이메일
-    roles: [], // 권한 목록
-  },
-
-  avatarTimestamp: Date.now(),
-  // (1) 아바타 이미지 경로에 추가할 쿼리스트링값(타임스탬프)
+  token: "",
+  refreshToken: "", // 메모리 전용
+  user: null, // 메모리 전용
 };
 
-// 스토어 정의
 export const useAuthStore = defineStore("auth", () => {
   const state = ref({ ...initState });
 
-  // Computed 속성들
-  const isLogin = computed(() => !!state.value.user.username); // 로그인 여부
-  const username = computed(() => state.value.user.username); // 사용자명
-  const email = computed(() => state.value.user.email); // 이메일
+  // 로그인 여부는 토큰 보유 + 유효성으로 판단하는 편이 안전하지만,
+  // 기존 사용처 최소 변경을 위해 user 여부 유지가 필요하면 아래처럼도 가능.
+  const isLogin = computed(() => !!state.value.token && !isTokenExpired());
+  const username = computed(() => state.value.user?.username || "");
+  const email = computed(() => state.value.user?.email || "");
 
-  // isLogin 사용자명 존재 여부로 로그인 상태 판단
-  // username, email 반응형 데이터로 컴포넌트에서 자동 업데이트
-  // !! 연산자로 boolean 타입 변환 보장
-
-  // (2) 로그인 여부에 따라 아바타 이미지 다운로드 주소 변경
-  const avatarUrl = computed(() =>
-    state.value.user.username // 사용자명이 있다면 == 로그인 상태라면
-      ? `/api/member/${state.value.user.username}/avatar?t=${state.value.avatarTimestamp}`
-      : null
-  );
-
-  // 액션 메서드 작성 영역
-
-  // (3) 아바타 업데이트 액션 추가
-  const updateAvatar = () => {
-    state.value.avatarTimestamp = Date.now();
-    localStorage.setItem("auth", JSON.stringify(state.value));
-  };
-
-  // 로그인 액션
+  // 로그인
   const login = async (member) => {
-    // 임시 테스트용 로그인 (실제 API 호출 전) <- 주석 처리
-    // state.value.token = 'test token';
-    // state.value.user = {
-    //   username: member.username,
-    //   email: member.username + '@test.com',
-    // };
-
     const { data } = await axios.post("/api/auth/login", {
       username: member.username,
       password: member.password,
     });
 
-    // AuthResultDTO 응답 구조에 맞춰 상태 업데이트
-    state.value.token = data.accessToken;
+    state.value.token = data.accessToken || data.token || "";
+    state.value.refreshToken = data.refreshToken || ""; // 메모리 전용
+
+    // 사용자 정보는 메모리에만
     state.value.user = {
-      username: data.username,
-      email: "", // email은 응답에 없으므로 빈 값 또는 별도 API로 보완
-      roles: [data.role], // role을 배열로 감싸서 roles로 매핑
+      username: data.username || member.username || "",
+      email: data.email || "",
+      roles: Array.isArray(data.roles)
+        ? data.roles
+        : [data.role].filter(Boolean),
     };
 
-    // localStorage에 상태 저장
-    localStorage.setItem("auth", JSON.stringify(state.value));
+    // 로컬에는 token만 저장
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({
+        token: state.value.token,
+      })
+    );
   };
 
-  // 로그아웃 액션
-  const logout = async () => {
-    const authToken = state.value.token;
+  // Access Token 재발급 (refresh 사용)
+  const refreshAccessToken = async () => {
+    if (!state.value.refreshToken) throw new Error("NO_REFRESH_TOKEN");
+    const { data } = await axios.post(
+      "/api/auth/refresh",
+      {},
+      { headers: { Authorization: `Bearer ${state.value.refreshToken}` } }
+    );
+    state.value.token = data.accessToken || "";
 
-    // 서버에 로그아웃 요청 (실패해도 로컬 상태는 정리)
-    if (authToken) {
+    // 로컬에는 token만 저장
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({
+        token: state.value.token,
+      })
+    );
+  };
+
+  // 로그아웃
+  const logout = async () => {
+    const access = state.value.token;
+    if (access) {
       try {
         await axios.post(
           "/api/auth/logout",
           {},
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${access}` } }
         );
       } catch (err) {
-        console.error('로그아웃 API 호출 실패:', err);
-        // 서버 로그아웃 실패해도 로컬 상태는 정리
+        console.error("로그아웃 API 실패:", err);
       }
     }
 
-    // 스토어 상태 초기화
     try {
-      const bookmarkStore = useBookmarkStore();
-      const notificationStore = useNotificationStore();
-      const assetStore = useAssetStore();
-      const policyQuizStore = usePolicyQuizStore();
-      const policyMatchingStore = usePolicyMatchingStore();
-
-      // 각 스토어 초기 상태로 리셋
-      bookmarkStore.$reset();
-      notificationStore.resetStore(); // 수동 초기화 함수 사용
-      assetStore.$reset();
-      assetStore.clearSummary(); // 추가 초기화
-      policyQuizStore.$reset();
-      policyMatchingStore.$reset();
-    } catch (storeError) {
-      console.error('스토어 초기화 실패:', storeError);
+      useBookmarkStore().$reset();
+      const notification = useNotificationStore();
+      notification.resetStore?.();
+      const asset = useAssetStore();
+      asset.$reset?.();
+      asset.clearSummary?.();
+      usePolicyQuizStore().$reset?.();
+      usePolicyMatchingStore().$reset?.();
+    } catch (e) {
+      console.error("스토어 초기화 실패:", e);
     }
 
-    // FCM 토큰 보존하면서 localStorage 정리
     const fcmToken = localStorage.getItem("fcm_token");
     localStorage.clear();
-    if (fcmToken) {
-      localStorage.setItem("fcm_token", fcmToken);
-    }
+    if (fcmToken) localStorage.setItem("fcm_token", fcmToken);
 
-    // 인증 상태 초기화
     state.value = { ...initState };
   };
 
-  // 토큰 얻어오기 액션
   const getToken = () => state.value.token;
 
-  // JWT 토큰 만료 확인 함수
+  // 만료 5분 전부터 만료 취급
   const isTokenExpired = () => {
     if (!state.value.token) return true;
-
     try {
-      // JWT 토큰의 payload 부분 디코딩
       const payload = JSON.parse(atob(state.value.token.split(".")[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      // exp 필드와 현재 시간 비교
-      return payload.exp && payload.exp < currentTime + 300;
-    } catch (error) {
-      console.error("토큰 디코딩 에러:", error);
+      const now = Math.floor(Date.now() / 1000);
+      return payload.exp && payload.exp < now + 300;
+    } catch {
       return true;
     }
   };
 
-  // 상태 복원 로직
-  // - localStorage에 인증 정보(auth)가 저장되어 있을 경우 상태 복원
+  // 로컬에서 token만 복원
   const load = () => {
-    const auth = localStorage.getItem("auth");
-    if (auth != null) {
-      state.value = JSON.parse(auth);
+    try {
+      const raw = localStorage.getItem("auth");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      state.value.token = parsed.token || "";
+      state.value.refreshToken = ""; // 새로고침 후엔 알 수 없음(메모리 전용)
+      state.value.user = null; // 필요시 /api/auth/me로 채우세요
+    } catch {
+      state.value = { ...initState };
     }
   };
 
-  // 프로필 변경 후 로컬 상태 동기화 액션
   const changeProfile = (member) => {
-    state.value.user.email = member.email;
-    localStorage.setItem("auth", JSON.stringify(state.value));
+    if (!state.value.user) {
+      state.value.user = { username: "", email: "", roles: [] };
+    }
+    state.value.user.email = member.email ?? state.value.user.email ?? "";
+    // 로컬 저장은 token만
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({
+        token: state.value.token,
+      })
+    );
   };
 
-  // 스토어 초기화 시 자동 실행
+  // 초기화
   load();
 
-  // 외부에서 사용할 수 있도록 반환
   return {
     state,
+    isLogin,
     username,
     email,
-    isLogin,
     login,
     logout,
     getToken,
-    isTokenExpired, // 토큰 만료 확인 함수 추가
+    isTokenExpired,
     changeProfile,
-
-    // avatar 관련
-    avatarUrl,
-    updateAvatar,
+    refreshAccessToken,
   };
 });
