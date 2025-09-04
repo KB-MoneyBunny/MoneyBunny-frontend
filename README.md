@@ -1,5 +1,5 @@
-<<<<<<< HEAD
 # 머니버니 :rabbit:
+<img width="1086" height="558" alt="스크린샷 2025-08-21 오후 2 05 01" src="https://github.com/user-attachments/assets/84a06b20-94d4-4eca-8139-3fecc05684f2" />
 
 안녕하세요, MZ 세대를 위한 맞춤형 금융 생활 플랫폼 "머니버니"입니다.
 
@@ -107,45 +107,77 @@ Databases <br>
 
 ## 역할 상세
 
-> ### 안홍영
+> ### 안홍영  
+팀장 / 백엔드 & 프론트 / GitHub / DB  
 
 ---
 
-> ### 박상일
+> ### 박상일  
+PM / 백엔드 & 프론트 / DB / CI/CD  
 
 ---
 
-> ### 박성빈
+> ### 박성빈  
+프론트 & 백엔드 / UX / DB  
 
 ---
 
-> ### 서은진
+> ### 서은진  
+프론트 / UI·UX / DB  
 
 ---
 
-> ### 윤제승
+> ### 윤제승  
+백엔드 & 프론트 / DB 
 
 ---
 
-> ### 최유정
+> ### 최유정  
+백엔드 & 프론트 / DB
+
 
 ---
 
 ## 🛠️ 개발 환경 및 설치 방법
 
+🛠️ 개발 환경
+
+Language & Framework: Java 17, Spring Boot 3.x, React 18, Node.js 20
+
+Database: MySQL 8.0, Redis
+
+Infra & Tools: Docker, GitHub Actions(CI/CD), Nginx
+
+IDE & Build: IntelliJ IDEA, VS Code, Gradle/Maven
+
 ---
 
-## Result
+## System Architecture 
+
+<img width="1001" height="581" alt="시스템아키텍처_13회차_1팀(MoneyBunny)" src="https://github.com/user-attachments/assets/30af3773-4a53-431d-b8ba-67f4e3e579b2" />
+
 
 ---
 
-## Discussion
+## ERD
+
+<img width="1461" height="517" alt="스크린샷 2025-08-21 오전 11 56 35" src="https://github.com/user-attachments/assets/83e30d7f-15bd-4e1d-a31a-116354afc786" />
 
 ---
 
 ## Communication
 
-### Naming Convetion
+<img width="225" height="225" alt="image" src="https://github.com/user-attachments/assets/bfa30c0c-c08b-4d43-b417-e7732cc2c8d2" />
+
+<img width="225" height="225" alt="image" src="https://github.com/user-attachments/assets/274b0e8c-9c2c-4d4f-9a36-a51ff1653be2" />
+
+### 주요 기능 소개
+
+<img width="1085" height="561" alt="스크린샷 2025-08-21 오후 2 18 11" src="https://github.com/user-attachments/assets/1c837a1b-8b28-41c8-9afd-9043b42d9c4f" />
+<img width="1085" height="561" alt="스크린샷 2025-08-21 오후 2 17 55" src="https://github.com/user-attachments/assets/b32cca16-eaf3-4fe9-a461-3b098ddeb24c" />
+<img width="1084" height="562" alt="스크린샷 2025-08-21 오후 2 17 38" src="https://github.com/user-attachments/assets/161e4453-ef26-4e61-96a9-1124e43b2c3f" />
+<img width="1084" height="561" alt="스크린샷 2025-08-21 오후 2 17 28" src="https://github.com/user-attachments/assets/a86a96a0-c174-4de4-819e-afc44a17f74c" />
+<img width="1085" height="561" alt="스크린샷 2025-08-21 오후 2 17 21" src="https://github.com/user-attachments/assets/9a1dea14-17a5-40da-be65-1d7a89f5b298" />
 
 ---
 
@@ -190,353 +222,5 @@ Databases <br>
 ---
 
 ```
-
-=======
-# frontend
-
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
->>>>>>> c27924b (Init: 프로젝트 초기 세팅)
-```
-
-```
-MoneyBunny-frontend
-├─ build.sh
-├─ index.html
-├─ jsconfig.json
-├─ package-lock.json
-├─ package.json
-├─ public
-│  ├─ favicon.ico
-│  ├─ firebase-messaging-sw.js
-│  ├─ icons
-│  │  ├─ icon-192x192.png
-│  │  ├─ icon-256x256.png
-│  │  ├─ icon-384x384.png
-│  │  ├─ icon-512x512.png
-│  │  └─ icon-72x72.png
-│  ├─ index.html
-│  ├─ install.webmanifest
-│  └─ manifest.json
-├─ README.md
-├─ src
-│  ├─ api
-│  │  └─ index.js
-│  ├─ App.vue
-│  ├─ assets
-│  │  ├─ data
-│  │  │  ├─ accounts.json
-│  │  │  └─ spendings.json
-│  │  ├─ fonts
-│  │  │  ├─ NanumSquareNeo-aLt.ttf
-│  │  │  ├─ NanumSquareNeo-bRg.ttf
-│  │  │  ├─ NanumSquareNeo-cBd.ttf
-│  │  │  ├─ NanumSquareNeo-dEb.ttf
-│  │  │  ├─ NanumSquareNeo-eHv.ttf
-│  │  │  └─ NanumSquareNeo-Variable.ttf
-│  │  ├─ images
-│  │  │  └─ icons
-│  │  │     ├─ attendance
-│  │  │     │  ├─ attendance_before.png
-│  │  │     │  ├─ attendance_bunny.png
-│  │  │     │  └─ attendance_complete.png
-│  │  │     ├─ bank
-│  │  │     │  ├─ citi_fill.png
-│  │  │     │  ├─ citi_original.png
-│  │  │     │  ├─ im_fill.png
-│  │  │     │  ├─ im_original.png
-│  │  │     │  ├─ kakao_original.png
-│  │  │     │  ├─ kb_fill.png
-│  │  │     │  ├─ kb_original.png
-│  │  │     │  ├─ keb_fill.png
-│  │  │     │  ├─ keb_original.png
-│  │  │     │  ├─ k_fill.png
-│  │  │     │  ├─ k_original.png
-│  │  │     │  ├─ nonghyup.png
-│  │  │     │  ├─ sc_fill.png
-│  │  │     │  ├─ sc_original.png
-│  │  │     │  ├─ shinhan_fill.png
-│  │  │     │  ├─ shinhan_original.png
-│  │  │     │  ├─ toss_fill.png
-│  │  │     │  ├─ toss_original.png
-│  │  │     │  ├─ woori_fill.png
-│  │  │     │  └─ woori_original.png
-│  │  │     ├─ bunny
-│  │  │     │  ├─ crying_bunny.png
-│  │  │     │  ├─ glasses_bunny.png
-│  │  │     │  ├─ main_bunny.png
-│  │  │     │  ├─ noaccount_bunny.png
-│  │  │     │  ├─ notification_bunny.png
-│  │  │     │  ├─ notification_bunny_background.png
-│  │  │     │  ├─ pencil_bunny_transparent.png
-│  │  │     │  ├─ pencil_bunny_white.png
-│  │  │     │  └─ personality_done_bunny.png
-│  │  │     ├─ common
-│  │  │     │  ├─ arrow_right.png
-│  │  │     │  ├─ increase.png
-│  │  │     │  ├─ load.png
-│  │  │     │  ├─ plus.png
-│  │  │     │  ├─ search.png
-│  │  │     │  ├─ Trash.png
-│  │  │     │  └─ x.png
-│  │  │     ├─ mypage
-│  │  │     │  ├─ edit.png
-│  │  │     │  ├─ right_arrow.png
-│  │  │     │  └─ search.png
-│  │  │     ├─ notification
-│  │  │     │  ├─ arrow-left.png
-│  │  │     │  └─ no_notification.png
-│  │  │     ├─ policy
-│  │  │     │  ├─ bookmark_after.png
-│  │  │     │  ├─ bookmark_before.png
-│  │  │     │  ├─ employment24.png
-│  │  │     │  ├─ filter.png
-│  │  │     │  ├─ interest_support.png
-│  │  │     │  ├─ kakaotalk.png
-│  │  │     │  ├─ lamp.png
-│  │  │     │  ├─ link.png
-│  │  │     │  ├─ location_mark.png
-│  │  │     │  ├─ online.png
-│  │  │     │  ├─ personalized_policy.png
-│  │  │     │  ├─ phone.png
-│  │  │     │  ├─ point_support.png
-│  │  │     │  ├─ search.png
-│  │  │     │  ├─ select_down.png
-│  │  │     │  ├─ share.png
-│  │  │     │  ├─ worknet.png
-│  │  │     │  └─ x.png
-│  │  │     ├─ profile
-│  │  │     │  ├─ profile_edit_beard.png
-│  │  │     │  ├─ profile_edit_carrot.png
-│  │  │     │  ├─ profile_edit_eyelash.png
-│  │  │     │  └─ profile_edit_sprout.png
-│  │  │     ├─ savings_category
-│  │  │     │  ├─ category_car.png
-│  │  │     │  ├─ category_education.png
-│  │  │     │  ├─ category_emergency_fund.png
-│  │  │     │  ├─ category_etc.png
-│  │  │     │  ├─ category_house_purchase.png
-│  │  │     │  ├─ category_retirement_fund.png
-│  │  │     │  ├─ category_travel.png
-│  │  │     │  └─ category_wedding_fund.png
-│  │  │     ├─ signup
-│  │  │     │  ├─ login_main.png
-│  │  │     │  ├─ signup_beard.png
-│  │  │     │  ├─ signup_carrot.png
-│  │  │     │  ├─ signup_eyelash.png
-│  │  │     │  └─ signup_sprout.png
-│  │  │     └─ spending_category
-│  │  │        ├─ education.png
-│  │  │        ├─ finance.png
-│  │  │        ├─ food.png
-│  │  │        ├─ gift.png
-│  │  │        ├─ hobby_leisure.png
-│  │  │        ├─ living_expense.png
-│  │  │        ├─ medical.png
-│  │  │        ├─ shopping.png
-│  │  │        └─ transportation.png
-│  │  ├─ navbar
-│  │  │  ├─ asset.png
-│  │  │  ├─ asset_color.png
-│  │  │  ├─ Home.png
-│  │  │  ├─ Home_color.png
-│  │  │  ├─ policy.png
-│  │  │  ├─ policy_color.png
-│  │  │  ├─ User.png
-│  │  │  └─ User_color.png
-│  │  ├─ styles
-│  │  │  ├─ colors.css
-│  │  │  ├─ fonts.css
-│  │  │  ├─ homecard.css
-│  │  │  └─ main.css
-│  │  └─ utils
-│  │     ├─ bankCodeMap.js
-│  │     ├─ bankLogoMap.js
-│  │     └─ spendingCategoryIcons.js
-│  ├─ components
-│  │  └─ layouts
-│  │     ├─ DefaultLayout.vue
-│  │     ├─ Header.vue
-│  │     └─ NavBar.vue
-│  ├─ config
-│  │  └─ index.js
-│  ├─ firebase
-│  │  ├─ foregroundMessage.js
-│  │  ├─ initFirebase.js
-│  │  ├─ notificationPermission.js
-│  │  └─ registerServiceWorker.js
-│  ├─ main.js
-│  ├─ pages
-│  │  ├─ asset
-│  │  │  ├─ common
-│  │  │  │  └─ AssetTabSwitcher.vue
-│  │  │  ├─ income
-│  │  │  │  ├─ IncomeChart.vue
-│  │  │  │  └─ IncomeSummary.vue
-│  │  │  ├─ main
-│  │  │  │  ├─ AssetCompareCard.vue
-│  │  │  │  ├─ AssetPieChart.vue
-│  │  │  │  └─ AssetRecommendation.vue
-│  │  │  ├─ saving
-│  │  │  │  ├─ AnnualReturn.vue
-│  │  │  │  ├─ MonthlySavingRate.vue
-│  │  │  │  └─ SavingTotalStatus.vue
-│  │  │  ├─ spending
-│  │  │  │  ├─ BudgetStatus.vue
-│  │  │  │  ├─ MonthlySpendingChart.vue
-│  │  │  │  ├─ SpendingHistoryItem.vue
-│  │  │  │  ├─ SpendingHistoryList.vue
-│  │  │  │  └─ ViewAllButton.vue
-│  │  │  └─ tabs
-│  │  │     ├─ AssetIncomeTab.vue
-│  │  │     ├─ AssetMainTab.vue
-│  │  │     ├─ AssetSavingTab.vue
-│  │  │     └─ AssetSpendingTab.vue
-│  │  ├─ auth
-│  │  │  ├─ AttendanceCheckModal.vue
-│  │  │  ├─ components
-│  │  │  │  ├─ AuthButton.vue
-│  │  │  │  ├─ AuthInput.vue
-│  │  │  │  ├─ EmailVerificationForm.vue
-│  │  │  │  ├─ ProfileImageSelector.vue
-│  │  │  │  └─ TermsCheckboxGroup.vue
-│  │  │  ├─ FindIdCodePage.vue
-│  │  │  ├─ FindIdPage.vue
-│  │  │  ├─ FindIdResultPage.vue
-│  │  │  ├─ FindPasswordPage.vue
-│  │  │  ├─ LoginPage.vue
-│  │  │  ├─ ResetPasswordPage.vue
-│  │  │  ├─ SignUpEmailVerifyPage.vue
-│  │  │  ├─ SignUpProfilePage.vue
-│  │  │  └─ WelcomeModal.vue
-│  │  ├─ home
-│  │  │  ├─ account
-│  │  │  │  ├─ AccountItemCard.vue
-│  │  │  │  ├─ AccountList.vue
-│  │  │  │  ├─ AccountSummaryCard.vue
-│  │  │  │  └─ NoAccountCard.vue
-│  │  │  ├─ common
-│  │  │  │  ├─ AddItemButton.vue
-│  │  │  │  ├─ AddItemSummaryCard.vue
-│  │  │  │  ├─ AssetSummaryCard.vue
-│  │  │  │  ├─ DeleteConfirmModal.vue
-│  │  │  │  ├─ NoDataCard.vue
-│  │  │  │  └─ TabSwitcher.vue
-│  │  │  ├─ HomeMainPage.vue
-│  │  │  ├─ saving
-│  │  │  │  ├─ NoSavingCard.vue
-│  │  │  │  ├─ SavingItemCard.vue
-│  │  │  │  ├─ SavingList.vue
-│  │  │  │  └─ SavingSummaryCard.vue
-│  │  │  ├─ spending
-│  │  │  │  ├─ NoSpendingCard.vue
-│  │  │  │  ├─ SpendingDetailList.vue
-│  │  │  │  ├─ SpendingFilter.vue
-│  │  │  │  └─ SpendingSummaryCard.vue
-│  │  │  ├─ tabs
-│  │  │  │  ├─ HomeAccountTab.vue
-│  │  │  │  ├─ HomeSavingTab.vue
-│  │  │  │  ├─ HomeSpendingTab.vue
-│  │  │  │  └─ HomeTotalTab.vue
-│  │  │  └─ total
-│  │  │     ├─ AccountOverviewCard.vue
-│  │  │     ├─ DailyMessageCard.vue
-│  │  │     ├─ RecentSpendingCard.vue
-│  │  │     ├─ TotalSummaryCard.vue
-│  │  │     └─ UpcomingScheduleCard.vue
-│  │  ├─ mypage
-│  │  │  ├─ bookmark
-│  │  │  │  ├─ BookmarkCard.vue
-│  │  │  │  ├─ BookmarkList.vue
-│  │  │  │  └─ NoBookmarkCard.vue
-│  │  │  ├─ common
-│  │  │  │  ├─ EditButton.vue
-│  │  │  │  ├─ MypageProfileCard.vue
-│  │  │  │  └─ MypageTabMenu.vue
-│  │  │  ├─ MypageMain.vue
-│  │  │  ├─ profile
-│  │  │  │  ├─ EditProfileModal.vue
-│  │  │  │  ├─ ProfileImagePicker.vue
-│  │  │  │  └─ ProfileInfoTable.vue
-│  │  │  └─ settings
-│  │  │     ├─ ChangePassword.vue
-│  │  │     ├─ LogoutConfirmModal.vue
-│  │  │     ├─ SettingMain.vue
-│  │  │     └─ VersionInfo.vue
-│  │  ├─ notification
-│  │  │  ├─ common
-│  │  │  │  ├─ NoNotification.vue
-│  │  │  │  ├─ NotificationHeader.vue
-│  │  │  │  ├─ NotificationList.vue
-│  │  │  │  └─ NotificationTabSwitcher.vue
-│  │  │  ├─ NotificationCenter.vue
-│  │  │  └─ types
-│  │  │     ├─ FeedbackAlertCard.vue
-│  │  │     ├─ NotificationAll.vue
-│  │  │     ├─ NotificationItem.vue
-│  │  │     ├─ PolicyAlertCard.vue
-│  │  │     └─ ReminderAlertCard.vue
-│  │  └─ policy
-│  │     ├─ detail
-│  │     │  ├─ ApplySiteModal.vue
-│  │     │  ├─ InquirySection.vue
-│  │     │  ├─ PolicyApplyTab.vue
-│  │     │  ├─ PolicyConditionTab.vue
-│  │     │  ├─ PolicyDetailHeader.vue
-│  │     │  ├─ PolicyOverviewTab.vue
-│  │     │  ├─ RelatedPolicyList.vue
-│  │     │  └─ ShareModal.vue
-│  │     ├─ filter
-│  │     │  ├─ AreaSelectModal.vue
-│  │     │  ├─ EducationSelectModal.vue
-│  │     │  ├─ JobStatusSelectModal.vue
-│  │     │  ├─ MajorSelectModal.vue
-│  │     │  ├─ OtherFilterModal.vue
-│  │     │  └─ PolicyFilterModal.vue
-│  │     ├─ list
-│  │     │  ├─ PolicyCard.vue
-│  │     │  ├─ PolicyLIstView.vue
-│  │     │  ├─ PolicySearchBar.vue
-│  │     │  └─ PolicyTop3Recommend.vue
-│  │     ├─ recommend
-│  │     │  ├─ AddressSearchModal.vue
-│  │     │  ├─ PolicyIntroForm.vue
-│  │     │  ├─ PolicyQuizStep1.vue
-│  │     │  ├─ PolicyQuizStep2.vue
-│  │     │  ├─ PolicyQuizStep3.vue
-│  │     │  └─ PolicyResultSummary.vue
-│  │     └─ tabs
-│  │        └─ PolicyMainTab.vue
-│  ├─ router
-│  │  └─ index.js
-│  └─ stores
-│     ├─ auth.js
-│     └─ counter.js
-├─ vercel.json
-└─ vite.config.js
 
 ```
